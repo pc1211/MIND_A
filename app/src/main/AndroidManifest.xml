@@ -18,21 +18,11 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="com.example.pgyl.mind_a.CtDisplayActivity"
-            android:label="CTActivity" />
-        <activity
             android:name="com.example.pgyl.pekislib_a.PresetsActivity"
             android:label="InputEditListActivity" />
         <activity
             android:name="com.example.pgyl.pekislib_a.InputButtonsActivity"
             android:label="InputButtonsActivity" />
-        <activity
-            android:name="com.example.pgyl.mind_a.CtDisplayColorsActivity"
-            android:label="CtDisplayColorsActivity"
-            android:screenOrientation="portrait" />
-        <activity
-            android:name="com.example.pgyl.mind_a.CtDisplayDotMatrixDisplayActivity"
-            android:label="CtDisplayDimensionsActivity" />
         <activity
             android:name="com.example.pgyl.pekislib_a.HelpActivity"
             android:label="HelpActivity" />

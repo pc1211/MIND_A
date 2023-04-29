@@ -7,24 +7,12 @@ import com.example.pgyl.pekislib_a.DotMatrixDisplayView;
 import com.example.pgyl.pekislib_a.DotMatrixFont;
 import com.example.pgyl.pekislib_a.DotMatrixFontDefault;
 
+import static com.example.pgyl.mind_a.PropRecord.MAX_SCORE_DISPLAY_SIZE;
 import static com.example.pgyl.pekislib_a.DotMatrixFontUtils.getFontTextDimensions;
 import static com.example.pgyl.pekislib_a.MiscUtils.BiDimensions;
 import static com.example.pgyl.pekislib_a.PointRectUtils.ALIGN_LEFT_HEIGHT;
 
 public class MainDotMatrixDisplayUpdater {
-
-    private enum MESSAGES {
-        EMPTY_LIST("List empty"), EMPTY_SELECTION("No items selected      ");
-        private String text;
-
-        MESSAGES(String text) {
-            this.text = text;
-        }
-
-        public String TEXT() {
-            return text;
-        }
-    }
 
     //region Variables
     private DotMatrixDisplayView dotMatrixDisplayView;
@@ -53,16 +41,8 @@ public class MainDotMatrixDisplayUpdater {
         defaultFont = null;
     }
 
-    public void displayEmptySelection() {
-        displayText(MESSAGES.EMPTY_SELECTION.TEXT());
-    }
-
-    public void displayEmptyList() {
-        displayText(MESSAGES.EMPTY_LIST.TEXT());
-    }
-
     private void displayText(String text) {
-        final String ON_COLOR = "707070";
+        final String ON_COLOR = "FF9A22";
         final String OFF_COLOR = "404040";
 
         dotMatrixDisplayView.fillRect(displayRect, ON_COLOR, OFF_COLOR);    //  Pressed=ON  Unpressed=OFF
@@ -88,13 +68,7 @@ public class MainDotMatrixDisplayUpdater {
     private void setupDimensions() {
         final RectF INTERNAL_MARGIN_SIZE_COEFFS = new RectF(0.02f, 0, 0.02f, 0);   //  Marge autour de l'affichage proprement dit (% de largeur)
 
-        String maxText = "";
-        for (MESSAGES dotMatrixDisplayMessage : MESSAGES.values()) {
-            if (dotMatrixDisplayMessage.TEXT().length() > maxText.length()) {
-                maxText = dotMatrixDisplayMessage.TEXT();
-            }
-        }
-        BiDimensions textDimensions = getFontTextDimensions(maxText, defaultFont);
+        BiDimensions textDimensions = getFontTextDimensions(MAX_SCORE_DISPLAY_SIZE, defaultFont);
 
         int displayRectWidth = margins.left + textDimensions.width - defaultFont.getRightMargin() + margins.right;   //   margins.right remplace la dernière marge droite
         int displayRectHeight = margins.top + textDimensions.height + margins.bottom;

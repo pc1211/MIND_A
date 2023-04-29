@@ -7,57 +7,246 @@
 
     <LinearLayout
         android:layout_width="match_parent"
+        android:layout_height="24dp"
+        android:layout_gravity="center_vertical"
+        android:layout_marginTop="8dp"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="WWho guesses ? " />
+
+        <RadioGroup xmlns:android="http://schemas.android.com/apk/res/android"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <RadioButton
+                android:id="@+id/RADIO_USER_GUESS"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="User" />
+
+            <RadioButton
+                android:id="@+id/RADIO_ANDROID_GUESS"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Android" />
+        </RadioGroup>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="48dp"
         android:layout_marginTop="8dp"
         android:orientation="horizontal">
 
         <com.example.pgyl.pekislib_a.SymbolButtonView
-            android:id="@+id/STATE_BTN_SHOW_EXPIRATION_TIME"
+            android:id="@+id/BTN_PAL_0"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_marginTop="2dp"
             android:layout_marginBottom="6dp"
-            android:layout_weight="3" />
+            android:layout_weight="1" />
 
         <com.example.pgyl.pekislib_a.SymbolButtonView
-            android:id="@+id/STATE_BTN_ADD_NEW_CHRONOTIMER_TO_LIST"
+            android:id="@+id/BTN_PAL_1"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_marginTop="2dp"
             android:layout_marginBottom="6dp"
-            android:layout_weight="3" />
+            android:layout_weight="1" />
 
-        <com.example.pgyl.pekislib_a.CustomImageButton
-            android:id="@+id/BTN_NEW_CHRONO"
+        <com.example.pgyl.pekislib_a.SymbolButtonView
+            android:id="@+id/BTN_PAL_2"
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_weight="4"
-            android:adjustViewBounds="true"
-            android:scaleType="fitCenter" />
+            android:layout_marginTop="2dp"
+            android:layout_marginBottom="6dp"
+            android:layout_weight="1" />
 
-        <com.example.pgyl.pekislib_a.CustomImageButton
-            android:id="@+id/BTN_NEW_TIMER"
+        <com.example.pgyl.pekislib_a.SymbolButtonView
+            android:id="@+id/BTN_PAL_3"
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_weight="4"
-            android:adjustViewBounds="true"
-            android:scaleType="fitCenter" />
+            android:layout_marginTop="2dp"
+            android:layout_marginBottom="6dp"
+            android:layout_weight="1" />
 
-        <com.example.pgyl.pekislib_a.CustomImageButton
-            android:id="@+id/BTN_INVERT_SELECTION_ALL_CT"
+        <com.example.pgyl.pekislib_a.SymbolButtonView
+            android:id="@+id/BTN_PAL_4"
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_weight="4"
-            android:adjustViewBounds="true"
-            android:scaleType="fitCenter" />
+            android:layout_marginTop="2dp"
+            android:layout_marginBottom="6dp"
+            android:layout_weight="1" />
 
-        <com.example.pgyl.pekislib_a.CustomImageButton
-            android:id="@+id/BTN_SELECT_ALL_CT"
+        <com.example.pgyl.pekislib_a.SymbolButtonView
+            android:id="@+id/BTN_PAL_5"
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_weight="4"
-            android:adjustViewBounds="true"
-            android:scaleType="fitCenter" />
+            android:layout_marginTop="2dp"
+            android:layout_marginBottom="6dp"
+            android:layout_weight="1" />
+
+        <com.example.pgyl.pekislib_a.SymbolButtonView
+            android:id="@+id/BTN_PAL_6"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_marginTop="2dp"
+            android:layout_marginBottom="6dp"
+            android:layout_weight="1" />
+
+        <com.example.pgyl.pekislib_a.SymbolButtonView
+            android:id="@+id/BTN_PAL_7"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_marginTop="2dp"
+            android:layout_marginBottom="6dp"
+            android:layout_weight="1" />
+
+        <com.example.pgyl.pekislib_a.SymbolButtonView
+            android:id="@+id/BTN_PAL_8"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_marginTop="2dp"
+            android:layout_marginBottom="6dp"
+            android:layout_weight="1" />
+
+        <com.example.pgyl.pekislib_a.SymbolButtonView
+            android:id="@+id/BTN_PAL_9"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_marginTop="2dp"
+            android:layout_marginBottom="6dp"
+            android:layout_weight="1" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="24dp"
+        android:layout_marginTop="3dp"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:text="Current proposition:" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:layout_marginTop="8dp"
+        android:orientation="horizontal">
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_marginTop="8dp"
+            android:layout_weight="5"
+            android:orientation="horizontal">
+
+            <com.example.pgyl.pekislib_a.SymbolButtonView
+                android:id="@+id/BTN_PROP_0"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_marginTop="2dp"
+                android:layout_marginBottom="6dp"
+                android:layout_weight="1" />
+
+            <com.example.pgyl.pekislib_a.SymbolButtonView
+                android:id="@+id/BTN_PROP_1"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_marginTop="2dp"
+                android:layout_marginBottom="6dp"
+                android:layout_weight="1" />
+
+            <com.example.pgyl.pekislib_a.SymbolButtonView
+                android:id="@+id/BTN_PROP_2"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_marginTop="2dp"
+                android:layout_marginBottom="6dp"
+                android:layout_weight="1" />
+
+            <com.example.pgyl.pekislib_a.SymbolButtonView
+                android:id="@+id/BTN_PROP_3"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_marginTop="2dp"
+                android:layout_marginBottom="6dp"
+                android:layout_weight="1" />
+
+            <com.example.pgyl.pekislib_a.SymbolButtonView
+                android:id="@+id/BTN_PROP_4"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_marginTop="2dp"
+                android:layout_marginBottom="6dp"
+                android:layout_weight="1" />
+
+            <com.example.pgyl.pekislib_a.SymbolButtonView
+                android:id="@+id/BTN_PROP_5"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_marginTop="2dp"
+                android:layout_marginBottom="6dp"
+                android:layout_weight="1" />
+
+            <com.example.pgyl.pekislib_a.SymbolButtonView
+                android:id="@+id/BTN_PROP_6"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_marginTop="2dp"
+                android:layout_marginBottom="6dp"
+                android:layout_weight="1" />
+
+            <com.example.pgyl.pekislib_a.SymbolButtonView
+                android:id="@+id/BTN_PROP_7"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_marginTop="2dp"
+                android:layout_marginBottom="6dp"
+                android:layout_weight="1" />
+
+            <com.example.pgyl.pekislib_a.SymbolButtonView
+                android:id="@+id/BTN_PROP_8"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_marginTop="2dp"
+                android:layout_marginBottom="6dp"
+                android:layout_weight="1" />
+
+            <com.example.pgyl.pekislib_a.SymbolButtonView
+                android:id="@+id/BTN_PROP_9"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_marginTop="2dp"
+                android:layout_marginBottom="6dp"
+                android:layout_weight="1" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_marginTop="8dp"
+            android:layout_weight="1"
+            android:orientation="horizontal">
+
+            <com.example.pgyl.pekislib_a.DotMatrixDisplayView
+                android:id="@+id/BTN_DOT_MATRIX_SCORE"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_marginLeft="4dp"
+                android:layout_marginTop="2dp"
+                android:layout_weight="1" />
+        </LinearLayout>
     </LinearLayout>
 
     <LinearLayout
@@ -66,69 +255,42 @@
         android:layout_marginTop="3dp"
         android:orientation="horizontal">
 
-        <FrameLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
+        <com.example.pgyl.pekislib_a.CustomButton
+            android:id="@+id/BTN_SUBMIT"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_marginTop="2dp"
+            android:layout_marginBottom="6dp"
+            android:layout_weight="3"
+            android:text="Submit" />
 
-            <LinearLayout
-                android:id="@+id/LAY_BUTTONS_ON_SELECTION"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:orientation="horizontal">
+        <com.example.pgyl.pekislib_a.CustomButton
+            android:id="@+id/BTN_CLEAR"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_marginTop="2dp"
+            android:layout_marginBottom="6dp"
+            android:layout_weight="3"
+            android:text="Clear " />
 
-                <com.example.pgyl.pekislib_a.CustomImageButton
-                    android:id="@+id/BTN_START_SELECTED_CT"
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_weight="1"
-                    android:adjustViewBounds="true"
-                    android:scaleType="fitCenter" />
+        <com.example.pgyl.pekislib_a.CustomButton
+            android:id="@+id/BTN_CLEAR_PREV"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_marginTop="2dp"
+            android:layout_marginBottom="6dp"
+            android:layout_weight="3"
+            android:text="Clear Previous" />
 
-                <com.example.pgyl.pekislib_a.CustomImageButton
-                    android:id="@+id/BTN_STOP_SELECTED_CT"
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_weight="1"
-                    android:adjustViewBounds="true"
-                    android:scaleType="fitCenter" />
+        <com.example.pgyl.pekislib_a.CustomButton
+            android:id="@+id/BTN_NEW"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_marginTop="2dp"
+            android:layout_marginBottom="6dp"
+            android:layout_weight="3"
+            android:text="New game" />
 
-                <com.example.pgyl.pekislib_a.CustomImageButton
-                    android:id="@+id/BTN_SPLIT_SELECTED_CT"
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_weight="1"
-                    android:adjustViewBounds="true"
-                    android:scaleType="fitCenter" />
-
-                <com.example.pgyl.pekislib_a.CustomImageButton
-                    android:id="@+id/BTN_RESET_SELECTED_CT"
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_weight="1"
-                    android:adjustViewBounds="true"
-                    android:scaleType="fitCenter" />
-
-                <com.example.pgyl.pekislib_a.CustomImageButton
-                    android:id="@+id/BTN_REMOVE_SELECTED_CT"
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_weight="1"
-                    android:adjustViewBounds="true"
-                    android:scaleType="fitCenter" />
-            </LinearLayout>
-
-            <LinearLayout
-                android:id="@+id/LAY_DOT_MATRIX_DISPLAY"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:orientation="horizontal">
-
-                <com.example.pgyl.pekislib_a.DotMatrixDisplayView
-                    android:id="@+id/DOT_MATRIX_DISPLAY"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent" />
-            </LinearLayout>
-        </FrameLayout>
     </LinearLayout>
 
     <LinearLayout
@@ -138,7 +300,7 @@
         android:orientation="horizontal">
 
         <ListView
-            android:id="@+id/CT_LIST"
+            android:id="@+id/PROP_LIST"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:cacheColorHint="@android:color/black"

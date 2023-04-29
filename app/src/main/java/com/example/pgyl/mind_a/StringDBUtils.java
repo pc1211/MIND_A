@@ -2,64 +2,51 @@ package com.example.pgyl.mind_a;
 
 import com.example.pgyl.pekislib_a.StringDB;
 
-import static com.example.pgyl.mind_a.StringDBTables.getBackScreenColorsInits;
-import static com.example.pgyl.mind_a.StringDBTables.getBackScreenColorsTableName;
-import static com.example.pgyl.mind_a.StringDBTables.getChronoTimersTableName;
-import static com.example.pgyl.mind_a.StringDBTables.getDotMatrixDisplayCoeffsInits;
-import static com.example.pgyl.mind_a.StringDBTables.getDotMatrixDisplayCoeffsTableName;
-import static com.example.pgyl.mind_a.StringDBTables.getDotMatrixDisplayColorsInits;
-import static com.example.pgyl.mind_a.StringDBTables.getDotMatrixDisplayColorsTableName;
-import static com.example.pgyl.mind_a.StringDBTables.getPresetsCTInits;
-import static com.example.pgyl.mind_a.StringDBTables.getPresetsCTTableName;
-import static com.example.pgyl.mind_a.StringDBTables.getStateButtonsColorsInits;
-import static com.example.pgyl.mind_a.StringDBTables.getStateButtonsColorsTableName;
-import static com.example.pgyl.mind_a.StringDBTables.getSwTimerTableDataFieldsCount;
+import static com.example.pgyl.mind_a.StringDBTables.getMindTableDataFieldsCount;
+import static com.example.pgyl.mind_a.StringDBTables.getPropsInits;
+import static com.example.pgyl.mind_a.StringDBTables.getPropsTableName;
+import static com.example.pgyl.mind_a.StringDBTables.getTempNumberColorsOrPegsInits;
+import static com.example.pgyl.mind_a.StringDBTables.getTempScoreInits;
+import static com.example.pgyl.pekislib_a.StringDBTables.getTempTableName;
 
 public class StringDBUtils {
 
     //region TABLES
-    public static void createSwtimerTableIfNotExists(StringDB stringDB, String tableName) {
-        stringDB.createTableIfNotExists(tableName, 1 + getSwTimerTableDataFieldsCount(tableName));   //  Champ ID + Données;
-    }
-
-    public static void initializeTablePresetsCT(StringDB stringDB) {
-        stringDB.insertOrReplaceRows(getPresetsCTTableName(), getPresetsCTInits());
-    }
-
-    public static void initializeTableDotMatrixDisplayColors(StringDB stringDB) {
-        stringDB.insertOrReplaceRows(getDotMatrixDisplayColorsTableName(), getDotMatrixDisplayColorsInits());
-    }
-
-    public static void initializeTableDotMatrixDisplayCoeffs(StringDB stringDB) {
-        stringDB.insertOrReplaceRows(getDotMatrixDisplayCoeffsTableName(), getDotMatrixDisplayCoeffsInits());
-    }
-
-    public static void initializeTableStateButtonsColors(StringDB stringDB) {
-        stringDB.insertOrReplaceRows(getStateButtonsColorsTableName(), getStateButtonsColorsInits());
-    }
-
-    public static void initializeTableBackScreenColors(StringDB stringDB) {
-        stringDB.insertOrReplaceRows(getBackScreenColorsTableName(), getBackScreenColorsInits());
+    public static void createMindTableIfNotExists(StringDB stringDB, String tableName) {
+        stringDB.createTableIfNotExists(tableName, 1 + getMindTableDataFieldsCount(tableName));   //  Champ ID + Données;
     }
     //endregion
 
-    //region CHRONO_TIMERS
-    public static String[] getDBChronoTimerById(StringDB stringDB, int idct) {
-        return stringDB.selectRowByIdOrCreate(getChronoTimersTableName(), String.valueOf(idct));
+    //region PROPS
+    public static void initializeTableProps(StringDB stringDB) {
+        stringDB.insertOrReplaceRows(getPropsTableName(), getPropsInits());
     }
 
-    public static String[][] getDBChronoTimers(StringDB stringDB) {
-        return stringDB.selectRows(getChronoTimersTableName(), null);
+    public static String[] getDBPropById(StringDB stringDB, int idProp) {
+        return stringDB.selectRowByIdOrCreate(getPropsTableName(), String.valueOf(idProp));
     }
 
-    public static void saveDBChronoTimer(StringDB stringDB, String[] values) {
-            stringDB.insertOrReplaceRow(getChronoTimersTableName(), values);
+    public static String[][] getDBProps(StringDB stringDB) {
+        return stringDB.selectRows(getPropsTableName(), null);
     }
 
-    public static void saveDBChronoTimers(StringDB stringDB, String[][] values) {
-        stringDB.deleteRows(getChronoTimersTableName(), null);
-        stringDB.insertOrReplaceRows(getChronoTimersTableName(), values);
+    public static void saveDBProp(StringDB stringDB, String[] values) {
+        stringDB.insertOrReplaceRow(getPropsTableName(), values);
+    }
+
+    public static void saveDBProps(StringDB stringDB, String[][] values) {
+        stringDB.deleteRows(getPropsTableName(), null);
+        stringDB.insertOrReplaceRows(getPropsTableName(), values);
     }
     //endregion
 
+    //region TEMP
+    public static void initializeTableTempForNumberColorsOrPegs(StringDB stringDB) {
+        stringDB.insertOrReplaceRows(getTempTableName(), getTempNumberColorsOrPegsInits());
+    }
+
+    public static void initializeTableTempForScore(StringDB stringDB) {
+        stringDB.insertOrReplaceRows(getTempTableName(), getTempScoreInits());
+    }
+    //endregion
 }
