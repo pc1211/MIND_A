@@ -15,7 +15,6 @@ import static com.example.pgyl.mind_a.StringDBTables.propRowsToPropRecords;
 import static com.example.pgyl.mind_a.StringDBUtils.getDBPropById;
 import static com.example.pgyl.mind_a.StringDBUtils.getDBProps;
 import static com.example.pgyl.mind_a.StringDBUtils.saveDBProps;
-import static com.example.pgyl.pekislib_a.Constants.SHP_FILE_NAME_SUFFIX;
 
 public class PropRecordsHandler {
 
@@ -24,14 +23,12 @@ public class PropRecordsHandler {
     private ArrayList<PropRecord> propRecords;
     private PropRecord currentPropRecord;
     private StringDB stringDB;
-    private String shpFileName;
     //endregion
 
     public PropRecordsHandler(Context context, StringDB stringDB) {
         this.context = context;
         this.stringDB = stringDB;
         setupPropRecords();
-        shpFileName = context.getPackageName() + SHP_FILE_NAME_SUFFIX;   //  Sans nom d'activité car partagé avec MainActivity
         init();
     }
 
