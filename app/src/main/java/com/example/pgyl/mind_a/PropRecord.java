@@ -9,7 +9,7 @@ public class PropRecord {
     //endregion
     //region Variables
     private int id;             //  Identifiant de la proposition (1, 2, 3, ...)   (0 pour current Prop)
-    private int[] colorNums;    //  Numéros de couleur (0..9) de la proposition (cf PALETTE_COLORS[])  (-1 si pas de couleur attribuée (COLOR_NUM_EMPTY))
+    private int[] comb;         //  Numéros de couleur (0..9) de la proposition (cf PALETTE_COLORS[])  (-1 si pas de couleur attribuée (COLOR_NUM_EMPTY))
     private int score;          //  Score de la proposition p.ex. 2N1B => 21
     //endregion
 
@@ -18,7 +18,7 @@ public class PropRecord {
     }
 
     private void init() {
-        //
+        score = 0;
     }
 
     public int getId() {
@@ -29,15 +29,23 @@ public class PropRecord {
         id = newIdProp;
     }
 
-    public int[] getColorNums() {
-        return colorNums;
+    public int[] getComb() {
+        return comb;
     }
 
-    public void setColorNums(int[] colorNums) {
-        this.colorNums = new int[colorNums.length];
-        for (int i = 0; i <= (colorNums.length - 1); i = i + 1) {
-            this.colorNums[i] = colorNums[i];
+    public int getCombIndex(int index) {
+        return comb[index];
+    }
+
+    public void setComb(int[] comb) {
+        this.comb = new int[comb.length];
+        for (int i = 0; i <= (comb.length - 1); i = i + 1) {
+            this.comb[i] = comb[i];
         }
+    }
+
+    public void setCombIndex(int index, int value) {
+        comb[index] = value;
     }
 
     public int getScore() {
@@ -46,6 +54,12 @@ public class PropRecord {
 
     public void setScore(int score) {
         this.score = score;
+    }
+
+    public void resetComb() {
+        for (int i = 0; i <= (comb.length - 1); i = i + 1) {
+            this.comb[i] = COLOR_NUM_EMPTY;
+        }
     }
 
     public String getSeparator() {

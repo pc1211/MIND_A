@@ -11,5 +11,4 @@ public class Constants {
     }
 
     public static final int MIND_ACTIVITIES_REQUEST_CODE_MULTIPLIER = 100;
-    public static final int MAX_PEGS = 10;
 }

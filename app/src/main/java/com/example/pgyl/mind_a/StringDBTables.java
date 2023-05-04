@@ -1,10 +1,11 @@
 package com.example.pgyl.mind_a;
 
+import com.example.pgyl.mind_a.MainActivity.CURRENT_PROP_PEGS;
+import com.example.pgyl.mind_a.MainActivity.PALETTE_COLORS;
 import com.example.pgyl.pekislib_a.InputButtonsActivity;
 
 import java.util.ArrayList;
 
-import static com.example.pgyl.mind_a.Constants.MAX_PEGS;
 import static com.example.pgyl.mind_a.PropRecord.COLOR_NUM_EMPTY;
 import static com.example.pgyl.mind_a.PropRecord.CURRENT_PROP_ID;
 import static com.example.pgyl.pekislib_a.Constants.REG_EXP_INTEGER_FROM_0;
@@ -15,7 +16,7 @@ import static com.example.pgyl.pekislib_a.StringDBTables.TABLE_IDS;
 public class StringDBTables {
 
     enum MIND_TABLES {   // Les tables, rattachées à leurs champs de data
-        PROPS(MindTableDataFields.props.class, "");   //  Table des propositions (chacune avec ses couleurs et son score)
+        PROPS(MindTableDataFields.props.class, ""), INPUT_PARAMS(MindTableDataFields.inputParams.class, "");   //  Table des propositions (chacune avec ses couleurs et son score)
 
         private int dataFieldsCount;
         private String description;
@@ -41,11 +42,29 @@ public class StringDBTables {
     private interface MindTableDataFields {  //  Les champs de data, par table
 
         enum props implements MindTableDataFields {   //  Les champs de data de la table PROPS
-            COL_NUM_0, COL_NUM_1, COL_NUM_2, COL_NUM_3, COL_NUM_4, COL_NUM_5, COL_NUM_6, COL_NUM_7, COL_NUM_8, COL_NUM_9, SCORE;
+            PROP_0, PROP_1, PROP_2, PROP_3, PROP_4, PROP_5, PROP_6, PROP_7, PROP_8, SCORE;
 
             public int INDEX() {
                 return ordinal() + 1;
             }   //  INDEX 0 pour identifiant utilisateur
+        }
+
+        enum inputParams implements MindTableDataFields {   //  Les champs de data de la table INPUT_PARAMS
+            PEGS("Number of Pegs"), COLORS("Number of Colors"), SCORE("Score");
+
+            private String valueLabel;
+
+            inputParams(String valueLabel) {
+                this.valueLabel = valueLabel;
+            }
+
+            public int INDEX() {
+                return ordinal() + 1;
+            }   //  INDEX 0 pour identifiant utilisateur
+
+            public String LABEL() {
+                return valueLabel;
+            }
         }
     }
 
@@ -62,63 +81,71 @@ public class StringDBTables {
         return MIND_TABLES.valueOf(tableName).DESCRIPTION();
     }
 
-    //region TEMP
-    public static String[][] getTempNumberColorsOrPegsInits() {
-        final String[][] TEMP_NUMBER_COLORS_OR_PEGS = {
-                {TABLE_IDS.KEYBOARD.toString(), InputButtonsActivity.KEYBOARDS.INTEGER.toString()},
-                {TABLE_IDS.REGEXP.toString(), REG_EXP_INTEGER_FROM_0},
-                {TABLE_IDS.REGEXP_ERROR_MESSAGE.toString(), REG_EXP_INTEGER_FROM_0_ERROR_MESSAGE},
-                {TABLE_IDS.MIN.toString(), "1"},
-                {TABLE_IDS.MAX.toString(), "10"}
-        };
-        return TEMP_NUMBER_COLORS_OR_PEGS;
+    //region INPUT_PARAMS
+    public static String getInputParamsTableName() {
+        return MIND_TABLES.INPUT_PARAMS.toString();
     }
 
-    public static String[][] getTempScoreInits() {
-        final String[][] TEMP_SCORE_INITS = {
-                {TABLE_IDS.KEYBOARD.toString(), InputButtonsActivity.KEYBOARDS.INTEGER.toString()},
-                {TABLE_IDS.REGEXP.toString(), REG_EXP_INTEGER_FROM_0},
-                {TABLE_IDS.REGEXP_ERROR_MESSAGE.toString(), REG_EXP_INTEGER_FROM_0_ERROR_MESSAGE},
-                {TABLE_IDS.MIN.toString(), "0"},
-                {TABLE_IDS.MAX.toString(), "10"}
+    public static String[][] getInputParamsInits() {
+        final String[][] INPUT_PARAMS_INITS = {   //  Pour entrer le nombre de pegs, de couleurs, ou le score d'une proposition d'Android
+                {TABLE_IDS.LABEL.toString(), MindTableDataFields.inputParams.PEGS.LABEL(), MindTableDataFields.inputParams.COLORS.LABEL(), MindTableDataFields.inputParams.SCORE.LABEL()},
+                {TABLE_IDS.KEYBOARD.toString(), InputButtonsActivity.KEYBOARDS.INTEGER.toString(), InputButtonsActivity.KEYBOARDS.INTEGER.toString(), InputButtonsActivity.KEYBOARDS.INTEGER.toString()},
+                {TABLE_IDS.REGEXP.toString(), REG_EXP_INTEGER_FROM_0, REG_EXP_INTEGER_FROM_0, REG_EXP_INTEGER_FROM_0},
+                {TABLE_IDS.REGEXP_ERROR_MESSAGE.toString(), REG_EXP_INTEGER_FROM_0_ERROR_MESSAGE, REG_EXP_INTEGER_FROM_0_ERROR_MESSAGE, REG_EXP_INTEGER_FROM_0_ERROR_MESSAGE},
+                {TABLE_IDS.MIN.toString(), "1", "1", "0"},
+                {TABLE_IDS.MAX.toString(), String.valueOf(CURRENT_PROP_PEGS.values().length), String.valueOf(PALETTE_COLORS.values().length), "99"},
+                {TABLE_IDS.DEFAULT.toString(), "4", "6", "0"}   //  4 pegs, 6 colors, Pas pertinent pour le score
         };
-        return TEMP_SCORE_INITS;
+        return INPUT_PARAMS_INITS;
+    }
+
+    public static int getInputParamsPegsIndex() {
+        return MindTableDataFields.inputParams.PEGS.INDEX();
+    }
+
+    public static int getInputParamsColorsIndex() {
+        return MindTableDataFields.inputParams.COLORS.INDEX();
+    }
+
+    public static int getInputParamsScoreIndex() {
+        return MindTableDataFields.inputParams.SCORE.INDEX();
     }
 
     //region PROPS
     public static String getPropsTableName() {
         return MIND_TABLES.PROPS.toString();
     }
+
     public static String[][] getPropsInits() {   //  Créer un enregistrement d'office pour currentPropRecord avec couleurs vides et score 0
         final String[][] TABLE_PROPS_INITS = {
                 {String.valueOf(CURRENT_PROP_ID),
                         String.valueOf(COLOR_NUM_EMPTY), String.valueOf(COLOR_NUM_EMPTY), String.valueOf(COLOR_NUM_EMPTY), String.valueOf(COLOR_NUM_EMPTY),
                         String.valueOf(COLOR_NUM_EMPTY), String.valueOf(COLOR_NUM_EMPTY), String.valueOf(COLOR_NUM_EMPTY), String.valueOf(COLOR_NUM_EMPTY),
-                        String.valueOf(COLOR_NUM_EMPTY), String.valueOf(COLOR_NUM_EMPTY),
+                        String.valueOf(COLOR_NUM_EMPTY),
                         String.valueOf(0)}
         };
         return TABLE_PROPS_INITS;
     }
 
-    public static int getPropsColorNumIndex(int colNum) {
-        return MindTableDataFields.props.COL_NUM_0.INDEX() + colNum;
+    public static int getPropsCombIndex(int index) {
+        return MindTableDataFields.props.PROP_0.INDEX() + index;
     }
 
     public static int getPropsScoreIndex() {
         return MindTableDataFields.props.SCORE.INDEX();
     }
 
-    public static final String PROPS_COLOR_FIELD_NAME_PREFIX = "COL_NUM_";
+    public static final String PROPS_NAME_PREFIX = "PROP_";
 
     public static PropRecord propRowToPropRecord(String[] propRow) {
         PropRecord propRecord = new PropRecord();
 
-        int[] colorNums = new int[MAX_PEGS];
-        for (int i = 0; i <= (MAX_PEGS - 1); i = i + 1) {
-            colorNums[i] = Integer.parseInt(propRow[MindTableDataFields.props.valueOf(PROPS_COLOR_FIELD_NAME_PREFIX + i).INDEX()]);
+        int[] comb = new int[CURRENT_PROP_PEGS.values().length];
+        for (int i = 0; i <= (CURRENT_PROP_PEGS.values().length - 1); i = i + 1) {
+            comb[i] = Integer.parseInt(propRow[MindTableDataFields.props.valueOf(PROPS_NAME_PREFIX + i).INDEX()]);
         }
         propRecord.setId(Integer.parseInt(propRow[TABLE_ID_INDEX]));
-        propRecord.setColorNums(colorNums);
+        propRecord.setComb(comb);
         propRecord.setScore(Integer.parseInt(propRow[MindTableDataFields.props.SCORE.INDEX()]));
         return propRecord;
     }
@@ -127,8 +154,9 @@ public class StringDBTables {
         String[] propRow = new String[1 + MindTableDataFields.props.values().length];  //  Champ ID + Données
 
         propRow[TABLE_ID_INDEX] = String.valueOf(propRecord.getId());
-        for (int i = 0; i <= (MAX_PEGS - 1); i = i + 1) {
-            propRow[MindTableDataFields.props.valueOf(PROPS_COLOR_FIELD_NAME_PREFIX + i).INDEX()] = String.valueOf(propRecord.getColorNums()[i]);
+        int[] propComb = propRecord.getComb();
+        for (int i = 0; i <= (CURRENT_PROP_PEGS.values().length - 1); i = i + 1) {
+            propRow[MindTableDataFields.props.valueOf(PROPS_NAME_PREFIX + i).INDEX()] = String.valueOf((i < propComb.length) ? propRecord.getComb()[i] : COLOR_NUM_EMPTY);
         }
         propRow[MindTableDataFields.props.SCORE.INDEX()] = String.valueOf(propRecord.getScore());
 

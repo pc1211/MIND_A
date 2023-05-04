@@ -15,7 +15,6 @@ import static com.example.pgyl.pekislib_a.PointRectUtils.ALIGN_LEFT_HEIGHT;
 public class MainPropListItemDotMatrixDisplayUpdater {
     //region Variables
     private DotMatrixFont defaultFont;
-    private DotMatrixFont extraFont;
     private Rect margins;
     private Rect gridRect;
     private Rect displayRect;
@@ -30,15 +29,12 @@ public class MainPropListItemDotMatrixDisplayUpdater {
 
     private void init() {
         setupDefaultFont();
-        setupExtraFont();
         setupMargins();
     }
 
     public void close() {
         defaultFont.close();
         defaultFont = null;
-        extraFont.close();
-        extraFont = null;
     }
 
     public void displayScore(DotMatrixDisplayView dotMatrixDisplayView, PropRecord propRecord) {
@@ -79,10 +75,6 @@ public class MainPropListItemDotMatrixDisplayUpdater {
 
     private void setupDefaultFont() {
         defaultFont = new DotMatrixFontDefault();
-    }
-
-    private void setupExtraFont() {
-        extraFont = new TimeExtraDotMatrixFont(defaultFont);
     }
 
     private void setupMargins() {    // Marges autour de l'affichage proprement dit

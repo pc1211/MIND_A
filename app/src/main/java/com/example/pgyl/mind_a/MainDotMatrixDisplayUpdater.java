@@ -41,7 +41,7 @@ public class MainDotMatrixDisplayUpdater {
         defaultFont = null;
     }
 
-    private void displayText(String text) {
+    public void displayText(String text) {
         final String ON_COLOR = "FF9A22";
         final String OFF_COLOR = "404040";
 
@@ -51,17 +51,17 @@ public class MainDotMatrixDisplayUpdater {
         dotMatrixDisplayView.updateDisplay();
     }
 
-    private void setupBackColor() {
+    public void setupBackColor() {
         final String BACK_COLOR = "000000";
 
         dotMatrixDisplayView.setBackColor(BACK_COLOR);
     }
 
-    private void setupDefaultFont() {
+    public void setupDefaultFont() {
         defaultFont = new DotMatrixFontDefault();
     }
 
-    private void setupMargins() {    // Marges (en nombre de carrés autour de l'affichage proprement dit)
+    public void setupMargins() {    // Marges (en nombre de carrés autour de l'affichage proprement dit)
         margins = new Rect(1, 1, 1, 1);
     }
 

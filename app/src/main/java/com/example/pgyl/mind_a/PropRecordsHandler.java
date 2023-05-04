@@ -15,6 +15,7 @@ import static com.example.pgyl.mind_a.StringDBTables.propRowsToPropRecords;
 import static com.example.pgyl.mind_a.StringDBUtils.getDBPropById;
 import static com.example.pgyl.mind_a.StringDBUtils.getDBProps;
 import static com.example.pgyl.mind_a.StringDBUtils.saveDBProps;
+import static com.example.pgyl.pekislib_a.Constants.UNDEFINED;
 
 public class PropRecordsHandler {
 
@@ -39,9 +40,14 @@ public class PropRecordsHandler {
         propRecords.add(currentPropRecord);   //  Réincorporer le currentPropRecord dans propRecords avant de sauver en DB
         saveDBProps(stringDB, propRecordsToPropRows(propRecords));
         stringDB = null;
-        propRecords.clear();
+        removeProps();
         propRecords = null;
+        currentPropRecord = null;
         context = null;
+    }
+
+    public void removeProps() {   // Sauf currentPropRecord
+        propRecords.clear();
     }
 
     public ArrayList<PropRecord> getProps() {
@@ -60,8 +66,12 @@ public class PropRecordsHandler {
         return propRecord.getId();
     }
 
-    private int getMaxId() {
-        int ret = 0;
+    public void remove(int id) {
+        propRecords.remove(id);
+    }
+
+    public int getMaxId() {
+        int ret = UNDEFINED;
         if (!propRecords.isEmpty()) {
             for (int i = 0; i <= (propRecords.size() - 1); i = i + 1) {
                 if (propRecords.get(i).getId() > ret) {
@@ -100,6 +110,4 @@ public class PropRecordsHandler {
         }
         propRecords.remove(currentPropIndex);   //  Retirer le currentPropRecord de PropRecords
     }
-
-
 }

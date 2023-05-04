@@ -12,7 +12,7 @@
         android:orientation="horizontal">
 
         <com.example.pgyl.pekislib_a.SymbolButtonView
-            android:id="@+id/BTN_ITEM_COL_0"
+            android:id="@+id/BTN_ITEM_COMB_0"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_marginTop="2dp"
@@ -20,7 +20,7 @@
             android:layout_weight="1" />
 
         <com.example.pgyl.pekislib_a.SymbolButtonView
-            android:id="@+id/BTN_ITEM_COL_1"
+            android:id="@+id/BTN_ITEM_COMB_1"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_marginTop="2dp"
@@ -28,7 +28,7 @@
             android:layout_weight="1" />
 
         <com.example.pgyl.pekislib_a.SymbolButtonView
-            android:id="@+id/BTN_ITEM_COL_2"
+            android:id="@+id/BTN_ITEM_COMB_2"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_marginTop="2dp"
@@ -36,15 +36,7 @@
             android:layout_weight="1" />
 
         <com.example.pgyl.pekislib_a.SymbolButtonView
-            android:id="@+id/BTN_ITEM_COL_3"
-            android:layout_weight="1"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_marginTop="2dp"
-            android:layout_marginBottom="6dp" />
-
-        <com.example.pgyl.pekislib_a.SymbolButtonView
-            android:id="@+id/BTN_ITEM_COL_4"
+            android:id="@+id/BTN_ITEM_COMB_3"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_marginTop="2dp"
@@ -52,7 +44,7 @@
             android:layout_weight="1" />
 
         <com.example.pgyl.pekislib_a.SymbolButtonView
-            android:id="@+id/BTN_ITEM_COL_5"
+            android:id="@+id/BTN_ITEM_COMB_4"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_marginTop="2dp"
@@ -60,7 +52,7 @@
             android:layout_weight="1" />
 
         <com.example.pgyl.pekislib_a.SymbolButtonView
-            android:id="@+id/BTN_ITEM_COL_6"
+            android:id="@+id/BTN_ITEM_COMB_5"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_marginTop="2dp"
@@ -68,7 +60,7 @@
             android:layout_weight="1" />
 
         <com.example.pgyl.pekislib_a.SymbolButtonView
-            android:id="@+id/BTN_ITEM_COL_7"
+            android:id="@+id/BTN_ITEM_COMB_6"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_marginTop="2dp"
@@ -76,7 +68,7 @@
             android:layout_weight="1" />
 
         <com.example.pgyl.pekislib_a.SymbolButtonView
-            android:id="@+id/BTN_ITEM_COL_8"
+            android:id="@+id/BTN_ITEM_CMB_7"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_marginTop="2dp"
@@ -84,7 +76,15 @@
             android:layout_weight="1" />
 
         <com.example.pgyl.pekislib_a.SymbolButtonView
-            android:id="@+id/BTN_ITEM_COL_9"
+            android:id="@+id/BTN_ITEM_COMB_8"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_marginTop="2dp"
+            android:layout_marginBottom="6dp"
+            android:layout_weight="1" />
+
+        <com.example.pgyl.pekislib_a.SymbolButtonView
+            android:id="@+id/BTN_ITEM_COMB_9"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_marginTop="2dp"
