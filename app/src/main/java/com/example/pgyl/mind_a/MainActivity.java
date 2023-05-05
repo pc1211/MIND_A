@@ -91,7 +91,7 @@ public class MainActivity extends Activity {
     }
 
     public enum CURRENT_PROP_PEGS {   //  Autant de valeurs que dans main.xml (BTN_PROP_...), avec un maximum de 9 (score avec max 9 dizaines)
-        CUR_PROP_0, CUR_PROP_1, CUR_PROP_2, VPROP_3, CUR_PROP_4, CUR_PROP_5, CUR_PROP_6, CUR_PROP_7, CUR_PROP_8;
+        CUR_PROP_0, CUR_PROP_1, CUR_PROP_2, CUR_PROP_3, CUR_PROP_4, CUR_PROP_5, CUR_PROP_6, CUR_PROP_7, CUR_PROP_8;
 
         public int INDEX() {
             return ordinal();
