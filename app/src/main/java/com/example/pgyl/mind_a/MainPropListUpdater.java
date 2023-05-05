@@ -1,6 +1,5 @@
 package com.example.pgyl.mind_a;
 
-import android.content.Context;
 import android.widget.ListView;
 
 public class MainPropListUpdater {
@@ -37,8 +36,9 @@ public class MainPropListUpdater {
 
     public void reload() {
         propRecordsHandler.sortPropRecords();
-        mainPropListItemAdapter.setItems(propRecordsHandler.getProps());
+        mainPropListItemAdapter.setItems(propRecordsHandler.getPropRecords());
         mainPropListItemAdapter.notifyDataSetChanged();
+        mainPropListView.setAdapter(mainPropListItemAdapter);
         mainPropListView.post(runnableCheckNeedScrollBar);
     }
 

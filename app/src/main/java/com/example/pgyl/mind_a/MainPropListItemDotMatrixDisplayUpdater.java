@@ -16,9 +16,7 @@ public class MainPropListItemDotMatrixDisplayUpdater {
     //region Variables
     private DotMatrixFont defaultFont;
     private Rect margins;
-    private Rect gridRect;
     private Rect displayRect;
-    private Rect labelDisplayRect;
     //endregion
 
     public MainPropListItemDotMatrixDisplayUpdater() {    //  Général pour tous les MainPropListItems
@@ -37,29 +35,26 @@ public class MainPropListItemDotMatrixDisplayUpdater {
         defaultFont = null;
     }
 
-    public void displayScore(DotMatrixDisplayView dotMatrixDisplayView, PropRecord propRecord) {
+    public void displayText(DotMatrixDisplayView dotMatrixDisplayView, PropRecord propRecord) {
         final String LABEL_ON_COLOR = "FF9A22";
         final String OFF_COLOR = "404040";
 
         dotMatrixDisplayView.fillRect(displayRect, LABEL_ON_COLOR, OFF_COLOR);    //  Pressed=ON  Unpressed=OFF
-        dotMatrixDisplayView.setSymbolPos(labelDisplayRect.left + margins.left, labelDisplayRect.top + margins.top);
+        dotMatrixDisplayView.setSymbolPos(displayRect.left + margins.left, displayRect.top + margins.top);
         dotMatrixDisplayView.writeText(propRecord.getStringScore(), LABEL_ON_COLOR, defaultFont);
         dotMatrixDisplayView.updateDisplay();
     }
 
     public void setupDimensions(DotMatrixDisplayView dotMatrixDisplayView) {       //  La grille (gridRect) contient le score
         final RectF INTERNAL_MARGIN_SIZE_COEFFS = new RectF(0, 0, 0, 0);   //  Marge autour de l'affichage proprement dit (% de largeur)
-        int displayRectWidth;
-        int displayRectHeight;
 
         BiDimensions fillerLabelTextDimensions = getFontTextDimensions(MAX_SCORE_DISPLAY_SIZE, defaultFont);
 
-        displayRectWidth = margins.left + fillerLabelTextDimensions.width - defaultFont.getRightMargin() + margins.right;   //   Affichage sur la largeur du label maximum; margins.right remplace la dernière marge droite
-        displayRectHeight = margins.top + fillerLabelTextDimensions.height + margins.bottom;
+        int displayRectWidth = margins.left + fillerLabelTextDimensions.width - defaultFont.getRightMargin() + margins.right;   //   Affichage sur la largeur du label maximum; margins.right remplace la dernière marge droite
+        int displayRectHeight = margins.top + fillerLabelTextDimensions.height + margins.bottom;
 
-        gridRect = new Rect(0, 0, displayRectWidth, displayRectHeight);
+        Rect gridRect = new Rect(0, 0, displayRectWidth, displayRectHeight);
         displayRect = new Rect(gridRect.left, gridRect.top, gridRect.width(), gridRect.height());  //  Affichage au début de la grille
-        labelDisplayRect = displayRect;
 
         dotMatrixDisplayView.setInternalMarginCoeffs(INTERNAL_MARGIN_SIZE_COEFFS);
         dotMatrixDisplayView.setExternalMarginCoeffs(ALIGN_LEFT_HEIGHT);

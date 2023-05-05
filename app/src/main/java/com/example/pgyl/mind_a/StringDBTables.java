@@ -7,7 +7,6 @@ import com.example.pgyl.pekislib_a.InputButtonsActivity;
 import java.util.ArrayList;
 
 import static com.example.pgyl.mind_a.PropRecord.COLOR_NUM_EMPTY;
-import static com.example.pgyl.mind_a.PropRecord.CURRENT_PROP_ID;
 import static com.example.pgyl.pekislib_a.Constants.REG_EXP_INTEGER_FROM_0;
 import static com.example.pgyl.pekislib_a.Constants.REG_EXP_INTEGER_FROM_0_ERROR_MESSAGE;
 import static com.example.pgyl.pekislib_a.StringDB.TABLE_ID_INDEX;
@@ -116,9 +115,14 @@ public class StringDBTables {
         return MIND_TABLES.PROPS.toString();
     }
 
-    public static String[][] getPropsInits() {   //  Créer un enregistrement d'office pour currentPropRecord avec couleurs vides et score 0
+    public static String[][] getPropsInits() {   //  Créer un enregistrement d'office pour currentPropRecord et SecrPropRecord avec couleurs vides et score 0
         final String[][] TABLE_PROPS_INITS = {
                 {String.valueOf(CURRENT_PROP_ID),
+                        String.valueOf(COLOR_NUM_EMPTY), String.valueOf(COLOR_NUM_EMPTY), String.valueOf(COLOR_NUM_EMPTY), String.valueOf(COLOR_NUM_EMPTY),
+                        String.valueOf(COLOR_NUM_EMPTY), String.valueOf(COLOR_NUM_EMPTY), String.valueOf(COLOR_NUM_EMPTY), String.valueOf(COLOR_NUM_EMPTY),
+                        String.valueOf(COLOR_NUM_EMPTY),
+                        String.valueOf(0)},
+                {String.valueOf(SECR_PROP_ID),
                         String.valueOf(COLOR_NUM_EMPTY), String.valueOf(COLOR_NUM_EMPTY), String.valueOf(COLOR_NUM_EMPTY), String.valueOf(COLOR_NUM_EMPTY),
                         String.valueOf(COLOR_NUM_EMPTY), String.valueOf(COLOR_NUM_EMPTY), String.valueOf(COLOR_NUM_EMPTY), String.valueOf(COLOR_NUM_EMPTY),
                         String.valueOf(COLOR_NUM_EMPTY),
@@ -136,6 +140,8 @@ public class StringDBTables {
     }
 
     public static final String PROPS_NAME_PREFIX = "PROP_";
+    public static final int CURRENT_PROP_ID = 0;
+    public static final int SECR_PROP_ID = 1;
 
     public static PropRecord propRowToPropRecord(String[] propRow) {
         PropRecord propRecord = new PropRecord();

@@ -35,20 +35,16 @@ public class CandRecord {
         }
     }
 
-    public void setCombIndex(int index, int value) {
-        comb[index] = value;
-    }
-
     public boolean isSelected() {
         return selected;
     }
 
-    public int getNbScores(int nbScoresIndex) {
-        return nbScores[nbScoresIndex];
-    }
-
     public void setSelected(boolean selected) {
         this.selected = selected;
+    }
+
+    public int getNbScoresAtIndex(int index) {
+        return nbScores[index];
     }
 
     public void resetNbScores() {
@@ -57,7 +53,7 @@ public class CandRecord {
         }
     }
 
-    public void incNbScores(int nbScoresIndex) {
+    public void incNbScoresAtIndex(int nbScoresIndex) {
         this.nbScores[nbScoresIndex] = this.nbScores[nbScoresIndex] + 1;
     }
 }

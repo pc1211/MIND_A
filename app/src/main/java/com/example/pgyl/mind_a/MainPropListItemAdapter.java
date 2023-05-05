@@ -91,24 +91,24 @@ public class MainPropListItemAdapter extends BaseAdapter {
         int pos = position;
         MainPropListItemViewHolder viewHolder = (MainPropListItemViewHolder) rowView.getTag();
 
-        int[] colorNums = propRecords.get(pos).getComb();
+        int[] comb = propRecords.get(pos).getComb();
         for (int i = 0; i <= (CURRENT_PROP_PEGS.values().length - 1); i = i + 1) {
             if (i <= (pegs - 1)) {
-                String color = ((colorNums[i] != COLOR_NUM_EMPTY) ? PALETTE_COLORS.getByIndex(colorNums[i]).RGB() : EMPTY_COLOR);
-                viewHolder.buttonColors[pos].setColors(color, BACK_COLOR_NORMAL, color, BACK_COLOR_INVERSE);
+                String color = ((comb[i] != COLOR_NUM_EMPTY) ? PALETTE_COLORS.getByIndex(comb[i]).RGB() : EMPTY_COLOR);
+                viewHolder.buttonColors[i].setColors(color, BACK_COLOR_NORMAL, color, BACK_COLOR_INVERSE);
             } else {  //  Ne rendre visibles que <pegs> boutons de couleur
-                viewHolder.buttonColors[pos].setVisibility(View.GONE);
+                viewHolder.buttonColors[i].setVisibility(View.GONE);
             }
         }
 
-        mainPropListItemDotMatrixDisplayUpdater.displayScore(viewHolder.buttonDotMatrixDisplayScore, propRecords.get(pos));
+        mainPropListItemDotMatrixDisplayUpdater.displayText(viewHolder.buttonDotMatrixDisplayScore, propRecords.get(pos));
     }
 
     private void setupViewHolderButtonAttributes() {
         final long BUTTON_MIN_CLICK_TIME_INTERVAL_MS = 500;
         final float STATE_BUTTON_SYMBOL_SIZE_COEFF = 0.75f;   //  Pour que le symbole ne frôle pas les bords de sa View
 
-        for (int i = 0; i <= (pegs - 1); i = i + 1) {
+        for (int i = 0; i <= (CURRENT_PROP_PEGS.values().length - 1); i = i + 1) {
             viewHolder.buttonColors[i].setSVGImageResource(R.raw.disk);
             viewHolder.buttonColors[i].setSymbolSizeCoeff(STATE_BUTTON_SYMBOL_SIZE_COEFF);
             viewHolder.buttonColors[i].setMinClickTimeInterval(BUTTON_MIN_CLICK_TIME_INTERVAL_MS);

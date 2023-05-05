@@ -31,6 +31,12 @@ public class CandRecordsHandler {
         candRecords = null;
     }
 
+    public void selectAll() {
+        for (int i = 0; i <= (candRecords.length - 1); i = i + 1) {
+            candRecords[i].setSelected(true);
+        }
+    }
+
     public CandRecord[] getCandRecords() {
         return candRecords;
     }
@@ -50,29 +56,33 @@ public class CandRecordsHandler {
         return candRecords[getMiniMaxCandRecordsIndex()].getComb();
     }
 
+    public int[] getCombAtIndex(int index) {
+        return candRecords[index].getComb();
+    }
+
     public int getMiniMaxCandRecordsIndex() {
-        int ret = UNDEFINED;
+        int miniMaxCandRecordsIndex = UNDEFINED;
         int minNbScores = Integer.MAX_VALUE;
         for (int i = 0; i <= (candRecords.length - 1); i = i + 1) {
             int maxNbScores = -Integer.MAX_VALUE;
             candRecords[i].resetNbScores();
             for (int j = 0; j <= (candRecords.length - 1); j = j + 1) {
-                if (candRecords[i].isSelected()) {
+                if (candRecords[j].isSelected()) {
                     int nbScoresIndex = getScore(candRecords[i].getComb(), candRecords[j].getComb());   //  Le score lui-même est utilisé comme index dans nbScores; Si pegs = 4 => les nombres de score de chaque candidat seront stockés dans candRecords().nbScores aux index 00,01,02,03,04,10,11,12,13,20,21,22,30,40
-                    candRecords[i].incNbScores(nbScoresIndex);
+                    candRecords[i].incNbScoresAtIndex(nbScoresIndex);
                 }
             }
             for (int j = 0; j <= maxScore; j = j + 1) {
-                if (candRecords[i].getNbScores(j) > maxNbScores) {
-                    maxNbScores = candRecords[i].getNbScores(j);
+                if (candRecords[i].getNbScoresAtIndex(j) > maxNbScores) {
+                    maxNbScores = candRecords[i].getNbScoresAtIndex(j);
                 }
             }
             if (maxNbScores < minNbScores) {
                 minNbScores = maxNbScores;
-                ret = i;
+                miniMaxCandRecordsIndex = i;
             }
         }
-        return ret;
+        return miniMaxCandRecordsIndex;
     }
 
     public int getScore(int[] comb, int[] secrComb) {
@@ -108,21 +118,21 @@ public class CandRecordsHandler {
 
     public int getSolutionCandRecordsIndex(int[] comb, int score) {
         int count = 0;
-        int ret = UNDEFINED;
+        int solIndex = UNDEFINED;
         for (int i = 0; i <= (candRecords.length - 1); i = i + 1) {
             if (candRecords[i].isSelected()) {
                 if (getScore(candRecords[i].getComb(), comb) != score) {
                     candRecords[i].setSelected(false);
                 } else {   //  Score OK
-                    ret = i;
+                    solIndex = i;
                     count = count + 1;
                 }
             }
         }
-        if (count > 1) {
-            ret = UNDEFINED;
+        if (count != 1) {
+            solIndex = UNDEFINED;
         }
-        return ret;
+        return solIndex;
     }
 
     private void setupCandRecords() {

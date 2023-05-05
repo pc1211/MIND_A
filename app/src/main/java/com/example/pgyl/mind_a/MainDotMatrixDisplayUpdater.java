@@ -66,7 +66,7 @@ public class MainDotMatrixDisplayUpdater {
     }
 
     private void setupDimensions() {
-        final RectF INTERNAL_MARGIN_SIZE_COEFFS = new RectF(0.02f, 0, 0.02f, 0);   //  Marge autour de l'affichage proprement dit (% de largeur)
+        final RectF INTERNAL_MARGIN_SIZE_COEFFS = new RectF(0, 0, 0, 0);   //  Marge autour de l'affichage proprement dit (% de largeur)
 
         BiDimensions textDimensions = getFontTextDimensions(MAX_SCORE_DISPLAY_SIZE, defaultFont);
 

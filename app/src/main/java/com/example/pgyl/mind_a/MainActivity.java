@@ -99,7 +99,7 @@ public class MainActivity extends Activity {
     }
 
     private enum FLOWS {
-        SUBMIT, CLEAR, UNDO_LAST, NEW;
+        SUBMIT, CLEAR, DELETE_LAST, NEW, CHEAT;
 
         public int INDEX() {
             return ordinal();
@@ -133,6 +133,7 @@ public class MainActivity extends Activity {
     private CandRecordsHandler candRecordsHandler;
     private PropRecordsHandler propRecordsHandler;
     private PropRecord currentPropRecord;
+    private PropRecord secrPropRecord;
     private MainPropListUpdater mainPropListUpdater;
     private boolean keepScreen;
     private boolean userGuess;
@@ -227,6 +228,7 @@ public class MainActivity extends Activity {
             }
         }
 
+        setupSecrPropRecord();
         setupMainPropList();
         setupMainPropListUpdater();
         setupDotMatrixDisplayUpdater();
@@ -310,50 +312,54 @@ public class MainActivity extends Activity {
     }
 
     private void onPaletteButtonClick(int index) {
-        EDIT_MODES oldEditMode = editMode;
-        int oldEditIndex = editIndex;
-        editMode = EDIT_MODES.PALETTE;
-        editIndex = index;
-        if (oldEditMode.equals(EDIT_MODES.PALETTE)) {   //  Click Palette puis Palette
-            if (editIndex != oldEditIndex) {
-                updateDisplayPaletteButtonColor(editIndex, COLOR_MODES.INVERSE);
-            } else {   //  Même bouton => L'édition en cours est annulée
+        if (userGuess) {
+            EDIT_MODES oldEditMode = editMode;
+            int oldEditIndex = editIndex;
+            editMode = EDIT_MODES.PALETTE;
+            editIndex = index;
+            if (oldEditMode.equals(EDIT_MODES.PALETTE)) {   //  Click Palette puis Palette
+                if (editIndex != oldEditIndex) {
+                    updateDisplayPaletteButtonColor(editIndex, COLOR_MODES.INVERSE);
+                } else {   //  Même bouton => L'édition en cours est annulée
+                    editMode = EDIT_MODES.NONE;
+                }
+                updateDisplayPaletteButtonColor(oldEditIndex, COLOR_MODES.NORMAL);
+            }
+            if (oldEditMode.equals(EDIT_MODES.CURRENT_PROP)) {   //  Click Current Prop puis Palette
+                currentPropRecord.setCombAtIndex(oldEditIndex, editIndex);
+                updateDisplayPaletteButtonColor(editIndex, COLOR_MODES.NORMAL);
+                updateDisplayCurrentPropButtonColor(oldEditIndex, COLOR_MODES.NORMAL);
                 editMode = EDIT_MODES.NONE;
             }
-            updateDisplayPaletteButtonColor(oldEditIndex, COLOR_MODES.NORMAL);
-        }
-        if (oldEditMode.equals(EDIT_MODES.CURRENT_PROP)) {   //  Click Current Prop puis Palette
-            currentPropRecord.setCombIndex(oldEditIndex, editIndex);
-            updateDisplayPaletteButtonColor(editIndex, COLOR_MODES.NORMAL);
-            updateDisplayCurrentPropButtonColor(oldEditIndex, COLOR_MODES.NORMAL);
-            editMode = EDIT_MODES.NONE;
-        }
-        if (oldEditMode.equals(EDIT_MODES.NONE)) {   //  Rien puis Click Palette
-            updateDisplayPaletteButtonColor(editIndex, COLOR_MODES.INVERSE);
+            if (oldEditMode.equals(EDIT_MODES.NONE)) {   //  Rien puis Click Palette
+                updateDisplayPaletteButtonColor(editIndex, COLOR_MODES.INVERSE);
+            }
         }
     }
 
     private void onCurrentPropButtonClick(int index) {
-        EDIT_MODES oldEditMode = editMode;
-        int oldEditIndex = editIndex;
-        editMode = EDIT_MODES.CURRENT_PROP;
-        editIndex = index;
-        if (oldEditMode.equals(EDIT_MODES.CURRENT_PROP)) {   //  Click Current Prop puis Current Prop
-            if (editIndex != oldEditIndex) {
-                updateDisplayCurrentPropButtonColor(editIndex, COLOR_MODES.INVERSE);
-            } else {   //  Même bouton => L'édition en cours est annulée
+        if (userGuess) {
+            EDIT_MODES oldEditMode = editMode;
+            int oldEditIndex = editIndex;
+            editMode = EDIT_MODES.CURRENT_PROP;
+            editIndex = index;
+            if (oldEditMode.equals(EDIT_MODES.CURRENT_PROP)) {   //  Click Current Prop puis Current Prop
+                if (editIndex != oldEditIndex) {
+                    updateDisplayCurrentPropButtonColor(editIndex, COLOR_MODES.INVERSE);
+                } else {   //  Même bouton => L'édition en cours est annulée
+                    editMode = EDIT_MODES.NONE;
+                }
+                updateDisplayCurrentPropButtonColor(oldEditIndex, COLOR_MODES.NORMAL);
+            }
+            if (oldEditMode.equals(EDIT_MODES.PALETTE)) {   //  Click Palette puis Current Prop
+                currentPropRecord.setCombAtIndex(editIndex, oldEditIndex);
+                updateDisplayCurrentPropButtonColor(editIndex, COLOR_MODES.NORMAL);
+                updateDisplayPaletteButtonColor(oldEditIndex, COLOR_MODES.NORMAL);
                 editMode = EDIT_MODES.NONE;
             }
-            updateDisplayCurrentPropButtonColor(oldEditIndex, COLOR_MODES.NORMAL);
-        }
-        if (oldEditMode.equals(EDIT_MODES.PALETTE)) {   //  Click Palette puis Current Prop
-            currentPropRecord.setCombIndex(editIndex, oldEditIndex);
-            updateDisplayCurrentPropButtonColor(editIndex, COLOR_MODES.NORMAL);
-            updateDisplayPaletteButtonColor(oldEditIndex, COLOR_MODES.NORMAL);
-            editMode = EDIT_MODES.NONE;
-        }
-        if (oldEditMode.equals(EDIT_MODES.NONE)) {   //  Rien puis Click Current Prop
-            updateDisplayCurrentPropButtonColor(editIndex, COLOR_MODES.INVERSE);
+            if (oldEditMode.equals(EDIT_MODES.NONE)) {   //  Rien puis Click Current Prop
+                updateDisplayCurrentPropButtonColor(editIndex, COLOR_MODES.INVERSE);
+            }
         }
     }
 
@@ -392,39 +398,63 @@ public class MainActivity extends Activity {
         if (command.equals(FLOWS.CLEAR)) {
             onButtonClickClear();
         }
-        if (command.equals(FLOWS.UNDO_LAST)) {
-            onButtonClickUndoLast();
+        if (command.equals(FLOWS.DELETE_LAST)) {
+            onButtonClickDeleteLast();
         }
         if (command.equals(FLOWS.NEW)) {
             onButtonClickNew();
         }
+        if (command.equals(FLOWS.CHEAT)) {
+            onButtonClickCheat();
+        }
     }
 
     private void onButtonClickSubmit() {
-        if (userGuess) {
-
-        } else {   //  Android Guess
-
+        if (currentPropRecord.hasValidComb(pegs)) {   //  Aucune couleur COLOR_NUM_EMPTY
+            PropRecord newPropRecord = propRecordsHandler.createPropRecordWithId(propRecordsHandler.getPropRecordMaxId() + 1);
+            newPropRecord.setComb(currentPropRecord.getComb());
+            if (userGuess) {
+                newPropRecord.setScore(candRecordsHandler.getScore(currentPropRecord.getComb(), secrPropRecord.getComb()));
+                currentPropRecord.resetComb();
+                currentPropRecord.setScore(0);
+            } else {   //  Android Guess
+                newPropRecord.setScore(currentPropRecord.getScore());
+                int solIndex = candRecordsHandler.getSolutionCandRecordsIndex(currentPropRecord.getComb(), currentPropRecord.getScore());
+                if (solIndex == UNDEFINED) {   //  Encore plusieurs solutions possibles
+                    currentPropRecord.setComb(candRecordsHandler.getGuessComb());
+                    currentPropRecord.setScore(0);
+                } else {   //  Trouvé !
+                    newPropRecord = propRecordsHandler.createPropRecordWithId(propRecordsHandler.getPropRecordMaxId() + 1);
+                    newPropRecord.setComb(candRecordsHandler.getCombAtIndex(solIndex));
+                    newPropRecord.setScore(10 * pegs);
+                    currentPropRecord.resetComb();
+                    currentPropRecord.setScore(0);
+                }
+            }
+            mainPropListUpdater.reload();
+            mainPropListUpdater.repaint();
+            updateDisplayCurrentPropButtonColors();
+            updateDisplayCurrentPropDotMatrixDisplayScore();
+        } else {
+            msgBox("Invalid proposal", this);
         }
     }
 
     private void onButtonClickClear() {
         if (userGuess) {
             currentPropRecord.resetComb();
-            updateDisplayCurrentPropButtonColors();
-        } else {   //  Android Guess
-            currentPropRecord.setScore(0);
-            updateDisplayCurrentPropDotMatrixDisplayScore();
         }
+        currentPropRecord.setScore(0);
+        updateDisplayCurrentPropButtonColors();
+        updateDisplayCurrentPropDotMatrixDisplayScore();
     }
 
-    private void onButtonClickUndoLast() {
-        int lastPropId = propRecordsHandler.getMaxId();
-        if (lastPropId != UNDEFINED) {
-            propRecordsHandler.remove(lastPropId);
+    private void onButtonClickDeleteLast() {
+        if (!propRecordsHandler.getPropRecords().isEmpty()) {
+            propRecordsHandler.removePropRecordAtId(propRecordsHandler.getPropRecordMaxId());   //  Enlever le dernier PropRecord (cad avec le id le plus élevé)
         }
         if (!userGuess) {   //  Android Guess
-            candRecordsHandler.updateCandRecordsToPropRecords(propRecordsHandler.getProps());
+            candRecordsHandler.updateCandRecordsToPropRecords(propRecordsHandler.getPropRecords());
             currentPropRecord.setComb(candRecordsHandler.getGuessComb());
             currentPropRecord.setScore(0);
             updateDisplayCurrentPropButtonColors();
@@ -435,16 +465,30 @@ public class MainActivity extends Activity {
     }
 
     private void onButtonClickNew() {
-        propRecordsHandler.removeProps();   //  Sauf currentPropRecord
+        propRecordsHandler.removePropRecords();   //  Sauf currentPropRecord
         if (!userGuess) {
-            candRecordsHandler.updateCandRecordsToPropRecords(propRecordsHandler.getProps());   // Sans currentProp
+            candRecordsHandler.selectAll();
             currentPropRecord.setComb(candRecordsHandler.getGuessComb());
         } else {   //  User Guess
             currentPropRecord.resetComb();
+            secrPropRecord.setRandomComb(pegs, colors);
         }
         currentPropRecord.setScore(0);
         updateDisplayCurrentPropButtonColors();
         updateDisplayCurrentPropDotMatrixDisplayScore();
+        mainPropListUpdater.reload();
+        mainPropListUpdater.repaint();
+    }
+
+    private void onButtonClickCheat() {
+        if (userGuess) {
+            currentPropRecord.setComb(secrPropRecord.getComb());
+            currentPropRecord.setScore(10 * pegs);
+            updateDisplayCurrentPropButtonColors();
+            updateDisplayCurrentPropDotMatrixDisplayScore();
+        } else {
+            msgBox("I cannot read human memory", this);
+        }
     }
 
     private void updateDisplayPaletteButtonColors() {
@@ -476,7 +520,7 @@ public class MainActivity extends Activity {
         final String BACK_COLOR_INVERSE = "FFFFFF";
         final String EMPTY_COLOR = "808080";
 
-        String color = (currentPropRecord.getCombIndex(index) != COLOR_NUM_EMPTY) ? PALETTE_COLORS.getByIndex(currentPropRecord.getCombIndex(index)).RGB() : EMPTY_COLOR;
+        String color = (currentPropRecord.getCombAtIndex(index) != COLOR_NUM_EMPTY) ? PALETTE_COLORS.getByIndex(currentPropRecord.getCombAtIndex(index)).RGB() : EMPTY_COLOR;
         if (colorMode.equals(COLOR_MODES.NORMAL)) {
             currentPropButtons[index].setColors(color, BACK_COLOR_NORMAL, color, BACK_COLOR_INVERSE);
         } else {   // Inverse
@@ -504,7 +548,7 @@ public class MainActivity extends Activity {
         if (userGuess) {
             radioUserGuess.setChecked(true);
         } else {   //  Android Guesses
-            radioUserGuess.setChecked(false);
+            radioAndroidGuess.setChecked(true);
         }
     }
 
@@ -672,12 +716,19 @@ public class MainActivity extends Activity {
 
     private void setupPropRecords() {
         propRecordsHandler = new PropRecordsHandler(this, stringDB);
-        currentPropRecord = propRecordsHandler.getCurrentProp();
+        currentPropRecord = propRecordsHandler.getCurrentPropRecord();
+        secrPropRecord = propRecordsHandler.getSecrPropRecord();
+    }
+
+    private void setupSecrPropRecord() {
+        if (!secrPropRecord.hasValidComb(pegs)) {
+            secrPropRecord.setRandomComb(pegs, colors);
+        }
     }
 
     private void setupCandRecords() {
         candRecordsHandler = new CandRecordsHandler(pegs, colors);
-        candRecordsHandler.updateCandRecordsToPropRecords(propRecordsHandler.getProps());
+        candRecordsHandler.updateCandRecordsToPropRecords(propRecordsHandler.getPropRecords());
     }
 
     private void setupStringDB() {

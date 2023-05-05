@@ -3,7 +3,6 @@ package com.example.pgyl.mind_a;
 public class PropRecord {
     //region Constantes
     public static final int COLOR_NUM_EMPTY = -1;
-    public static final int CURRENT_PROP_ID = 0;
     private static final String SEPARATOR = "-";
     public static final String MAX_SCORE_DISPLAY_SIZE = "9" + SEPARATOR + "9";
     //endregion
@@ -33,7 +32,7 @@ public class PropRecord {
         return comb;
     }
 
-    public int getCombIndex(int index) {
+    public int getCombAtIndex(int index) {
         return comb[index];
     }
 
@@ -44,7 +43,7 @@ public class PropRecord {
         }
     }
 
-    public void setCombIndex(int index, int value) {
+    public void setCombAtIndex(int index, int value) {
         comb[index] = value;
     }
 
@@ -59,6 +58,23 @@ public class PropRecord {
     public void resetComb() {
         for (int i = 0; i <= (comb.length - 1); i = i + 1) {
             this.comb[i] = COLOR_NUM_EMPTY;
+        }
+    }
+
+    public boolean hasValidComb(int pegs) {
+        boolean ret = true;
+        for (int i = 0; i <= (pegs - 1); i = i + 1) {
+            if (comb[i] == COLOR_NUM_EMPTY) {
+                ret = false;
+                break;
+            }
+        }
+        return ret;
+    }
+
+    public void setRandomComb(int pegs, int colors) {
+        for (int i = 0; i <= (pegs - 1); i = i + 1) {
+            comb[i] = (int) (colors * Math.random());
         }
     }
 

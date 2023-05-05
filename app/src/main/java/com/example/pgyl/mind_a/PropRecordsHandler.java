@@ -8,11 +8,10 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 
-import static com.example.pgyl.mind_a.PropRecord.CURRENT_PROP_ID;
+import static com.example.pgyl.mind_a.StringDBTables.CURRENT_PROP_ID;
+import static com.example.pgyl.mind_a.StringDBTables.SECR_PROP_ID;
 import static com.example.pgyl.mind_a.StringDBTables.propRecordsToPropRows;
-import static com.example.pgyl.mind_a.StringDBTables.propRowToPropRecord;
 import static com.example.pgyl.mind_a.StringDBTables.propRowsToPropRecords;
-import static com.example.pgyl.mind_a.StringDBUtils.getDBPropById;
 import static com.example.pgyl.mind_a.StringDBUtils.getDBProps;
 import static com.example.pgyl.mind_a.StringDBUtils.saveDBProps;
 import static com.example.pgyl.pekislib_a.Constants.UNDEFINED;
@@ -23,6 +22,7 @@ public class PropRecordsHandler {
     private Context context;
     private ArrayList<PropRecord> propRecords;
     private PropRecord currentPropRecord;
+    private PropRecord secrPropRecord;
     private StringDB stringDB;
     //endregion
 
@@ -37,49 +37,65 @@ public class PropRecordsHandler {
     }
 
     public void saveAndClose() {
-        propRecords.add(currentPropRecord);   //  Réincorporer le currentPropRecord dans propRecords avant de sauver en DB
+        propRecords.add(currentPropRecord);   //  Réintégrer currentPropRecord et secrPropRecord dans propRecords avant de sauver en DB
+        propRecords.add(secrPropRecord);
         saveDBProps(stringDB, propRecordsToPropRows(propRecords));
         stringDB = null;
-        removeProps();
+        removePropRecords();
         propRecords = null;
         currentPropRecord = null;
         context = null;
     }
 
-    public void removeProps() {   // Sauf currentPropRecord
+    public void removePropRecords() {   // Sauf currentPropRecord
         propRecords.clear();
     }
 
-    public ArrayList<PropRecord> getProps() {
+    public ArrayList<PropRecord> getPropRecords() {
         return propRecords;
-    }   //  Props sans CurrentProp
+    }   //  PropRecords sans currentPropRecord ni secrPropRecord
 
-    public PropRecord getCurrentProp() {
+    public PropRecord getCurrentPropRecord() {
         return currentPropRecord;
     }
 
-    public int createProp() {
+    public PropRecord getSecrPropRecord() {
+        return secrPropRecord;
+    }
+
+    public PropRecord createPropRecordWithId(int id) {
         PropRecord propRecord = new PropRecord();
-        int idProp = getMaxId() + 1;
-        propRecord.setId(idProp);
+        propRecord.setId(id);
         propRecords.add(propRecord);
-        return propRecord.getId();
+        return propRecord;
     }
 
-    public void remove(int id) {
-        propRecords.remove(id);
+    public void removePropRecordAtId(int id) {
+        propRecords.remove(getPropRecordIndexOfId(id));
     }
 
-    public int getMaxId() {
-        int ret = UNDEFINED;
+    public int getPropRecordIndexOfId(int id) {
+        int index = UNDEFINED;
+
+        for (int i = 0; i <= (propRecords.size() - 1); i = i + 1) {
+            if (propRecords.get(i).getId() == id) {
+                index = i;
+                break;
+            }
+        }
+        return index;
+    }
+
+    public int getPropRecordMaxId() {   //  Hors currentPropRecord et scrPropRecord
+        int maxId = SECR_PROP_ID;   //  Pour ne pas attribuer des id déjà attribués à currentPropRecord et secrPropRecord
         if (!propRecords.isEmpty()) {
             for (int i = 0; i <= (propRecords.size() - 1); i = i + 1) {
-                if (propRecords.get(i).getId() > ret) {
-                    ret = propRecords.get(i).getId();
+                if (propRecords.get(i).getId() > maxId) {
+                    maxId = propRecords.get(i).getId();
                 }
             }
         }
-        return ret;
+        return maxId;
     }
 
     public void sortPropRecords() {
@@ -97,17 +113,19 @@ public class PropRecordsHandler {
         }
     }
 
-    private void setupPropRecords() {
-        int currentPropIndex = 0;
+    private PropRecord extractPropRecordAtId(int id) {
+        PropRecord propRecordSrc = propRecords.get(getPropRecordIndexOfId(id));
+        PropRecord propRecordDest = new PropRecord();
+        propRecordDest.setId(id);   //  Copier propRecordSrc dans propRecordDest
+        propRecordDest.setComb(propRecordSrc.getComb());
+        propRecordDest.setScore(propRecordSrc.getScore());
+        propRecords.remove(getPropRecordIndexOfId(id));   //  Retirer le PropRecord de PropRecords
+        return propRecordDest;
+    }
 
+    private void setupPropRecords() {
         propRecords = propRowsToPropRecords(getDBProps(stringDB));
-        currentPropRecord = propRowToPropRecord(getDBPropById(stringDB, CURRENT_PROP_ID));
-        for (int i = 0; i <= (propRecords.size() - 1); i = i + 1) {    //  Identifier dans propRecords le PropRecord correspondant au currentPropRecord
-            if (propRecords.get(i).getId() == CURRENT_PROP_ID) {
-                currentPropIndex = i;
-                break;
-            }
-        }
-        propRecords.remove(currentPropIndex);   //  Retirer le currentPropRecord de PropRecords
+        currentPropRecord = extractPropRecordAtId(CURRENT_PROP_ID);   //  Retirer currentPropRecord et secrPropRecord de propRecords
+        secrPropRecord = extractPropRecordAtId(SECR_PROP_ID);
     }
 }

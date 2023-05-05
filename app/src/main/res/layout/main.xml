@@ -151,7 +151,7 @@
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="48dp"
+        android:layout_height="36dp"
         android:layout_marginTop="4dp"
         android:orientation="horizontal">
 
@@ -165,40 +165,30 @@
                 android:id="@+id/BTN_CUR_PROP_0"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:layout_marginTop="2dp"
-                android:layout_marginBottom="6dp"
                 android:layout_weight="1" />
 
             <com.example.pgyl.pekislib_a.SymbolButtonView
                 android:id="@+id/BTN_CUR_PROP_1"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:layout_marginTop="2dp"
-                android:layout_marginBottom="6dp"
                 android:layout_weight="1" />
 
             <com.example.pgyl.pekislib_a.SymbolButtonView
                 android:id="@+id/BTN_CUR_PROP_2"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:layout_marginTop="2dp"
-                android:layout_marginBottom="6dp"
                 android:layout_weight="1" />
 
             <com.example.pgyl.pekislib_a.SymbolButtonView
                 android:id="@+id/BTN_CUR_PROP_3"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:layout_marginTop="2dp"
-                android:layout_marginBottom="6dp"
                 android:layout_weight="1" />
 
             <com.example.pgyl.pekislib_a.SymbolButtonView
                 android:id="@+id/BTN_CUR_PROP_4"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:layout_marginTop="2dp"
-                android:layout_marginBottom="6dp"
                 android:layout_weight="1" />
 
             <com.example.pgyl.pekislib_a.SymbolButtonView
@@ -213,26 +203,19 @@
                 android:id="@+id/BTN_CUR_PROP_6"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:layout_marginTop="2dp"
-                android:layout_marginBottom="6dp"
                 android:layout_weight="1" />
 
             <com.example.pgyl.pekislib_a.SymbolButtonView
                 android:id="@+id/BTN_CUR_PROP_7"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:layout_marginTop="2dp"
-                android:layout_marginBottom="6dp"
                 android:layout_weight="1" />
 
             <com.example.pgyl.pekislib_a.SymbolButtonView
                 android:id="@+id/BTN_CUR_PROP_8"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:layout_marginTop="2dp"
-                android:layout_marginBottom="6dp"
                 android:layout_weight="1" />
-
         </LinearLayout>
 
         <LinearLayout
@@ -245,7 +228,7 @@
                 android:id="@+id/BTN_DOT_MATRIX_SCORE"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:layout_marginLeft="4dp"
+                android:layout_marginRight="4dp"
                 android:layout_weight="1" />
         </LinearLayout>
     </LinearLayout>
@@ -272,16 +255,16 @@
             android:layout_marginTop="2dp"
             android:layout_marginBottom="6dp"
             android:layout_weight="3"
-            android:text="Clear " />
+            android:text="Clear" />
 
         <com.example.pgyl.pekislib_a.CustomButton
-            android:id="@+id/BTN_UNDO_LAST"
+            android:id="@+id/BTN_DELETE_LAST"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_marginTop="2dp"
             android:layout_marginBottom="6dp"
             android:layout_weight="3"
-            android:text="Undo Last" />
+            android:text="Del Last" />
 
         <com.example.pgyl.pekislib_a.CustomButton
             android:id="@+id/BTN_NEW"
@@ -292,6 +275,14 @@
             android:layout_weight="3"
             android:text="New game" />
 
+        <com.example.pgyl.pekislib_a.CustomButton
+            android:id="@+id/BTN_CHEAT"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_marginTop="2dp"
+            android:layout_marginBottom="6dp"
+            android:layout_weight="3"
+            android:text="Cheat" />
     </LinearLayout>
 
     <LinearLayout
