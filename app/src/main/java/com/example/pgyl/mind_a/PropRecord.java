@@ -6,18 +6,22 @@ public class PropRecord {
     private static final String SEPARATOR = "-";
     public static final String MAX_SCORE_DISPLAY_SIZE = "9" + SEPARATOR + "9";
     //endregion
+
     //region Variables
+    private int pegs;
+    private int colors;
     private int id;             //  Identifiant de la proposition (1, 2, 3, ...)   (0 pour current Prop)
     private int[] comb;         //  Numéros de couleur (0..9) de la proposition (cf PALETTE_COLORS[])  (-1 si pas de couleur attribuée (COLOR_NUM_EMPTY))
     private int score;          //  Score de la proposition p.ex. 2N1B => 21
     //endregion
 
-    public PropRecord() {
+    public PropRecord(int pegs, int colors) {
+        this.pegs = pegs;
+        this.colors = colors;
         init();
     }
 
     private void init() {
-        score = 0;
     }
 
     public int getId() {
@@ -32,19 +36,11 @@ public class PropRecord {
         return comb;
     }
 
-    public int getCombAtIndex(int index) {
-        return comb[index];
-    }
-
     public void setComb(int[] comb) {
         this.comb = new int[comb.length];
         for (int i = 0; i <= (comb.length - 1); i = i + 1) {
             this.comb[i] = comb[i];
         }
-    }
-
-    public void setCombAtIndex(int index, int value) {
-        comb[index] = value;
     }
 
     public int getScore() {
@@ -55,13 +51,22 @@ public class PropRecord {
         this.score = score;
     }
 
+    public int getCombAtIndex(int index) {
+        return comb[index];
+    }
+
+    public void setCombAtIndex(int index, int value) {
+        comb[index] = value;
+    }
+
     public void resetComb() {
+        int[] comb = new int[pegs];
         for (int i = 0; i <= (comb.length - 1); i = i + 1) {
             this.comb[i] = COLOR_NUM_EMPTY;
         }
     }
 
-    public boolean hasValidComb(int pegs) {
+    public boolean hasValidComb() {
         boolean ret = true;
         for (int i = 0; i <= (pegs - 1); i = i + 1) {
             if (comb[i] == COLOR_NUM_EMPTY) {
@@ -72,7 +77,7 @@ public class PropRecord {
         return ret;
     }
 
-    public void setRandomComb(int pegs, int colors) {
+    public void setRandomComb() {
         for (int i = 0; i <= (pegs - 1); i = i + 1) {
             comb[i] = (int) (colors * Math.random());
         }

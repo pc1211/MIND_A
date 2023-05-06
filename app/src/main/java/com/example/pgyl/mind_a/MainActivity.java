@@ -36,7 +36,6 @@ import static com.example.pgyl.mind_a.StringDBTables.getInputParamsTableName;
 import static com.example.pgyl.mind_a.StringDBTables.getPropsTableName;
 import static com.example.pgyl.mind_a.StringDBUtils.createMindTableIfNotExists;
 import static com.example.pgyl.mind_a.StringDBUtils.initializeTableInputParams;
-import static com.example.pgyl.mind_a.StringDBUtils.initializeTableProps;
 import static com.example.pgyl.pekislib_a.Constants.ACTIVITY_EXTRA_KEYS;
 import static com.example.pgyl.pekislib_a.Constants.COLOR_PREFIX;
 import static com.example.pgyl.pekislib_a.Constants.PEKISLIB_ACTIVITIES;
@@ -196,10 +195,10 @@ public class MainActivity extends Activity {
         userGuess = getSHPUserGuess();
         editMode = EDIT_MODES.NONE;
         setupStringDB();
-        setupPropRecords();
         inputParams = getCurrentsFromActivity(stringDB, MIND_ACTIVITIES.MAIN.toString(), getInputParamsTableName());
         pegs = Integer.valueOf(inputParams[getInputParamsPegsIndex()]);
         colors = Integer.valueOf(inputParams[getInputParamsColorsIndex()]);
+        boolean newScore = false;
 
         inputParamsIndex = getSHPInputParamsIndex();
         if (validReturnFromCalledActivity) {
@@ -220,7 +219,7 @@ public class MainActivity extends Activity {
                     int b = v % 10;   //  Blancs
                     if ((n <= pegs) && (b <= pegs) && (v <= (10 * pegs)) && (v != (10 * (pegs - 1) + 1))) {
                         inputParams[inputParamsIndex] = value;
-                        currentPropRecord.setScore(v);
+                        newScore = true;
                     } else {   //  Bad guy
                         msgBox("Invalid score: " + value, this);
                     }
@@ -228,7 +227,7 @@ public class MainActivity extends Activity {
             }
         }
 
-        setupSecrPropRecord();
+        setupPropRecords();
         setupMainPropList();
         setupMainPropListUpdater();
         setupDotMatrixDisplayUpdater();
@@ -236,6 +235,7 @@ public class MainActivity extends Activity {
         setupFlowButtonColors();
         setupPaletteButtonsVisibility();
         setupCurrentPropButtonsVisibility();
+        updateCurrentPropRecord(newScore, inputParamsIndex);
         updateDisplayKeepScreen();
         updateDisplayUserGuess();
         updateDisplayPaletteButtonColors();
@@ -410,8 +410,9 @@ public class MainActivity extends Activity {
     }
 
     private void onButtonClickSubmit() {
-        if (currentPropRecord.hasValidComb(pegs)) {   //  Aucune couleur COLOR_NUM_EMPTY
+        if (currentPropRecord.hasValidComb()) {   //  Aucune couleur COLOR_NUM_EMPTY
             PropRecord newPropRecord = propRecordsHandler.createPropRecordWithId(propRecordsHandler.getPropRecordMaxId() + 1);
+            propRecordsHandler.addPropRecord(newPropRecord);
             newPropRecord.setComb(currentPropRecord.getComb());
             if (userGuess) {
                 newPropRecord.setScore(candRecordsHandler.getScore(currentPropRecord.getComb(), secrPropRecord.getComb()));
@@ -425,6 +426,7 @@ public class MainActivity extends Activity {
                     currentPropRecord.setScore(0);
                 } else {   //  Trouvé !
                     newPropRecord = propRecordsHandler.createPropRecordWithId(propRecordsHandler.getPropRecordMaxId() + 1);
+                    propRecordsHandler.addPropRecord(newPropRecord);
                     newPropRecord.setComb(candRecordsHandler.getCombAtIndex(solIndex));
                     newPropRecord.setScore(10 * pegs);
                     currentPropRecord.resetComb();
@@ -465,13 +467,14 @@ public class MainActivity extends Activity {
     }
 
     private void onButtonClickNew() {
-        propRecordsHandler.removePropRecords();   //  Sauf currentPropRecord
+        propRecordsHandler.clearPropRecords();   //  Sauf currentPropRecord et secrPropRecord
         if (!userGuess) {
             candRecordsHandler.selectAll();
             currentPropRecord.setComb(candRecordsHandler.getGuessComb());
         } else {   //  User Guess
             currentPropRecord.resetComb();
-            secrPropRecord.setRandomComb(pegs, colors);
+            currentPropRecord.setScore(0);
+            secrPropRecord.setRandomComb();
         }
         currentPropRecord.setScore(0);
         updateDisplayCurrentPropButtonColors();
@@ -714,16 +717,16 @@ public class MainActivity extends Activity {
         dotMatrixDisplayUpdater = new MainDotMatrixDisplayUpdater(currentPropDotMatrixDisplayScore);
     }
 
-    private void setupPropRecords() {
-        propRecordsHandler = new PropRecordsHandler(this, stringDB);
-        currentPropRecord = propRecordsHandler.getCurrentPropRecord();
-        secrPropRecord = propRecordsHandler.getSecrPropRecord();
+    private void updateCurrentPropRecord(boolean newScore, int inputParamsIndex) {
+        if (newScore) {
+            currentPropRecord.setScore(Integer.valueOf(inputParams[inputParamsIndex]));
+        }
     }
 
-    private void setupSecrPropRecord() {
-        if (!secrPropRecord.hasValidComb(pegs)) {
-            secrPropRecord.setRandomComb(pegs, colors);
-        }
+    private void setupPropRecords() {
+        propRecordsHandler = new PropRecordsHandler(stringDB, pegs, colors);
+        currentPropRecord = propRecordsHandler.getCurrentPropRecord();
+        secrPropRecord = propRecordsHandler.getSecrPropRecord();
     }
 
     private void setupCandRecords() {
@@ -740,7 +743,6 @@ public class MainActivity extends Activity {
         }
         if (!stringDB.tableExists(getPropsTableName())) {
             createMindTableIfNotExists(stringDB, getPropsTableName());
-            initializeTableProps(stringDB);
         }
         if (!stringDB.tableExists(getInputParamsTableName())) {
             createMindTableIfNotExists(stringDB, getInputParamsTableName());

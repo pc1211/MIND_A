@@ -5,7 +5,6 @@ import com.example.pgyl.pekislib_a.StringDB;
 import static com.example.pgyl.mind_a.StringDBTables.getInputParamsInits;
 import static com.example.pgyl.mind_a.StringDBTables.getInputParamsTableName;
 import static com.example.pgyl.mind_a.StringDBTables.getMindTableDataFieldsCount;
-import static com.example.pgyl.mind_a.StringDBTables.getPropsInits;
 import static com.example.pgyl.mind_a.StringDBTables.getPropsTableName;
 
 public class StringDBUtils {
@@ -23,10 +22,6 @@ public class StringDBUtils {
     //endregion
 
     //region PROPS
-    public static void initializeTableProps(StringDB stringDB) {
-        stringDB.insertOrReplaceRows(getPropsTableName(), getPropsInits());
-    }
-
     public static String[] getDBPropById(StringDB stringDB, int idProp) {
         return stringDB.selectRowByIdOrCreate(getPropsTableName(), String.valueOf(idProp));
     }

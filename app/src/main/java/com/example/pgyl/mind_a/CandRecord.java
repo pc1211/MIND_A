@@ -3,15 +3,19 @@ package com.example.pgyl.mind_a;
 public class CandRecord {
     //region Constantes
     //endregion
+
     //region Variables
+    private int pegs;
+    private int colors;
     private int[] comb;         //  Chacune des couleurs du candidat
     private boolean selected;   //  Candidat possible
     private int[] nbScores;     //  Chacun des nombres de score obtenus par rapport aux autres candidats; un score obtenu est utilisé comm index dans nbScores
-    private int pegs;
+
     //endregion
 
-    public CandRecord(int pegs) {
+    public CandRecord(int pegs, int colors) {
         this.pegs = pegs;
+        this.colors = colors;
         init();
     }
 

@@ -115,22 +115,6 @@ public class StringDBTables {
         return MIND_TABLES.PROPS.toString();
     }
 
-    public static String[][] getPropsInits() {   //  Créer un enregistrement d'office pour currentPropRecord et SecrPropRecord avec couleurs vides et score 0
-        final String[][] TABLE_PROPS_INITS = {
-                {String.valueOf(CURRENT_PROP_ID),
-                        String.valueOf(COLOR_NUM_EMPTY), String.valueOf(COLOR_NUM_EMPTY), String.valueOf(COLOR_NUM_EMPTY), String.valueOf(COLOR_NUM_EMPTY),
-                        String.valueOf(COLOR_NUM_EMPTY), String.valueOf(COLOR_NUM_EMPTY), String.valueOf(COLOR_NUM_EMPTY), String.valueOf(COLOR_NUM_EMPTY),
-                        String.valueOf(COLOR_NUM_EMPTY),
-                        String.valueOf(0)},
-                {String.valueOf(SECR_PROP_ID),
-                        String.valueOf(COLOR_NUM_EMPTY), String.valueOf(COLOR_NUM_EMPTY), String.valueOf(COLOR_NUM_EMPTY), String.valueOf(COLOR_NUM_EMPTY),
-                        String.valueOf(COLOR_NUM_EMPTY), String.valueOf(COLOR_NUM_EMPTY), String.valueOf(COLOR_NUM_EMPTY), String.valueOf(COLOR_NUM_EMPTY),
-                        String.valueOf(COLOR_NUM_EMPTY),
-                        String.valueOf(0)}
-        };
-        return TABLE_PROPS_INITS;
-    }
-
     public static int getPropsCombIndex(int index) {
         return MindTableDataFields.props.PROP_0.INDEX() + index;
     }
@@ -143,17 +127,37 @@ public class StringDBTables {
     public static final int CURRENT_PROP_ID = 0;
     public static final int SECR_PROP_ID = 1;
 
-    public static PropRecord propRowToPropRecord(String[] propRow) {
-        PropRecord propRecord = new PropRecord();
+    public static ArrayList<PropRecord> propRowsToPropRecords(String[][] propRows, int pegs, int colors) {
+        ArrayList<PropRecord> propRecords = new ArrayList<PropRecord>();
+        if (propRows != null) {
+            for (int i = 0; i <= (propRows.length - 1); i = i + 1) {
+                propRecords.add(propRowToPropRecord(propRows[i], pegs, colors));
+            }
+        }
+        return propRecords;
+    }
 
-        int[] comb = new int[CURRENT_PROP_PEGS.values().length];
-        for (int i = 0; i <= (CURRENT_PROP_PEGS.values().length - 1); i = i + 1) {
+    public static PropRecord propRowToPropRecord(String[] propRow, int pegs, int colors) {
+        int[] comb = new int[pegs];
+        for (int i = 0; i <= (pegs - 1); i = i + 1) {
             comb[i] = Integer.parseInt(propRow[MindTableDataFields.props.valueOf(PROPS_NAME_PREFIX + i).INDEX()]);
         }
+        PropRecord propRecord = new PropRecord(pegs, colors);
         propRecord.setId(Integer.parseInt(propRow[TABLE_ID_INDEX]));
         propRecord.setComb(comb);
         propRecord.setScore(Integer.parseInt(propRow[MindTableDataFields.props.SCORE.INDEX()]));
         return propRecord;
+    }
+
+    public static String[][] propRecordsToPropRows(ArrayList<PropRecord> propRecords) {
+        String[][] propRows = null;
+        if (!propRecords.isEmpty()) {
+            propRows = new String[propRecords.size()][];
+            for (int i = 0; i <= (propRecords.size() - 1); i = i + 1) {
+                propRows[i] = propRecordToPropRow(propRecords.get(i));
+            }
+        }
+        return propRows;
     }
 
     public static String[] propRecordToPropRow(PropRecord propRecord) {
@@ -167,27 +171,6 @@ public class StringDBTables {
         propRow[MindTableDataFields.props.SCORE.INDEX()] = String.valueOf(propRecord.getScore());
 
         return propRow;
-    }
-
-    public static ArrayList<PropRecord> propRowsToPropRecords(String[][] propRows) {
-        ArrayList<PropRecord> propRecords = new ArrayList<PropRecord>();
-        if (propRows != null) {
-            for (int i = 0; i <= (propRows.length - 1); i = i + 1) {
-                propRecords.add(propRowToPropRecord(propRows[i]));
-            }
-        }
-        return propRecords;
-    }
-
-    public static String[][] propRecordsToPropRows(ArrayList<PropRecord> propRecords) {
-        String[][] propRows = null;
-        if (!propRecords.isEmpty()) {
-            propRows = new String[propRecords.size()][];
-            for (int i = 0; i <= (propRecords.size() - 1); i = i + 1) {
-                propRows[i] = propRecordToPropRow(propRecords.get(i));
-            }
-        }
-        return propRows;
     }
     //endregion
 }

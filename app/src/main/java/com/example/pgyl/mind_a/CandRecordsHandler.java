@@ -7,21 +7,19 @@ import static com.example.pgyl.pekislib_a.Constants.UNDEFINED;
 public class CandRecordsHandler {
 
     //region Variables
-    private CandRecord[] candRecords;
     private int pegs;
     private int colors;
-    private int maxScore;
+    private CandRecord[] candRecords;
     //endregion
 
     public CandRecordsHandler(int pegs, int colors) {
         this.pegs = pegs;
         this.colors = colors;
-        setupCandRecords();
         init();
     }
 
     private void init() {
-        maxScore = 10 * pegs;
+        setupCandRecords();
     }
 
     public void close() {
@@ -35,10 +33,6 @@ public class CandRecordsHandler {
         for (int i = 0; i <= (candRecords.length - 1); i = i + 1) {
             candRecords[i].setSelected(true);
         }
-    }
-
-    public CandRecord[] getCandRecords() {
-        return candRecords;
     }
 
     public void updateCandRecordsToPropRecords(ArrayList<PropRecord> propRecords) {
@@ -72,7 +66,7 @@ public class CandRecordsHandler {
                     candRecords[i].incNbScoresAtIndex(nbScoresIndex);
                 }
             }
-            for (int j = 0; j <= maxScore; j = j + 1) {
+            for (int j = 0; j <= (10 * pegs); j = j + 1) {
                 if (candRecords[i].getNbScoresAtIndex(j) > maxNbScores) {
                     maxNbScores = candRecords[i].getNbScoresAtIndex(j);
                 }
@@ -139,7 +133,7 @@ public class CandRecordsHandler {
         candRecords = new CandRecord[(int) Math.pow(colors, pegs)];
         int[] comb = new int[pegs];
         for (int i = 0; i <= (candRecords.length - 1); i = i + 1) {
-            candRecords[i] = new CandRecord(pegs);
+            candRecords[i] = new CandRecord(pegs, colors);
             if (i != 0) {
                 int j = pegs - 1;
                 do {
@@ -152,7 +146,7 @@ public class CandRecordsHandler {
                     }
                 } while (j >= 0);
             }
-            candRecords[i].setComb(comb);   //  Le candidat a sa combinaison de couleurs, réparties sur ses pegs dont le nombre est pegs
+            candRecords[i].setComb(comb);   //  Le candidat a maintenant sa combinaison de couleurs, réparties sur ses pegs dont le nombre est pegs
             candRecords[i].setSelected(true);
         }
     }
