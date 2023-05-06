@@ -60,8 +60,8 @@ public class PropRecord {
     }
 
     public void resetComb() {
-        int[] comb = new int[pegs];
-        for (int i = 0; i <= (comb.length - 1); i = i + 1) {
+        this.comb = new int[pegs];
+        for (int i = 0; i <= (pegs - 1); i = i + 1) {
             this.comb[i] = COLOR_NUM_EMPTY;
         }
     }
