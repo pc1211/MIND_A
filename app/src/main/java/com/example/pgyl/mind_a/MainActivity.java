@@ -89,8 +89,8 @@ public class MainActivity extends Activity {
         }
     }
 
-    public enum CURRENT_PROP_PEGS {   //  Autant de valeurs que dans main.xml (BTN_PROP_...), avec un maximum de 9 (score avec max 9 dizaines)
-        CUR_PROP_0, CUR_PROP_1, CUR_PROP_2, CUR_PROP_3, CUR_PROP_4, CUR_PROP_5, CUR_PROP_6, CUR_PROP_7, CUR_PROP_8;
+    public enum CURRENT_PROP_PEGS {   //  Autant de valeurs que dans main.xml (BTN_CUR_PROP_...), avec un maximum de 9 pions (cad score avec max 9 dizaines)
+        CUR_PROP_0, CUR_PROP_1, CUR_PROP_2, CUR_PROP_3, CUR_PROP_4, CUR_PROP_5, CUR_PROP_6, CUR_PROP_7, CUR_PROP_8;   //  Le score est dans la DotMatrixDisplayView
 
         public int INDEX() {
             return ordinal();
@@ -120,7 +120,7 @@ public class MainActivity extends Activity {
     private int inputParamsIndex;
     private CustomButton[] flowButtons;
     private SymbolButtonView[] paletteButtons;
-    private SymbolButtonView[] currentPropButtons;
+    private SymbolButtonView[] currentPropPegButtons;
     private DotMatrixDisplayView currentPropDotMatrixDisplayScore;
     private MainDotMatrixDisplayUpdater dotMatrixDisplayUpdater;
     private RadioButton radioUserGuess;
@@ -155,7 +155,7 @@ public class MainActivity extends Activity {
         getActionBar().setTitle(ACTIVITY_TITLE);
         setContentView(R.layout.main);
         setupPaletteButtons();
-        setupCurrentPropButtons();
+        setupCurrentPropPegButtons();
         setupFlowButtons();
         setupDotMatrixDisplay();
         setupRadioButtons();
@@ -198,7 +198,7 @@ public class MainActivity extends Activity {
         inputParams = getCurrentsFromActivity(stringDB, MIND_ACTIVITIES.MAIN.toString(), getInputParamsTableName());
         pegs = Integer.valueOf(inputParams[getInputParamsPegsIndex()]);
         colors = Integer.valueOf(inputParams[getInputParamsColorsIndex()]);
-        boolean newScore = false;
+        boolean newParam = false;
 
         inputParamsIndex = getSHPInputParamsIndex();
         if (validReturnFromCalledActivity) {
@@ -209,17 +209,19 @@ public class MainActivity extends Activity {
                 if (inputParamsIndex == getInputParamsPegsIndex()) {
                     inputParams[inputParamsIndex] = value;
                     pegs = v;
+                    newParam = true;
                 }
                 if (inputParamsIndex == getInputParamsColorsIndex()) {
                     inputParams[inputParamsIndex] = value;
                     colors = v;
+                    newParam = true;
                 }
                 if (inputParamsIndex == getInputParamsScoreIndex()) {
                     int n = v / 10;   //  Noirs
                     int b = v % 10;   //  Blancs
                     if ((n <= pegs) && (b <= pegs) && (v <= (10 * pegs)) && (v != (10 * (pegs - 1) + 1))) {
                         inputParams[inputParamsIndex] = value;
-                        newScore = true;
+                        newParam = true;
                     } else {   //  Bad guy
                         msgBox("Invalid score: " + value, this);
                     }
@@ -228,14 +230,14 @@ public class MainActivity extends Activity {
         }
 
         setupPropRecords();
+        onNewParam(newParam, inputParamsIndex);
         setupMainPropList();
         setupMainPropListUpdater();
         setupDotMatrixDisplayUpdater();
         setupCandRecords();
         setupFlowButtonColors();
         setupPaletteButtonsVisibility();
-        setupCurrentPropButtonsVisibility();
-        updateCurrentPropRecord(newScore, inputParamsIndex);
+        setupCurrentPropPegButtonsVisibility();
         updateDisplayKeepScreen();
         updateDisplayUserGuess();
         updateDisplayPaletteButtonColors();
@@ -337,7 +339,7 @@ public class MainActivity extends Activity {
         }
     }
 
-    private void onCurrentPropButtonClick(int index) {
+    private void onCurrentPropPegButtonClick(int index) {
         if (userGuess) {
             EDIT_MODES oldEditMode = editMode;
             int oldEditIndex = editIndex;
@@ -467,16 +469,7 @@ public class MainActivity extends Activity {
     }
 
     private void onButtonClickNew() {
-        propRecordsHandler.clearPropRecords();   //  Sauf currentPropRecord et secrPropRecord
-        if (!userGuess) {
-            candRecordsHandler.selectAll();
-            currentPropRecord.setComb(candRecordsHandler.getGuessComb());
-        } else {   //  User Guess
-            currentPropRecord.resetComb();
-            currentPropRecord.setScore(0);
-            secrPropRecord.setRandomComb();
-        }
-        currentPropRecord.setScore(0);
+        resetProps();
         updateDisplayCurrentPropButtonColors();
         updateDisplayCurrentPropDotMatrixDisplayScore();
         mainPropListUpdater.reload();
@@ -491,6 +484,31 @@ public class MainActivity extends Activity {
             updateDisplayCurrentPropDotMatrixDisplayScore();
         } else {
             msgBox("I cannot read human memory", this);
+        }
+    }
+
+    private void onNewParam(boolean newParam, int inputParamsIndex) {
+        if (newParam) {
+            if (inputParamsIndex == getInputParamsPegsIndex()) {
+                resetProps();
+            }
+            if (inputParamsIndex == getInputParamsColorsIndex()) {
+                resetProps();
+            }
+            if (inputParamsIndex == getInputParamsScoreIndex()) {
+                currentPropRecord.setScore(Integer.valueOf(inputParams[inputParamsIndex]));
+            }
+        }
+    }
+
+    private void resetProps() {
+        propRecordsHandler.clearPropRecords();          //  Vider propRecords, sauf currentPropRecord et secrPropRecord
+        propRecordsHandler.setupSpecialPropRecords();   //  Reconstruire currentPropRecord et secrPropRecord
+        currentPropRecord = propRecordsHandler.getCurrentPropRecord();
+        secrPropRecord = propRecordsHandler.getSecrPropRecord();
+        candRecordsHandler = new CandRecordsHandler(pegs, colors);   // Reconstruire tous les candidats
+        if (!userGuess) {
+            currentPropRecord.setComb(candRecordsHandler.getGuessComb());
         }
     }
 
@@ -525,9 +543,9 @@ public class MainActivity extends Activity {
 
         String color = (currentPropRecord.getCombAtIndex(index) != COLOR_NUM_EMPTY) ? PALETTE_COLORS.getByIndex(currentPropRecord.getCombAtIndex(index)).RGB() : EMPTY_COLOR;
         if (colorMode.equals(COLOR_MODES.NORMAL)) {
-            currentPropButtons[index].setColors(color, BACK_COLOR_NORMAL, color, BACK_COLOR_INVERSE);
+            currentPropPegButtons[index].setColors(color, BACK_COLOR_NORMAL, color, BACK_COLOR_INVERSE);
         } else {   // Inverse
-            currentPropButtons[index].setColors(color, BACK_COLOR_INVERSE, color, BACK_COLOR_NORMAL);
+            currentPropPegButtons[index].setColors(color, BACK_COLOR_INVERSE, color, BACK_COLOR_NORMAL);
         }
     }
 
@@ -641,24 +659,24 @@ public class MainActivity extends Activity {
         }
     }
 
-    private void setupCurrentPropButtons() {
+    private void setupCurrentPropPegButtons() {
         final String BUTTON_XML_PREFIX = "BTN_CUR_PROP_";
         final float BUTTON_SYMBOL_SIZE_COEFF = 0.75f;   //  Pour que le symbole ne frôle pas les bords de sa View
         final long BUTTON_MIN_CLICK_TIME_INTERVAL_MS = 500;
 
-        currentPropButtons = new SymbolButtonView[CURRENT_PROP_PEGS.values().length];
+        currentPropPegButtons = new SymbolButtonView[CURRENT_PROP_PEGS.values().length];
         Class rid = R.id.class;
         for (CURRENT_PROP_PEGS cpp : CURRENT_PROP_PEGS.values())
             try {
-                currentPropButtons[cpp.INDEX()] = findViewById(rid.getField(BUTTON_XML_PREFIX + cpp.INDEX()).getInt(rid));
-                currentPropButtons[cpp.INDEX()].setSymbolSizeCoeff(BUTTON_SYMBOL_SIZE_COEFF);
-                currentPropButtons[cpp.INDEX()].setSVGImageResource(COLOR_BUTTON_SVG_ID);
-                currentPropButtons[cpp.INDEX()].setMinClickTimeInterval(BUTTON_MIN_CLICK_TIME_INTERVAL_MS);
+                currentPropPegButtons[cpp.INDEX()] = findViewById(rid.getField(BUTTON_XML_PREFIX + cpp.INDEX()).getInt(rid));
+                currentPropPegButtons[cpp.INDEX()].setSymbolSizeCoeff(BUTTON_SYMBOL_SIZE_COEFF);
+                currentPropPegButtons[cpp.INDEX()].setSVGImageResource(COLOR_BUTTON_SVG_ID);
+                currentPropPegButtons[cpp.INDEX()].setMinClickTimeInterval(BUTTON_MIN_CLICK_TIME_INTERVAL_MS);
                 final int index = cpp.INDEX();
-                currentPropButtons[cpp.INDEX()].setCustomOnClickListener(new SymbolButtonView.onCustomClickListener() {
+                currentPropPegButtons[cpp.INDEX()].setCustomOnClickListener(new SymbolButtonView.onCustomClickListener() {
                     @Override
                     public void onCustomClick() {
-                        onCurrentPropButtonClick(index);
+                        onCurrentPropPegButtonClick(index);
                     }
                 });
             } catch (IllegalAccessException | IllegalArgumentException | NoSuchFieldException |
@@ -667,9 +685,9 @@ public class MainActivity extends Activity {
             }
     }
 
-    private void setupCurrentPropButtonsVisibility() {
+    private void setupCurrentPropPegButtonsVisibility() {
         for (int i = 0; i <= (CURRENT_PROP_PEGS.values().length - 1); i = i + 1) {
-            currentPropButtons[i].setVisibility((i < pegs) ? View.VISIBLE : View.GONE);
+            currentPropPegButtons[i].setVisibility((i < pegs) ? View.VISIBLE : View.GONE);
         }
     }
 
@@ -715,12 +733,6 @@ public class MainActivity extends Activity {
 
     private void setupDotMatrixDisplayUpdater() {
         dotMatrixDisplayUpdater = new MainDotMatrixDisplayUpdater(currentPropDotMatrixDisplayScore);
-    }
-
-    private void updateCurrentPropRecord(boolean newScore, int inputParamsIndex) {
-        if (newScore) {
-            currentPropRecord.setScore(Integer.valueOf(inputParams[inputParamsIndex]));
-        }
     }
 
     private void setupPropRecords() {

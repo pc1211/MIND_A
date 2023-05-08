@@ -41,7 +41,7 @@ public class StringDBTables {
     private interface MindTableDataFields {  //  Les champs de data, par table
 
         enum props implements MindTableDataFields {   //  Les champs de data de la table PROPS
-            PROP_0, PROP_1, PROP_2, PROP_3, PROP_4, PROP_5, PROP_6, PROP_7, PROP_8, SCORE;
+            PROP_0, PROP_1, PROP_2, PROP_3, PROP_4, PROP_5, PROP_6, PROP_7, PROP_8, PROP_SCORE;
 
             public int INDEX() {
                 return ordinal() + 1;
@@ -120,10 +120,10 @@ public class StringDBTables {
     }
 
     public static int getPropsScoreIndex() {
-        return MindTableDataFields.props.SCORE.INDEX();
+        return MindTableDataFields.props.PROP_SCORE.INDEX();
     }
 
-    public static final String PROPS_NAME_PREFIX = "PROP_";
+    public static final String COMB_NAME_PREFIX = "PROP_";
     public static final int CURRENT_PROP_ID = 0;
     public static final int SECR_PROP_ID = 1;
 
@@ -138,14 +138,17 @@ public class StringDBTables {
     }
 
     public static PropRecord propRowToPropRecord(String[] propRow, int pegs, int colors) {
+        int id = Integer.parseInt(propRow[TABLE_ID_INDEX]);
         int[] comb = new int[pegs];
-        for (int i = 0; i <= (pegs - 1); i = i + 1) {
-            comb[i] = Integer.parseInt(propRow[MindTableDataFields.props.valueOf(PROPS_NAME_PREFIX + i).INDEX()]);
+        for (int i = 0; i <= (pegs - 1); i = i + 1) {   //  Les pions, uniquement la partie utilisée (via pegs)
+            comb[i] = Integer.parseInt(propRow[MindTableDataFields.props.valueOf(COMB_NAME_PREFIX + i).INDEX()]);
         }
+        int score = Integer.parseInt(propRow[MindTableDataFields.props.PROP_SCORE.INDEX()]);
+
         PropRecord propRecord = new PropRecord(pegs, colors);
-        propRecord.setId(Integer.parseInt(propRow[TABLE_ID_INDEX]));
+        propRecord.setId(id);
         propRecord.setComb(comb);
-        propRecord.setScore(Integer.parseInt(propRow[MindTableDataFields.props.SCORE.INDEX()]));
+        propRecord.setScore(score);
         return propRecord;
     }
 
@@ -161,14 +164,13 @@ public class StringDBTables {
     }
 
     public static String[] propRecordToPropRow(PropRecord propRecord) {
-        String[] propRow = new String[1 + MindTableDataFields.props.values().length];  //  Champ ID + Données
+        String[] propRow = new String[1 + MindTableDataFields.props.values().length];  //  Champ ID + Données (9 pions + Score)
 
         propRow[TABLE_ID_INDEX] = String.valueOf(propRecord.getId());
-        int[] propComb = propRecord.getComb();
-        for (int i = 0; i <= (CURRENT_PROP_PEGS.values().length - 1); i = i + 1) {
-            propRow[MindTableDataFields.props.valueOf(PROPS_NAME_PREFIX + i).INDEX()] = String.valueOf((i < propComb.length) ? propRecord.getComb()[i] : COLOR_NUM_EMPTY);
+        for (int i = 0; i <= (CURRENT_PROP_PEGS.values().length - 1); i = i + 1) {    //  Les pions, partie utilisée (via getcomb()) et partie non utilisée (via couleur vide)
+            propRow[MindTableDataFields.props.valueOf(COMB_NAME_PREFIX + i).INDEX()] = String.valueOf((i < propRecord.getComb().length) ? propRecord.getComb()[i] : COLOR_NUM_EMPTY);
         }
-        propRow[MindTableDataFields.props.SCORE.INDEX()] = String.valueOf(propRecord.getScore());
+        propRow[MindTableDataFields.props.PROP_SCORE.INDEX()] = String.valueOf(propRecord.getScore());   //  Le score
 
         return propRow;
     }

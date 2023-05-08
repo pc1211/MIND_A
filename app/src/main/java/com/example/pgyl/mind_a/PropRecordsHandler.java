@@ -29,11 +29,12 @@ public class PropRecordsHandler {
         this.stringDB = stringDB;
         this.pegs = pegs;
         this.colors = colors;
-        setupPropRecords();
+        propRecords = propRowsToPropRecords(getDBProps(stringDB), pegs, colors);
         init();
     }
 
     private void init() {
+        setupSpecialPropRecords();
     }
 
     public void saveAndClose() {
@@ -122,7 +123,7 @@ public class PropRecordsHandler {
                     public int compare(PropRecord propRecord1, PropRecord propRecord2) {
                         int idProp1 = propRecord1.getId();
                         int idProp2 = propRecord2.getId();
-                        int sortResult = ((idProp1 == idProp2) ? 0 : ((idProp1 < idProp2) ? 1 : -1));   //  Tri par n° idProp DESC
+                        int sortResult = ((idProp1 == idProp2) ? 0 : ((idProp1 < idProp2) ? 1 : -1));   //  Tri par n° id DESC
                         return sortResult;
                     }
                 });
@@ -142,8 +143,7 @@ public class PropRecordsHandler {
         return propRecordDest;
     }
 
-    private void setupPropRecords() {
-        propRecords = propRowsToPropRecords(getDBProps(stringDB), pegs, colors);
+    public void setupSpecialPropRecords() {
         if (getPropRecordIndexOfId(CURRENT_PROP_ID) == UNDEFINED) {   //  N'existe pas
             currentPropRecord = createPropRecordWithId(CURRENT_PROP_ID);
         } else {    //  Existe déjà

@@ -10,7 +10,7 @@ public class PropRecord {
     //region Variables
     private int pegs;
     private int colors;
-    private int id;             //  Identifiant de la proposition (1, 2, 3, ...)   (0 pour current Prop)
+    private int id;             //  Identifiant de la proposition (0, 1, 2, 3, ...)
     private int[] comb;         //  Numéros de couleur (0..9) de la proposition (cf PALETTE_COLORS[])  (-1 si pas de couleur attribuée (COLOR_NUM_EMPTY))
     private int score;          //  Score de la proposition p.ex. 2N1B => 21
     //endregion
@@ -88,6 +88,6 @@ public class PropRecord {
     }
 
     public String getStringScore() {
-        return (score / 10) + SEPARATOR + (score % 10);
+        return String.valueOf(score / 10) + SEPARATOR + String.valueOf(score % 10);
     }
 }
