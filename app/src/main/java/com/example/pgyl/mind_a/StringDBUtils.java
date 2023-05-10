@@ -5,6 +5,8 @@ import com.example.pgyl.pekislib_a.StringDB;
 import static com.example.pgyl.mind_a.StringDBTables.getInputParamsInits;
 import static com.example.pgyl.mind_a.StringDBTables.getInputParamsTableName;
 import static com.example.pgyl.mind_a.StringDBTables.getMindTableDataFieldsCount;
+import static com.example.pgyl.mind_a.StringDBTables.getPaletteColorsInits;
+import static com.example.pgyl.mind_a.StringDBTables.getPaletteColorsTableName;
 import static com.example.pgyl.mind_a.StringDBTables.getPropsTableName;
 
 public class StringDBUtils {
@@ -12,6 +14,12 @@ public class StringDBUtils {
     //region TABLES
     public static void createMindTableIfNotExists(StringDB stringDB, String tableName) {
         stringDB.createTableIfNotExists(tableName, 1 + getMindTableDataFieldsCount(tableName));   //  Champ ID + Données;
+    }
+    //endregion
+
+    //region PALETTE_COLORS
+    public static void initializeTablePaletteColors(StringDB stringDB) {
+        stringDB.insertOrReplaceRows(getPaletteColorsTableName(), getPaletteColorsInits());
     }
     //endregion
 
@@ -39,4 +47,5 @@ public class StringDBUtils {
         stringDB.insertOrReplaceRows(getPropsTableName(), values);
     }
     //endregion
+
 }

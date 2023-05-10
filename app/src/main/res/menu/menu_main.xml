@@ -7,11 +7,15 @@
     <item
         android:id="@+id/MENU_ITEM_PEGS"
         android:showAsAction="never"
-        android:title="Pegs" />
+        android:title="Number of pegs" />
     <item
         android:id="@+id/MENU_ITEM_COLORS"
         android:showAsAction="never"
-        android:title="Colors" />
+        android:title="Number of colors" />
+    <item
+        android:id="@+id/MENU_ITEM_EDIT_COLORS"
+        android:showAsAction="never"
+        android:title="Edit colors" />
     <item
         android:id="@+id/HELP"
         android:showAsAction="never"

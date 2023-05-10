@@ -7,7 +7,6 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 
 import com.example.pgyl.mind_a.MainActivity.CURRENT_PROP_PEGS;
-import com.example.pgyl.mind_a.MainActivity.PALETTE_COLORS;
 import com.example.pgyl.pekislib_a.StringDB;
 import com.example.pgyl.pekislib_a.SymbolButtonView;
 
@@ -16,6 +15,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import static com.example.pgyl.mind_a.PropRecord.COLOR_NUM_EMPTY;
+import static com.example.pgyl.mind_a.StringDBTables.getPaletteColorsAtIndex;
 
 public class MainPropListItemAdapter extends BaseAdapter {
     //region Variables
@@ -23,18 +23,20 @@ public class MainPropListItemAdapter extends BaseAdapter {
     private ArrayList<PropRecord> propRecords;
     private StringDB stringDB;
     private int pegs;
+    private String[] paletteColors;
     private MainPropListItemViewHolder viewHolder;
     private boolean showExpirationTime;
     private boolean setClockAppAlarmOnStartTimer;
     private MainPropListItemDotMatrixDisplayUpdater mainPropListItemDotMatrixDisplayUpdater;
     //endregion
 
-    public MainPropListItemAdapter(Context context, StringDB stringDB, int pegs) {
+    public MainPropListItemAdapter(Context context, StringDB stringDB, int pegs, String[] paletteColors) {
         super();
 
         this.context = context;
         this.stringDB = stringDB;
         this.pegs = pegs;
+        this.paletteColors = paletteColors;
         init();
     }
 
@@ -94,7 +96,7 @@ public class MainPropListItemAdapter extends BaseAdapter {
         int[] comb = propRecords.get(pos).getComb();
         for (int i = 0; i <= (CURRENT_PROP_PEGS.values().length - 1); i = i + 1) {
             if (i <= (pegs - 1)) {
-                String color = ((comb[i] != COLOR_NUM_EMPTY) ? PALETTE_COLORS.getByIndex(comb[i]).RGB() : EMPTY_COLOR);
+                String color = ((comb[i] != COLOR_NUM_EMPTY) ? paletteColors[getPaletteColorsAtIndex(comb[i])] : EMPTY_COLOR);
                 viewHolder.buttonColors[i].setColors(color, BACK_COLOR_NORMAL, color, BACK_COLOR_INVERSE);
             } else {  //  Ne rendre visibles que <pegs> boutons de couleur
                 viewHolder.buttonColors[i].setVisibility(View.GONE);
