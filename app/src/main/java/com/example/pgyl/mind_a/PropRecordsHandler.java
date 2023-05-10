@@ -87,7 +87,7 @@ public class PropRecordsHandler {
     public void removePropRecordAtId(int id) {
         int index = getPropRecordIndexOfId(id);
         if (index != UNDEFINED) {
-            propRecords.remove(getPropRecordIndexOfId(id));
+            propRecords.remove(index);
         }
     }
 

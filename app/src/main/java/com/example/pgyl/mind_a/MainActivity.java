@@ -496,7 +496,7 @@ public class MainActivity extends Activity {
                 resetProps();
             }
             if (inputParamsIndex == getInputParamsScoreIndex()) {
-                currentPropRecord.setScore(Integer.valueOf(inputParams[inputParamsIndex]));
+                currentPropRecord.setScore(Integer.parseInt(inputParams[inputParamsIndex]));
             }
         }
     }
