@@ -91,7 +91,8 @@ public class MainActivity extends Activity {
 
     public enum MIND_SHP_KEY_NAMES {KEEP_SCREEN, USER_GUESS, INPUT_PARAMS_INDEX}
 
-    public int COLOR_BUTTON_SVG_ID = R.raw.disk;
+    public final int COLOR_BUTTON_SVG_ID = R.raw.disk;
+    public final int MAX_CANDS_SAMSUNG_A52S = (int) Math.pow(9, 6);   // Combinaison (9 pegs, 6 colors) maximum supportée par la mémoire du Samsung A52
     //endregion
 
     //region Variables
@@ -183,46 +184,25 @@ public class MainActivity extends Activity {
         paletteColors = getCurrentsFromActivity(stringDB, MIND_ACTIVITIES.MAIN.toString(), getPaletteColorsTableName());
         pegs = Integer.parseInt(inputParams[getInputParamsPegsIndex()]);
         colors = Integer.parseInt(inputParams[getInputParamsColorsIndex()]);
-        boolean newParam = false;
+        setupPropRecords();   //  Charger à partir de la DB
+        setupCandRecords();
 
         inputParamsIndex = getSHPInputParamsIndex();
+        String newParamValue = null;
         if (validReturnFromCalledActivity) {
             validReturnFromCalledActivity = false;
             if (calledActivityName.equals(PEKISLIB_ACTIVITIES.INPUT_BUTTONS.toString())) {
-                String value = getCurrentFromActivity(stringDB, PEKISLIB_ACTIVITIES.INPUT_BUTTONS.toString(), getInputParamsTableName(), inputParamsIndex);
-                int v = Integer.parseInt(value);
-                if (inputParamsIndex == getInputParamsPegsIndex()) {
-                    inputParams[inputParamsIndex] = value;
-                    pegs = v;
-                    newParam = true;
-                }
-                if (inputParamsIndex == getInputParamsColorsIndex()) {
-                    inputParams[inputParamsIndex] = value;
-                    colors = v;
-                    newParam = true;
-                }
-                if (inputParamsIndex == getInputParamsScoreIndex()) {
-                    int n = v / 10;   //  Noirs
-                    int b = v % 10;   //  Blancs
-                    if ((n <= pegs) && (b <= pegs) && (v <= (10 * pegs)) && (v != (10 * (pegs - 1) + 1))) {
-                        inputParams[inputParamsIndex] = value;
-                        newParam = true;
-                    } else {   //  Bad guy
-                        msgBox("Invalid score: " + value, this);
-                    }
-                }
+                newParamValue = getCurrentFromActivity(stringDB, PEKISLIB_ACTIVITIES.INPUT_BUTTONS.toString(), getInputParamsTableName(), inputParamsIndex);
             }
             if (calledActivityName.equals(PEKISLIB_ACTIVITIES.COLOR_PICKER.toString())) {
                 String[] paletteColors = getCurrentsFromActivity(stringDB, PEKISLIB_ACTIVITIES.COLOR_PICKER.toString(), getPaletteColorsTableName());
             }
         }
 
-        setupPropRecords();
-        onNewParam(newParam, inputParamsIndex);
+        handleNewParamFollowUp(isValidNewParam(newParamValue));
         setupMainPropList();
         setupMainPropListUpdater();
         setupDotMatrixDisplayUpdater();
-        setupCandRecords();
         setupFlowButtonColors();
         setupPaletteButtonsVisibility();
         setupCurrentPropPegButtonsVisibility();
@@ -244,6 +224,56 @@ public class MainActivity extends Activity {
             calledActivityName = PEKISLIB_ACTIVITIES.INPUT_BUTTONS.toString();
             if (resultCode == RESULT_OK) {
                 validReturnFromCalledActivity = true;
+            }
+        }
+    }
+
+    private boolean isValidNewParam(String value) {
+        boolean ret = false;
+        if (value != null) {
+            int v = Integer.parseInt(value);
+            if (inputParamsIndex == getInputParamsPegsIndex()) {
+                inputParams[inputParamsIndex] = value;
+                pegs = v;
+                ret = true;
+            }
+            if (inputParamsIndex == getInputParamsColorsIndex()) {
+                inputParams[inputParamsIndex] = value;
+                colors = v;
+                ret = true;
+            }
+            if (inputParamsIndex == getInputParamsScoreIndex()) {
+                int n = v / 10;   //  Noirs
+                int b = v % 10;   //  Blancs
+                if ((n <= pegs) && (b <= pegs) && (v <= (10 * pegs)) && (v != (10 * (pegs - 1) + 1))) {
+                    inputParams[inputParamsIndex] = value;
+                    ret = true;
+                } else {   //  Bad guy
+                    msgBox("Invalid score: " + value, this);
+                }
+            }
+        }
+        return ret;
+    }
+
+    private void handleNewParamFollowUp(boolean isValidNewParam) {
+        if (isValidNewParam) {
+            if ((inputParamsIndex == getInputParamsPegsIndex()) || (inputParamsIndex == getInputParamsPegsIndex())) {
+                try {
+                    resetPropsAndCands();
+                } catch (OutOfMemoryError e) {   // Pas assez de RAM
+                    candRecordsHandler = null;   //  Libérer ce qui fâche
+                    propRecordsHandler = null;
+                    msgBox("Out of Memory Error. Now Trying to go back to previous state", this);
+                    inputParams = getCurrentsFromActivity(stringDB, MIND_ACTIVITIES.MAIN.toString(), getInputParamsTableName());   //  Restaurer les anciennes valeurs de pegs et colors
+                    pegs = Integer.parseInt(inputParams[getInputParamsPegsIndex()]);
+                    colors = Integer.parseInt(inputParams[getInputParamsColorsIndex()]);
+                    setupPropRecords();   //  Restaurer à partir de la DB
+                    setupCandRecords();   //  Reconstruire les candidats
+                }
+            }
+            if (inputParamsIndex == getInputParamsScoreIndex()) {
+                currentPropRecord.setScore(Integer.parseInt(inputParams[inputParamsIndex]));
             }
         }
     }
@@ -276,7 +306,7 @@ public class MainActivity extends Activity {
             launchInputButtonsActivity(inputParamsIndex);
             return true;
         }
-        if (item.getItemId() == R.id.MENU_ITEM_EDIT_COLORS) {
+        if (item.getItemId() == R.id.MENU_ITEM_EDIT_PALETTE) {
             launchColorPickerActivity();
             return true;
         }
@@ -461,7 +491,7 @@ public class MainActivity extends Activity {
     }
 
     private void onButtonClickNew() {
-        resetProps();
+        resetPropsAndCands();
         updateDisplayCurrentPropButtonColors();
         updateDisplayCurrentPropDotMatrixDisplayScore();
         mainPropListUpdater.reload();
@@ -479,21 +509,7 @@ public class MainActivity extends Activity {
         }
     }
 
-    private void onNewParam(boolean newParam, int inputParamsIndex) {
-        if (newParam) {
-            if (inputParamsIndex == getInputParamsPegsIndex()) {
-                resetProps();
-            }
-            if (inputParamsIndex == getInputParamsColorsIndex()) {
-                resetProps();
-            }
-            if (inputParamsIndex == getInputParamsScoreIndex()) {
-                currentPropRecord.setScore(Integer.parseInt(inputParams[inputParamsIndex]));
-            }
-        }
-    }
-
-    private void resetProps() {
+    private void resetPropsAndCands() {
         propRecordsHandler.clearPropRecords();          //  Vider propRecords, sauf currentPropRecord et secrPropRecord
         propRecordsHandler.setupSpecialPropRecords();   //  Reconstruire currentPropRecord et secrPropRecord
         currentPropRecord = propRecordsHandler.getCurrentPropRecord();

@@ -7,10 +7,11 @@
         android:theme="@style/AppTheme">
         <activity
             android:name="com.example.pgyl.mind_a.MainActivity"
+            android:exported="true"
             android:label="Mind"
             android:launchMode="singleTask"
-            android:windowSoftInputMode="stateHidden"
-            android:exported="true">
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="stateHidden">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
