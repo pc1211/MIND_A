@@ -1,6 +1,5 @@
 package com.example.pgyl.mind_a;
 
-import com.example.pgyl.mind_a.MainActivity.CURRENT_PROP_PEGS;
 import com.example.pgyl.pekislib_a.InputButtonsActivity;
 
 import java.util.ArrayList;
@@ -50,7 +49,7 @@ public class StringDBTables {
         }
 
         enum paletteColors implements MindTableDataFields {   //  Les champs de data de la table PALETTE_COLORS
-            COL_0, COL_1, COL_2, COL_3, COL_4, COL_5, COL_6, COL_7, COL_8, COL_9;   //  Avec un maximum de 10 (index de 0 à 9)
+            PAL_0, PAL_1, PAL_2, PAL_3, PAL_4, PAL_5, PAL_6, PAL_7, PAL_8, PAL_9;   //  Avec un maximum de 10 (index de 0 à 9)
 
             private String valueLabel;
 
@@ -105,12 +104,12 @@ public class StringDBTables {
     }
 
     public static int getPaletteColorsAtIndex(int index) {
-        return MindTableDataFields.paletteColors.COL_0.INDEX() + index;
+        return MindTableDataFields.paletteColors.PAL_0.INDEX() + index;
     }
 
     public static String[][] getPaletteColorsInits() {
         final String[][] PALETTE_COLORS_INITS = {   //  Pour entrer le nombre de pegs, de couleurs, ou le score d'une proposition d'Android
-                {TABLE_IDS.LABEL.toString(), MindTableDataFields.paletteColors.COL_0.LABEL(), MindTableDataFields.paletteColors.COL_1.LABEL(), MindTableDataFields.paletteColors.COL_2.LABEL(), MindTableDataFields.paletteColors.COL_3.LABEL(), MindTableDataFields.paletteColors.COL_4.LABEL(), MindTableDataFields.paletteColors.COL_5.LABEL(), MindTableDataFields.paletteColors.COL_6.LABEL(), MindTableDataFields.paletteColors.COL_7.LABEL(), MindTableDataFields.paletteColors.COL_8.LABEL(), MindTableDataFields.paletteColors.COL_9.LABEL()},
+                {TABLE_IDS.LABEL.toString(), MindTableDataFields.paletteColors.PAL_0.LABEL(), MindTableDataFields.paletteColors.PAL_1.LABEL(), MindTableDataFields.paletteColors.PAL_2.LABEL(), MindTableDataFields.paletteColors.PAL_3.LABEL(), MindTableDataFields.paletteColors.PAL_4.LABEL(), MindTableDataFields.paletteColors.PAL_5.LABEL(), MindTableDataFields.paletteColors.PAL_6.LABEL(), MindTableDataFields.paletteColors.PAL_7.LABEL(), MindTableDataFields.paletteColors.PAL_8.LABEL(), MindTableDataFields.paletteColors.PAL_9.LABEL()},
                 {TABLE_IDS.KEYBOARD.toString(), InputButtonsActivity.KEYBOARDS.HEX.toString(), InputButtonsActivity.KEYBOARDS.HEX.toString(), InputButtonsActivity.KEYBOARDS.HEX.toString(), InputButtonsActivity.KEYBOARDS.HEX.toString(), InputButtonsActivity.KEYBOARDS.HEX.toString(), InputButtonsActivity.KEYBOARDS.HEX.toString(), InputButtonsActivity.KEYBOARDS.HEX.toString(), InputButtonsActivity.KEYBOARDS.HEX.toString(), InputButtonsActivity.KEYBOARDS.HEX.toString(), InputButtonsActivity.KEYBOARDS.HEX.toString()},
                 {TABLE_IDS.REGEXP.toString(), REGEXP_SIX_CHARS, REGEXP_SIX_CHARS, REGEXP_SIX_CHARS, REGEXP_SIX_CHARS, REGEXP_SIX_CHARS, REGEXP_SIX_CHARS, REGEXP_SIX_CHARS, REGEXP_SIX_CHARS, REGEXP_SIX_CHARS, REGEXP_SIX_CHARS},
                 {TABLE_IDS.REGEXP_ERROR_MESSAGE.toString(), REGEXP_SIX_CHARS_ERROR_MESSAGE, REGEXP_SIX_CHARS_ERROR_MESSAGE, REGEXP_SIX_CHARS_ERROR_MESSAGE, REGEXP_SIX_CHARS_ERROR_MESSAGE, REGEXP_SIX_CHARS_ERROR_MESSAGE, REGEXP_SIX_CHARS_ERROR_MESSAGE, REGEXP_SIX_CHARS_ERROR_MESSAGE, REGEXP_SIX_CHARS_ERROR_MESSAGE, REGEXP_SIX_CHARS_ERROR_MESSAGE, REGEXP_SIX_CHARS_ERROR_MESSAGE},
@@ -131,7 +130,7 @@ public class StringDBTables {
                 {TABLE_IDS.REGEXP.toString(), REGEXP_INTEGER_FROM_0, REGEXP_INTEGER_FROM_0, REGEXP_INTEGER_FROM_0},
                 {TABLE_IDS.REGEXP_ERROR_MESSAGE.toString(), REGEXP_INTEGER_FROM_0_ERROR_MESSAGE, REGEXP_INTEGER_FROM_0_ERROR_MESSAGE, REGEXP_INTEGER_FROM_0_ERROR_MESSAGE},
                 {TABLE_IDS.MIN.toString(), "1", "1", "0"},
-                {TABLE_IDS.MAX.toString(), String.valueOf(CURRENT_PROP_PEGS.values().length), String.valueOf(MIND_TABLES.PALETTE_COLORS.getDataFieldsCount()), "99"},
+                {TABLE_IDS.MAX.toString(), String.valueOf(getPegsCount()), String.valueOf(MIND_TABLES.PALETTE_COLORS.getDataFieldsCount()), "99"},
                 {TABLE_IDS.DEFAULT.toString(), "4", "6", "0"}   //  4 pegs, 6 colors, Pas pertinent pour le score
         };
         return INPUT_PARAMS_INITS;
@@ -152,6 +151,10 @@ public class StringDBTables {
     //region PROPS
     public static String getPropsTableName() {
         return MIND_TABLES.PROPS.toString();
+    }
+
+    public static int getPegsCount() {
+        return MIND_TABLES.PROPS.getDataFieldsCount() - 1;   //  Ne pas prendre en compte le score
     }
 
     public static int getPropsCombAtIndex(int index) {
@@ -206,7 +209,7 @@ public class StringDBTables {
         String[] propRow = new String[1 + MindTableDataFields.props.values().length];  //  Champ ID + Données (9 pions + Score)
 
         propRow[TABLE_ID_INDEX] = String.valueOf(propRecord.getId());
-        for (int i = 0; i <= (CURRENT_PROP_PEGS.values().length - 1); i = i + 1) {    //  Les pions, partie utilisée (via getcomb()) et partie non utilisée (via couleur vide)
+        for (int i = 0; i <= (getPegsCount() - 1); i = i + 1) {    //  Les pions, partie utilisée (via getcomb()) et partie non utilisée (via couleur vide)
             propRow[MindTableDataFields.props.valueOf(COMB_NAME_PREFIX + i).INDEX()] = String.valueOf((i < propRecord.getComb().length) ? propRecord.getComb()[i] : COLOR_NUM_EMPTY);
         }
         propRow[MindTableDataFields.props.PROP_SCORE.INDEX()] = String.valueOf(propRecord.getScore());   //  Le score

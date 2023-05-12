@@ -37,6 +37,7 @@ import static com.example.pgyl.mind_a.StringDBTables.getInputParamsScoreIndex;
 import static com.example.pgyl.mind_a.StringDBTables.getInputParamsTableName;
 import static com.example.pgyl.mind_a.StringDBTables.getPaletteColorsAtIndex;
 import static com.example.pgyl.mind_a.StringDBTables.getPaletteColorsTableName;
+import static com.example.pgyl.mind_a.StringDBTables.getPegsCount;
 import static com.example.pgyl.mind_a.StringDBTables.getPropsTableName;
 import static com.example.pgyl.mind_a.StringDBUtils.createMindTableIfNotExists;
 import static com.example.pgyl.mind_a.StringDBUtils.initializeTableInputParams;
@@ -68,16 +69,7 @@ import static com.example.pgyl.pekislib_a.StringDBUtils.setStartStatusOfActivity
 
 public class MainActivity extends Activity {
     //region Constantes
-
-    public enum CURRENT_PROP_PEGS {   //  Autant de valeurs que dans main.xml (BTN_CUR_PROP_...), avec un maximum de 9 pions (cad score avec max 9 dizaines)
-        CUR_PROP_0, CUR_PROP_1, CUR_PROP_2, CUR_PROP_3, CUR_PROP_4, CUR_PROP_5, CUR_PROP_6, CUR_PROP_7, CUR_PROP_8;   //  Le score est dans la DotMatrixDisplayView
-
-        public int INDEX() {
-            return ordinal();
-        }
-    }
-
-    private enum FLOWS {
+    private enum COMMANDS {
         SUBMIT, CLEAR, DELETE_LAST, NEW, CHEAT;
 
         public int INDEX() {
@@ -92,7 +84,6 @@ public class MainActivity extends Activity {
     public enum MIND_SHP_KEY_NAMES {KEEP_SCREEN, USER_GUESS, INPUT_PARAMS_INDEX}
 
     public final int COLOR_BUTTON_SVG_ID = R.raw.disk;
-    public final int MAX_CANDS_SAMSUNG_A52S = (int) Math.pow(9, 6);   // Combinaison (9 pegs, 6 colors) maximum supportée par la mémoire du Samsung A52
     //endregion
 
     //region Variables
@@ -100,7 +91,7 @@ public class MainActivity extends Activity {
     private String[] inputParams;
     private int inputParamsIndex;
     private String[] paletteColors;
-    private CustomButton[] flowButtons;
+    private CustomButton[] commandButtons;
     private SymbolButtonView[] paletteButtons;
     private SymbolButtonView[] currentPropPegButtons;
     private DotMatrixDisplayView currentPropDotMatrixDisplayScore;
@@ -138,7 +129,7 @@ public class MainActivity extends Activity {
         setContentView(R.layout.main);
         setupPaletteButtons();
         setupCurrentPropPegButtons();
-        setupFlowButtons();
+        setupCommandButtons();
         setupDotMatrixDisplay();
         setupRadioButtons();
         setupTextViews();
@@ -203,7 +194,7 @@ public class MainActivity extends Activity {
         setupMainPropList();
         setupMainPropListUpdater();
         setupDotMatrixDisplayUpdater();
-        setupFlowButtonColors();
+        setupCommandButtonColors();
         setupPaletteButtonsVisibility();
         setupCurrentPropPegButtonsVisibility();
         updateDisplayKeepScreen();
@@ -415,20 +406,20 @@ public class MainActivity extends Activity {
         onButtonClickNew();
     }
 
-    private void onFlowButtonClick(FLOWS command) {
-        if (command.equals(FLOWS.SUBMIT)) {
+    private void onCommandButtonClick(COMMANDS command) {
+        if (command.equals(COMMANDS.SUBMIT)) {
             onButtonClickSubmit();
         }
-        if (command.equals(FLOWS.CLEAR)) {
+        if (command.equals(COMMANDS.CLEAR)) {
             onButtonClickClear();
         }
-        if (command.equals(FLOWS.DELETE_LAST)) {
+        if (command.equals(COMMANDS.DELETE_LAST)) {
             onButtonClickDeleteLast();
         }
-        if (command.equals(FLOWS.NEW)) {
+        if (command.equals(COMMANDS.NEW)) {
             onButtonClickNew();
         }
-        if (command.equals(FLOWS.CHEAT)) {
+        if (command.equals(COMMANDS.CHEAT)) {
             onButtonClickCheat();
         }
     }
@@ -673,16 +664,16 @@ public class MainActivity extends Activity {
         final float BUTTON_SYMBOL_SIZE_COEFF = 0.75f;   //  Pour que le symbole ne frôle pas les bords de sa View
         final long BUTTON_MIN_CLICK_TIME_INTERVAL_MS = 500;
 
-        currentPropPegButtons = new SymbolButtonView[CURRENT_PROP_PEGS.values().length];
+        currentPropPegButtons = new SymbolButtonView[getPegsCount()];
         Class rid = R.id.class;
-        for (CURRENT_PROP_PEGS cpp : CURRENT_PROP_PEGS.values())
+        for (int i = 0; i <= (currentPropPegButtons.length - 1); i = i + 1) {
             try {
-                currentPropPegButtons[cpp.INDEX()] = findViewById(rid.getField(BUTTON_XML_PREFIX + cpp.INDEX()).getInt(rid));
-                currentPropPegButtons[cpp.INDEX()].setSymbolSizeCoeff(BUTTON_SYMBOL_SIZE_COEFF);
-                currentPropPegButtons[cpp.INDEX()].setSVGImageResource(COLOR_BUTTON_SVG_ID);
-                currentPropPegButtons[cpp.INDEX()].setMinClickTimeInterval(BUTTON_MIN_CLICK_TIME_INTERVAL_MS);
-                final int index = cpp.INDEX();
-                currentPropPegButtons[cpp.INDEX()].setCustomOnClickListener(new SymbolButtonView.onCustomClickListener() {
+                currentPropPegButtons[i] = findViewById(rid.getField(BUTTON_XML_PREFIX + i).getInt(rid));
+                currentPropPegButtons[i].setSymbolSizeCoeff(BUTTON_SYMBOL_SIZE_COEFF);
+                currentPropPegButtons[i].setSVGImageResource(COLOR_BUTTON_SVG_ID);
+                currentPropPegButtons[i].setMinClickTimeInterval(BUTTON_MIN_CLICK_TIME_INTERVAL_MS);
+                final int index = i;
+                currentPropPegButtons[i].setCustomOnClickListener(new SymbolButtonView.onCustomClickListener() {
                     @Override
                     public void onCustomClick() {
                         onCurrentPropPegButtonClick(index);
@@ -692,29 +683,30 @@ public class MainActivity extends Activity {
                     SecurityException ex) {
                 Logger.getLogger(MainActivity.class.getName()).log(Level.SEVERE, null, ex);
             }
+        }
     }
 
     private void setupCurrentPropPegButtonsVisibility() {
-        for (int i = 0; i <= (CURRENT_PROP_PEGS.values().length - 1); i = i + 1) {
+        for (int i = 0; i <= (currentPropPegButtons.length - 1); i = i + 1) {
             currentPropPegButtons[i].setVisibility((i < pegs) ? View.VISIBLE : View.GONE);
         }
     }
 
-    private void setupFlowButtons() {
+    private void setupCommandButtons() {
         final String BUTTON_COMMAND_XML_PREFIX = "BTN_";
         final long BUTTON_MIN_CLICK_TIME_INTERVAL_MS = 500;
 
-        flowButtons = new CustomButton[FLOWS.values().length];
+        commandButtons = new CustomButton[COMMANDS.values().length];
         Class rid = R.id.class;
-        for (FLOWS f : FLOWS.values())
+        for (COMMANDS c : COMMANDS.values())
             try {
-                flowButtons[f.INDEX()] = findViewById(rid.getField(BUTTON_COMMAND_XML_PREFIX + f.toString()).getInt(rid));
-                flowButtons[f.INDEX()].setMinClickTimeInterval(BUTTON_MIN_CLICK_TIME_INTERVAL_MS);
-                final FLOWS ff = f;
-                flowButtons[f.INDEX()].setOnClickListener(new CustomButton.OnClickListener() {
+                commandButtons[c.INDEX()] = findViewById(rid.getField(BUTTON_COMMAND_XML_PREFIX + c.toString()).getInt(rid));
+                commandButtons[c.INDEX()].setMinClickTimeInterval(BUTTON_MIN_CLICK_TIME_INTERVAL_MS);
+                final COMMANDS cc = c;
+                commandButtons[c.INDEX()].setOnClickListener(new CustomButton.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        onFlowButtonClick(ff);
+                        onCommandButtonClick(cc);
                     }
                 });
             } catch (IllegalAccessException | IllegalArgumentException | NoSuchFieldException | SecurityException ex) {
@@ -722,11 +714,11 @@ public class MainActivity extends Activity {
             }
     }
 
-    private void setupFlowButtonColors() {
+    private void setupCommandButtonColors() {
         final String COLOR_PRESSED = "FF9A22";
 
-        for (FLOWS f : FLOWS.values()) {
-            flowButtons[f.INDEX()].setColors(COLOR_PRESSED, null);
+        for (COMMANDS f : COMMANDS.values()) {
+            commandButtons[f.INDEX()].setColors(COLOR_PRESSED, null);
         }
     }
 

@@ -6,7 +6,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 
-import com.example.pgyl.mind_a.MainActivity.CURRENT_PROP_PEGS;
 import com.example.pgyl.pekislib_a.StringDB;
 import com.example.pgyl.pekislib_a.SymbolButtonView;
 
@@ -16,6 +15,7 @@ import java.util.logging.Logger;
 
 import static com.example.pgyl.mind_a.PropRecord.COLOR_NUM_EMPTY;
 import static com.example.pgyl.mind_a.StringDBTables.getPaletteColorsAtIndex;
+import static com.example.pgyl.mind_a.StringDBTables.getPegsCount;
 
 public class MainPropListItemAdapter extends BaseAdapter {
     //region Variables
@@ -94,7 +94,7 @@ public class MainPropListItemAdapter extends BaseAdapter {
         MainPropListItemViewHolder viewHolder = (MainPropListItemViewHolder) rowView.getTag();
 
         int[] comb = propRecords.get(pos).getComb();
-        for (int i = 0; i <= (CURRENT_PROP_PEGS.values().length - 1); i = i + 1) {
+        for (int i = 0; i <= (getPegsCount() - 1); i = i + 1) {
             if (i <= (pegs - 1)) {
                 String color = ((comb[i] != COLOR_NUM_EMPTY) ? paletteColors[getPaletteColorsAtIndex(comb[i])] : EMPTY_COLOR);
                 viewHolder.buttonColors[i].setColors(color, BACK_COLOR_NORMAL, color, BACK_COLOR_INVERSE);
@@ -110,7 +110,7 @@ public class MainPropListItemAdapter extends BaseAdapter {
         final long BUTTON_MIN_CLICK_TIME_INTERVAL_MS = 500;
         final float STATE_BUTTON_SYMBOL_SIZE_COEFF = 0.75f;   //  Pour que le symbole ne frôle pas les bords de sa View
 
-        for (int i = 0; i <= (CURRENT_PROP_PEGS.values().length - 1); i = i + 1) {
+        for (int i = 0; i <= (getPegsCount() - 1); i = i + 1) {
             viewHolder.buttonColors[i].setSVGImageResource(R.raw.disk);
             viewHolder.buttonColors[i].setSymbolSizeCoeff(STATE_BUTTON_SYMBOL_SIZE_COEFF);
             viewHolder.buttonColors[i].setMinClickTimeInterval(BUTTON_MIN_CLICK_TIME_INTERVAL_MS);
@@ -128,9 +128,9 @@ public class MainPropListItemAdapter extends BaseAdapter {
 
         viewHolder = new MainPropListItemViewHolder();
 
-        viewHolder.buttonColors = new SymbolButtonView[CURRENT_PROP_PEGS.values().length];
+        viewHolder.buttonColors = new SymbolButtonView[getPegsCount()];
         Class rid = R.id.class;
-        for (int i = 0; i <= (CURRENT_PROP_PEGS.values().length - 1); i = i + 1) {
+        for (int i = 0; i <= (getPegsCount() - 1); i = i + 1) {
             try {
                 viewHolder.buttonColors[i] = rowView.findViewById(rid.getField(BUTTON_XML_NAME_PREFIX + i).getInt(rid));
                 viewHolder.buttonColors[i].setMinClickTimeInterval(BUTTON_MIN_CLICK_TIME_INTERVAL_MS);
