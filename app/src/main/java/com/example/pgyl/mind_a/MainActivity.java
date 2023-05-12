@@ -269,6 +269,17 @@ public class MainActivity extends Activity {
         }
     }
 
+    private void resetPropsAndCands() {
+        propRecordsHandler.clearPropRecords();                 //  Vider propRecords et nuller currentPropRecord et secrPropRecord
+        propRecordsHandler.setupCurrentAndSecrPropRecords();   //  Reconstruire currentPropRecord et secrPropRecord
+        currentPropRecord = propRecordsHandler.getCurrentPropRecord();
+        secrPropRecord = propRecordsHandler.getSecrPropRecord();
+        candRecordsHandler = new CandRecordsHandler(pegs, colors);   // Reconstruire tous les candidats
+        if (!userGuess) {
+            currentPropRecord.setComb(candRecordsHandler.getGuessComb());
+        }
+    }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {  //  Non appelé après changement d'orientation
         getMenuInflater().inflate(R.menu.menu_main, menu);
@@ -497,17 +508,6 @@ public class MainActivity extends Activity {
             updateDisplayCurrentPropDotMatrixDisplayScore();
         } else {
             msgBox("I cannot read human memory", this);
-        }
-    }
-
-    private void resetPropsAndCands() {
-        propRecordsHandler.clearPropRecords();          //  Vider propRecords, sauf currentPropRecord et secrPropRecord
-        propRecordsHandler.setupSpecialPropRecords();   //  Reconstruire currentPropRecord et secrPropRecord
-        currentPropRecord = propRecordsHandler.getCurrentPropRecord();
-        secrPropRecord = propRecordsHandler.getSecrPropRecord();
-        candRecordsHandler = new CandRecordsHandler(pegs, colors);   // Reconstruire tous les candidats
-        if (!userGuess) {
-            currentPropRecord.setComb(candRecordsHandler.getGuessComb());
         }
     }
 

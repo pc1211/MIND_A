@@ -29,12 +29,12 @@ public class PropRecordsHandler {
         this.stringDB = stringDB;
         this.pegs = pegs;
         this.colors = colors;
-        propRecords = propRowsToPropRecords(getDBProps(stringDB), pegs, colors);
+        propRecords = propRowsToPropRecords(getDBProps(stringDB), pegs, colors);   //  Créer propRecords via la DB
         init();
     }
 
     private void init() {
-        setupSpecialPropRecords();
+        setupCurrentAndSecrPropRecords();
     }
 
     public void saveAndClose() {
@@ -42,12 +42,13 @@ public class PropRecordsHandler {
         propRecords.add(secrPropRecord);
         saveDBProps(stringDB, propRecordsToPropRows(propRecords));
         stringDB = null;
-        propRecords.clear();
+        clearPropRecords();
         propRecords = null;
-        currentPropRecord = null;
     }
 
     public void clearPropRecords() {
+        currentPropRecord = null;
+        secrPropRecord = null;
         propRecords.clear();
     }
 
@@ -143,7 +144,7 @@ public class PropRecordsHandler {
         return propRecordDest;
     }
 
-    public void setupSpecialPropRecords() {
+    public void setupCurrentAndSecrPropRecords() {
         if (getPropRecordIndexOfId(CURRENT_PROP_ID) == UNDEFINED) {   //  N'existe pas
             currentPropRecord = createPropRecordWithId(CURRENT_PROP_ID);
         } else {    //  Existe déjà
