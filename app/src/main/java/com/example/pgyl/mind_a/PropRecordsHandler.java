@@ -64,41 +64,12 @@ public class PropRecordsHandler {
         return secrPropRecord;
     }
 
-    public PropRecord createPropRecordWithId(int id) {
-        PropRecord propRecord = new PropRecord();
-        propRecord.setId(id);
-        propRecord.resetComb();
-        propRecord.setScore(0);
-        return propRecord;
+    public PropRecord createPropRecordWithNewId() {
+        return createPropRecordWithId(getPropRecordMaxId() + 1);
     }
 
-    public PropRecord getPropRecordAtId(int id) {
-        PropRecord propRecord = null;
-        int index = getPropRecordIndexOfId(id);
-        if (index != UNDEFINED) {
-            propRecord = propRecords.get(index);
-        }
-        return propRecord;
-    }
-
-    public void removePropRecordAtId(int id) {
-        int index = getPropRecordIndexOfId(id);
-        if (index != UNDEFINED) {
-            propRecords.remove(index);
-        }
-    }
-
-    public int getPropRecordIndexOfId(int id) {
-        int index = UNDEFINED;
-        if (!propRecords.isEmpty()) {
-            for (int i = 0; i <= (propRecords.size() - 1); i = i + 1) {
-                if (propRecords.get(i).getId() == id) {
-                    index = i;
-                    break;
-                }
-            }
-        }
-        return index;
+    public void removePropRecordAtMaxId() {
+        removePropRecordAtId(getPropRecordMaxId());
     }
 
     public int getPropRecordMaxId() {   //  Hors currentPropRecord et scrPropRecord
@@ -111,6 +82,43 @@ public class PropRecordsHandler {
             }
         }
         return maxId;
+    }
+
+    private PropRecord getPropRecordAtId(int id) {
+        PropRecord propRecord = null;
+        int index = getPropRecordIndexOfId(id);
+        if (index != UNDEFINED) {
+            propRecord = propRecords.get(index);
+        }
+        return propRecord;
+    }
+
+    private PropRecord createPropRecordWithId(int id) {
+        PropRecord propRecord = new PropRecord();
+        propRecord.setId(id);
+        propRecord.resetComb();
+        propRecord.setScore(0);
+        return propRecord;
+    }
+
+    private void removePropRecordAtId(int id) {
+        int index = getPropRecordIndexOfId(id);
+        if (index != UNDEFINED) {
+            propRecords.remove(index);
+        }
+    }
+
+    private int getPropRecordIndexOfId(int id) {
+        int index = UNDEFINED;
+        if (!propRecords.isEmpty()) {
+            for (int i = 0; i <= (propRecords.size() - 1); i = i + 1) {
+                if (propRecords.get(i).getId() == id) {
+                    index = i;
+                    break;
+                }
+            }
+        }
+        return index;
     }
 
     public void sortPropRecords() {

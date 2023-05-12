@@ -2,19 +2,17 @@ package com.example.pgyl.mind_a;
 
 import java.util.ArrayList;
 
+import static com.example.pgyl.mind_a.MainActivity.colors;
+import static com.example.pgyl.mind_a.MainActivity.pegs;
 import static com.example.pgyl.pekislib_a.Constants.UNDEFINED;
 
 public class CandRecordsHandler {
 
     //region Variables
-    private int pegs;
-    private int colors;
     private CandRecord[] candRecords;
     //endregion
 
-    public CandRecordsHandler(int pegs, int colors) {
-        this.pegs = pegs;
-        this.colors = colors;
+    public CandRecordsHandler() {
         init();
     }
 
@@ -29,13 +27,8 @@ public class CandRecordsHandler {
         candRecords = null;
     }
 
-    public void selectAll() {
-        for (int i = 0; i <= (candRecords.length - 1); i = i + 1) {
-            candRecords[i].setSelected(true);
-        }
-    }
-
-    public void updateCandRecordsToPropRecords(ArrayList<PropRecord> propRecords) {
+    public void updateCandRecordsToPropRecords(PropRecordsHandler propRecordsHandler) {
+        ArrayList<PropRecord> propRecords = propRecordsHandler.getPropRecords();
         for (int i = 0; i <= (candRecords.length - 1); i = i + 1) {
             candRecords[i].setSelected(true);   //  Comme au début
         }
@@ -52,31 +45,6 @@ public class CandRecordsHandler {
 
     public int[] getCombAtIndex(int index) {
         return candRecords[index].getComb();
-    }
-
-    public int getMiniMaxCandRecordsIndex() {
-        int miniMaxCandRecordsIndex = UNDEFINED;
-        int minNbScores = Integer.MAX_VALUE;
-        for (int i = 0; i <= (candRecords.length - 1); i = i + 1) {
-            int maxNbScores = -Integer.MAX_VALUE;
-            candRecords[i].resetNbScores();
-            for (int j = 0; j <= (candRecords.length - 1); j = j + 1) {
-                if (candRecords[j].isSelected()) {
-                    int nbScoresIndex = getScore(candRecords[i].getComb(), candRecords[j].getComb());   //  Le score lui-même est utilisé comme index dans nbScores; Si pegs = 4 => les nombres de score de chaque candidat seront stockés dans candRecords().nbScores aux index 00,01,02,03,04,10,11,12,13,20,21,22,30,40
-                    candRecords[i].incNbScoresAtIndex(nbScoresIndex);
-                }
-            }
-            for (int j = 0; j <= (10 * pegs); j = j + 1) {
-                if (candRecords[i].getNbScoresAtIndex(j) > maxNbScores) {
-                    maxNbScores = candRecords[i].getNbScoresAtIndex(j);
-                }
-            }
-            if (maxNbScores < minNbScores) {
-                minNbScores = maxNbScores;
-                miniMaxCandRecordsIndex = i;
-            }
-        }
-        return miniMaxCandRecordsIndex;
     }
 
     public int getScore(int[] comb, int[] secrComb) {
@@ -129,6 +97,31 @@ public class CandRecordsHandler {
         return solIndex;
     }
 
+    private int getMiniMaxCandRecordsIndex() {
+        int miniMaxCandRecordsIndex = UNDEFINED;
+        int minNbScores = Integer.MAX_VALUE;
+        for (int i = 0; i <= (candRecords.length - 1); i = i + 1) {
+            int maxNbScores = -Integer.MAX_VALUE;
+            candRecords[i].resetNbScores();
+            for (int j = 0; j <= (candRecords.length - 1); j = j + 1) {
+                if (candRecords[j].isSelected()) {
+                    int nbScoresIndex = getScore(candRecords[i].getComb(), candRecords[j].getComb());   //  Le score lui-même est utilisé comme index dans nbScores; Si pegs = 4 => les nombres de score de chaque candidat seront stockés dans candRecords().nbScores aux index 00,01,02,03,04,10,11,12,13,20,21,22,30,40
+                    candRecords[i].incNbScoresAtIndex(nbScoresIndex);
+                }
+            }
+            for (int j = 0; j <= (10 * pegs); j = j + 1) {
+                if (candRecords[i].getNbScoresAtIndex(j) > maxNbScores) {
+                    maxNbScores = candRecords[i].getNbScoresAtIndex(j);
+                }
+            }
+            if (maxNbScores < minNbScores) {
+                minNbScores = maxNbScores;
+                miniMaxCandRecordsIndex = i;
+            }
+        }
+        return miniMaxCandRecordsIndex;
+    }
+
     private void setupCandRecords() {
         candRecords = new CandRecord[(int) Math.pow(colors, pegs)];
         int[] comb = new int[pegs];
@@ -146,7 +139,7 @@ public class CandRecordsHandler {
                     }
                 } while (j >= 0);
             }
-            candRecords[i].setComb(comb);   //  Le candidat a maintenant sa combinaison de couleurs, réparties sur ses pegs dont le nombre est pegs
+            candRecords[i].setComb(comb);   //  Le candidat a maintenant sa combinaison de couleurs, réparties sur ses pegs pions
             candRecords[i].setSelected(true);
         }
     }

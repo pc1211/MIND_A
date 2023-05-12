@@ -275,7 +275,7 @@ public class MainActivity extends Activity {
         propRecordsHandler.setupCurrentAndSecrPropRecords();   //  Reconstruire currentPropRecord et secrPropRecord
         currentPropRecord = propRecordsHandler.getCurrentPropRecord();
         secrPropRecord = propRecordsHandler.getSecrPropRecord();
-        candRecordsHandler = new CandRecordsHandler(pegs, colors);   // Reconstruire tous les candidats
+        candRecordsHandler = new CandRecordsHandler();   // Reconstruire tous les candidats
         if (!userGuess) {
             currentPropRecord.setComb(candRecordsHandler.getGuessComb());
         }
@@ -438,7 +438,7 @@ public class MainActivity extends Activity {
 
     private void onButtonClickSubmit() {
         if (currentPropRecord.hasValidComb()) {   //  Aucune couleur COLOR_NUM_EMPTY
-            PropRecord newPropRecord = propRecordsHandler.createPropRecordWithId(propRecordsHandler.getPropRecordMaxId() + 1);
+            PropRecord newPropRecord = propRecordsHandler.createPropRecordWithNewId();
             propRecordsHandler.addPropRecord(newPropRecord);
             newPropRecord.setComb(currentPropRecord.getComb());
             if (userGuess) {
@@ -452,7 +452,7 @@ public class MainActivity extends Activity {
                     currentPropRecord.setComb(candRecordsHandler.getGuessComb());
                     currentPropRecord.setScore(0);
                 } else {   //  Trouvé !
-                    newPropRecord = propRecordsHandler.createPropRecordWithId(propRecordsHandler.getPropRecordMaxId() + 1);
+                    newPropRecord = propRecordsHandler.createPropRecordWithNewId();
                     propRecordsHandler.addPropRecord(newPropRecord);
                     newPropRecord.setComb(candRecordsHandler.getCombAtIndex(solIndex));
                     newPropRecord.setScore(10 * pegs);
@@ -479,11 +479,9 @@ public class MainActivity extends Activity {
     }
 
     private void onButtonClickDeleteLast() {
-        if (!propRecordsHandler.getPropRecords().isEmpty()) {
-            propRecordsHandler.removePropRecordAtId(propRecordsHandler.getPropRecordMaxId());   //  Enlever le dernier PropRecord (cad avec le id le plus élevé)
-        }
+        propRecordsHandler.removePropRecordAtMaxId();   //  Enlever le dernier PropRecord (cad avec le id le plus élevé)
         if (!userGuess) {   //  Android Guess
-            candRecordsHandler.updateCandRecordsToPropRecords(propRecordsHandler.getPropRecords());
+            candRecordsHandler.updateCandRecordsToPropRecords(propRecordsHandler);
             currentPropRecord.setComb(candRecordsHandler.getGuessComb());
             currentPropRecord.setScore(0);
             updateDisplayCurrentPropButtonColors();
@@ -744,8 +742,8 @@ public class MainActivity extends Activity {
     }
 
     private void setupCandRecords() {
-        candRecordsHandler = new CandRecordsHandler(pegs, colors);
-        candRecordsHandler.updateCandRecordsToPropRecords(propRecordsHandler.getPropRecords());
+        candRecordsHandler = new CandRecordsHandler();
+        candRecordsHandler.updateCandRecordsToPropRecords(propRecordsHandler);
     }
 
     private void setupStringDB() {
@@ -774,7 +772,7 @@ public class MainActivity extends Activity {
     }
 
     private void setupMainPropList() {
-        mainPropListItemAdapter = new MainPropListItemAdapter(this, stringDB, pegs, paletteColors);
+        mainPropListItemAdapter = new MainPropListItemAdapter(this, paletteColors);
         mainPropListView = findViewById(R.id.PROP_LIST);
         mainPropListView.setAdapter(mainPropListItemAdapter);
     }

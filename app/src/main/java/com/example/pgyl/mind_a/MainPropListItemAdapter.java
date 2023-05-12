@@ -6,13 +6,13 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 
-import com.example.pgyl.pekislib_a.StringDB;
 import com.example.pgyl.pekislib_a.SymbolButtonView;
 
 import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import static com.example.pgyl.mind_a.MainActivity.pegs;
 import static com.example.pgyl.mind_a.PropRecord.COLOR_NUM_EMPTY;
 import static com.example.pgyl.mind_a.StringDBTables.getPaletteColorsAtIndex;
 import static com.example.pgyl.mind_a.StringDBTables.getPegsCount;
@@ -21,21 +21,15 @@ public class MainPropListItemAdapter extends BaseAdapter {
     //region Variables
     private Context context;
     private ArrayList<PropRecord> propRecords;
-    private StringDB stringDB;
-    private int pegs;
     private String[] paletteColors;
     private MainPropListItemViewHolder viewHolder;
-    private boolean showExpirationTime;
-    private boolean setClockAppAlarmOnStartTimer;
     private MainPropListItemDotMatrixDisplayUpdater mainPropListItemDotMatrixDisplayUpdater;
     //endregion
 
-    public MainPropListItemAdapter(Context context, StringDB stringDB, int pegs, String[] paletteColors) {
+    public MainPropListItemAdapter(Context context, String[] paletteColors) {
         super();
 
         this.context = context;
-        this.stringDB = stringDB;
-        this.pegs = pegs;
         this.paletteColors = paletteColors;
         init();
     }
@@ -49,7 +43,6 @@ public class MainPropListItemAdapter extends BaseAdapter {
         mainPropListItemDotMatrixDisplayUpdater.close();
         mainPropListItemDotMatrixDisplayUpdater = null;
         propRecords = null;
-        stringDB = null;
         context = null;
     }
 
