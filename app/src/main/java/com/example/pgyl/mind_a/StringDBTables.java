@@ -187,7 +187,7 @@ public class StringDBTables {
         }
         int score = Integer.parseInt(propRow[MindTableDataFields.props.PROP_SCORE.INDEX()]);
 
-        PropRecord propRecord = new PropRecord(pegs, colors);
+        PropRecord propRecord = new PropRecord();
         propRecord.setId(id);
         propRecord.setComb(comb);
         propRecord.setScore(score);

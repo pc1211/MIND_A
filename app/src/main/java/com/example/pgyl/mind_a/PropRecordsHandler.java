@@ -6,6 +6,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 
+import static com.example.pgyl.mind_a.MainActivity.colors;
+import static com.example.pgyl.mind_a.MainActivity.pegs;
 import static com.example.pgyl.mind_a.StringDBTables.CURRENT_PROP_ID;
 import static com.example.pgyl.mind_a.StringDBTables.SECR_PROP_ID;
 import static com.example.pgyl.mind_a.StringDBTables.propRecordsToPropRows;
@@ -18,17 +20,13 @@ public class PropRecordsHandler {
 
     //region Variables
     private StringDB stringDB;
-    private int pegs;
-    private int colors;
     private ArrayList<PropRecord> propRecords;
     private PropRecord currentPropRecord;
     private PropRecord secrPropRecord;
     //endregion
 
-    public PropRecordsHandler(StringDB stringDB, int pegs, int colors) {
+    public PropRecordsHandler(StringDB stringDB) {
         this.stringDB = stringDB;
-        this.pegs = pegs;
-        this.colors = colors;
         propRecords = propRowsToPropRecords(getDBProps(stringDB), pegs, colors);   //  Créer propRecords via la DB
         init();
     }
@@ -69,7 +67,7 @@ public class PropRecordsHandler {
     }
 
     public PropRecord createPropRecordWithId(int id) {
-        PropRecord propRecord = new PropRecord(pegs, colors);
+        PropRecord propRecord = new PropRecord();
         propRecord.setId(id);
         propRecord.resetComb();
         propRecord.setScore(0);
@@ -136,7 +134,7 @@ public class PropRecordsHandler {
         PropRecord propRecordSrc = getPropRecordAtId(id);
         PropRecord propRecordDest = null;
         if (propRecordSrc != null) {
-            propRecordDest = new PropRecord(pegs, colors);
+            propRecordDest = new PropRecord();
             propRecordDest.setId(id);   //  Copier le contenu de propRecordSrc dans propRecordDest
             propRecordDest.setComb(propRecordSrc.getComb());
             propRecordDest.setScore(propRecordSrc.getScore());

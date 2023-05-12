@@ -68,6 +68,9 @@ import static com.example.pgyl.pekislib_a.StringDBUtils.setStartStatusOfActivity
 //  MainPropListItemAdapter reçoit ses items (PropRecord) de la part de MainPropListUpdater et gère chaque item de la liste
 
 public class MainActivity extends Activity {
+    public static int pegs;   //  Static pour que PropRecordsHandler et PropRecord y accèdent automatiquement en cas de changement de pegs ou colors
+    public static int colors;
+
     //region Constantes
     private enum COMMANDS {
         SUBMIT, CLEAR, DELETE_LAST, NEW, CHEAT;
@@ -109,8 +112,6 @@ public class MainActivity extends Activity {
     private MainPropListUpdater mainPropListUpdater;
     private boolean keepScreen;
     private boolean userGuess;
-    private int pegs;
-    private int colors;
     private ListView mainPropListView;
     private MainPropListItemAdapter mainPropListItemAdapter;
     private StringDB stringDB;
@@ -249,7 +250,7 @@ public class MainActivity extends Activity {
 
     private void handleNewParamFollowUp(boolean isValidNewParam) {
         if (isValidNewParam) {
-            if ((inputParamsIndex == getInputParamsPegsIndex()) || (inputParamsIndex == getInputParamsPegsIndex())) {
+            if ((inputParamsIndex == getInputParamsPegsIndex()) || (inputParamsIndex == getInputParamsColorsIndex())) {
                 try {
                     resetPropsAndCands();
                 } catch (OutOfMemoryError e) {   // Pas assez de RAM
@@ -737,7 +738,7 @@ public class MainActivity extends Activity {
     }
 
     private void setupPropRecords() {
-        propRecordsHandler = new PropRecordsHandler(stringDB, pegs, colors);
+        propRecordsHandler = new PropRecordsHandler(stringDB);
         currentPropRecord = propRecordsHandler.getCurrentPropRecord();
         secrPropRecord = propRecordsHandler.getSecrPropRecord();
     }

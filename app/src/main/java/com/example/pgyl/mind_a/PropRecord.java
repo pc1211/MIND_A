@@ -1,5 +1,8 @@
 package com.example.pgyl.mind_a;
 
+import static com.example.pgyl.mind_a.MainActivity.colors;
+import static com.example.pgyl.mind_a.MainActivity.pegs;
+
 public class PropRecord {
     //region Constantes
     public static final int COLOR_NUM_EMPTY = -1;
@@ -8,16 +11,12 @@ public class PropRecord {
     //endregion
 
     //region Variables
-    private int pegs;
-    private int colors;
     private int id;             //  Identifiant de la proposition (0, 1, 2, 3, ...)
     private int[] comb;         //  Numéros de couleur (0..9) de la proposition (cf PALETTE_COLORS[])  (-1 si pas de couleur attribuée (COLOR_NUM_EMPTY))
     private int score;          //  Score de la proposition p.ex. 2N1B => 21
     //endregion
 
-    public PropRecord(int pegs, int colors) {
-        this.pegs = pegs;
-        this.colors = colors;
+    public PropRecord() {
         init();
     }
 
