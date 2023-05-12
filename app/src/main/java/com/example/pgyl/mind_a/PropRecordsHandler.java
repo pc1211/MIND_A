@@ -6,8 +6,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 
-import static com.example.pgyl.mind_a.MainActivity.colors;
-import static com.example.pgyl.mind_a.MainActivity.pegs;
 import static com.example.pgyl.mind_a.StringDBTables.CURRENT_PROP_ID;
 import static com.example.pgyl.mind_a.StringDBTables.SECR_PROP_ID;
 import static com.example.pgyl.mind_a.StringDBTables.propRecordsToPropRows;
@@ -27,7 +25,7 @@ public class PropRecordsHandler {
 
     public PropRecordsHandler(StringDB stringDB) {
         this.stringDB = stringDB;
-        propRecords = propRowsToPropRecords(getDBProps(stringDB), pegs, colors);   //  Créer propRecords via la DB
+        propRecords = propRowsToPropRecords(getDBProps(stringDB));   //  Créer propRecords via la DB
         init();
     }
 

@@ -68,7 +68,7 @@ import static com.example.pgyl.pekislib_a.StringDBUtils.setStartStatusOfActivity
 //  MainPropListItemAdapter reçoit ses items (PropRecord) de la part de MainPropListUpdater et gère chaque item de la liste
 
 public class MainActivity extends Activity {
-    public static int pegs;   //  Static pour que PropRecordsHandler et PropRecord y accèdent automatiquement en cas de changement de pegs ou colors
+    public static int pegs;   //  Static pour que PropRecordsHandler et PropRecord puissent y accéder automatiquement en cas de changement de pegs ou colors
     public static int colors;
 
     //region Constantes

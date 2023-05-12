@@ -4,6 +4,7 @@ import com.example.pgyl.pekislib_a.InputButtonsActivity;
 
 import java.util.ArrayList;
 
+import static com.example.pgyl.mind_a.MainActivity.pegs;
 import static com.example.pgyl.mind_a.PropRecord.COLOR_NUM_EMPTY;
 import static com.example.pgyl.pekislib_a.Constants.REGEXP_INTEGER_FROM_0;
 import static com.example.pgyl.pekislib_a.Constants.REGEXP_INTEGER_FROM_0_ERROR_MESSAGE;
@@ -169,17 +170,17 @@ public class StringDBTables {
     public static final int CURRENT_PROP_ID = 0;
     public static final int SECR_PROP_ID = 1;
 
-    public static ArrayList<PropRecord> propRowsToPropRecords(String[][] propRows, int pegs, int colors) {
+    public static ArrayList<PropRecord> propRowsToPropRecords(String[][] propRows) {
         ArrayList<PropRecord> propRecords = new ArrayList<PropRecord>();
         if (propRows != null) {
             for (int i = 0; i <= (propRows.length - 1); i = i + 1) {
-                propRecords.add(propRowToPropRecord(propRows[i], pegs, colors));
+                propRecords.add(propRowToPropRecord(propRows[i]));
             }
         }
         return propRecords;
     }
 
-    public static PropRecord propRowToPropRecord(String[] propRow, int pegs, int colors) {
+    public static PropRecord propRowToPropRecord(String[] propRow) {
         int id = Integer.parseInt(propRow[TABLE_ID_INDEX]);
         int[] comb = new int[pegs];
         for (int i = 0; i <= (pegs - 1); i = i + 1) {   //  Les pions, uniquement la partie utilisée (via pegs)
