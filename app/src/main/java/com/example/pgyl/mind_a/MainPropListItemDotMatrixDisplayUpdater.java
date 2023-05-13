@@ -45,6 +45,20 @@ public class MainPropListItemDotMatrixDisplayUpdater {
         dotMatrixDisplayView.updateDisplay();
     }
 
+    public void setupBackColor(DotMatrixDisplayView dotMatrixDisplayView) {
+        final String BACK_COLOR = "000000";
+
+        dotMatrixDisplayView.setBackColor(BACK_COLOR);
+    }
+
+    private void setupDefaultFont() {
+        defaultFont = new DotMatrixFontDefault();
+    }
+
+    public void setupMargins() {    // Marges (en nombre de carrés autour de l'affichage proprement dit)
+        margins = new Rect(1, 1, 1, 1);
+    }
+
     public void setupDimensions(DotMatrixDisplayView dotMatrixDisplayView) {       //  La grille (gridRect) contient le score
         final RectF INTERNAL_MARGIN_SIZE_COEFFS = new RectF(0, 0, 0, 0);   //  Marge autour de l'affichage proprement dit (% de largeur)
 
@@ -61,24 +75,4 @@ public class MainPropListItemDotMatrixDisplayUpdater {
         dotMatrixDisplayView.setGridRect(gridRect);
         dotMatrixDisplayView.setDisplayRect(displayRect);
     }
-
-    public void setupBackColor(DotMatrixDisplayView dotMatrixDisplayView) {
-        final String BACK_COLOR = "000000";
-
-        dotMatrixDisplayView.setBackColor(BACK_COLOR);
-    }
-
-    private void setupDefaultFont() {
-        defaultFont = new DotMatrixFontDefault();
-    }
-
-    private void setupMargins() {    // Marges autour de l'affichage proprement dit
-        final int MARGIN_LEFT = 1;
-        final int MARGIN_RIGHT = 1;
-        final int MARGIN_TOP = 1;
-        final int MARGIN_BOTTOM = 1;
-
-        margins = new Rect(MARGIN_LEFT, MARGIN_TOP, MARGIN_RIGHT, MARGIN_BOTTOM);
-    }
-
 }

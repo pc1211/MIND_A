@@ -46,7 +46,7 @@
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="48dp"
+        android:layout_height="36dp"
         android:background="@drawable/border"
         android:orientation="horizontal">
 
@@ -130,7 +130,7 @@
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="48dp"
+        android:layout_height="38dp"
         android:layout_marginTop="4dp"
         android:background="@drawable/border"
         android:orientation="horizontal">
@@ -214,17 +214,8 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="48dp"
-        android:layout_marginTop="8dp"
+        android:layout_marginTop="16dp"
         android:orientation="horizontal">
-
-        <com.example.pgyl.pekislib_a.CustomButton
-            android:id="@+id/BTN_SUBMIT"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_marginTop="2dp"
-            android:layout_marginBottom="6dp"
-            android:layout_weight="3"
-            android:text="Submit" />
 
         <com.example.pgyl.pekislib_a.CustomButton
             android:id="@+id/BTN_CLEAR"
@@ -261,6 +252,15 @@
             android:layout_marginBottom="6dp"
             android:layout_weight="3"
             android:text="Cheat" />
+
+        <com.example.pgyl.pekislib_a.CustomButton
+            android:id="@+id/BTN_SUBMIT"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_marginTop="2dp"
+            android:layout_marginBottom="6dp"
+            android:layout_weight="3"
+            android:text="Submit" />
 
     </LinearLayout>
 

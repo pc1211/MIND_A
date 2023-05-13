@@ -4,6 +4,7 @@
     android:layout_height="match_parent"
     android:layout_marginTop="4dp"
     android:background="@drawable/border"
+    android:minHeight="38dp"
     android:orientation="horizontal">
 
     <LinearLayout
@@ -78,6 +79,8 @@
             android:id="@+id/BTN_ITEM_DOT_MATRIX_SCORE"
             android:layout_width="0dp"
             android:layout_height="match_parent"
+            android:layout_marginTop="1dp"
+            android:layout_marginBottom="1dp"
             android:layout_weight="1" />
     </LinearLayout>
 

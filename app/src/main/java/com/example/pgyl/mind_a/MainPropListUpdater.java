@@ -34,7 +34,7 @@ public class MainPropListUpdater {
         propRecordsHandler = null;
     }
 
-    public void reload() {
+    public void rebuild() {
         propRecordsHandler.sortPropRecords();
         mainPropListItemAdapter.setItems(propRecordsHandler.getPropRecords());
         mainPropListItemAdapter.notifyDataSetChanged();

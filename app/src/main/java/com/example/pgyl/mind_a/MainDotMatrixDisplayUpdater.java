@@ -81,5 +81,4 @@ public class MainDotMatrixDisplayUpdater {
         dotMatrixDisplayView.setGridRect(gridRect);
         dotMatrixDisplayView.setDisplayRect(displayRect);
     }
-
 }
