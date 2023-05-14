@@ -219,6 +219,12 @@ public class MainActivity extends Activity {
                 validReturnFromCalledActivity = true;
             }
         }
+        if (requestCode == PEKISLIB_ACTIVITIES.COLOR_PICKER.INDEX()) {
+            calledActivityName = PEKISLIB_ACTIVITIES.COLOR_PICKER.toString();
+            if (resultCode == RESULT_OK) {
+                validReturnFromCalledActivity = true;
+            }
+        }
     }
 
     private boolean isValidNewParam(String value) {
