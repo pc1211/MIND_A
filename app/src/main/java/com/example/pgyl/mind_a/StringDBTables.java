@@ -125,14 +125,14 @@ public class StringDBTables {
     }
 
     public static String[][] getInputParamsInits() {
-        final String[][] INPUT_PARAMS_INITS = {   //  Pour entrer le nombre de pegs, de couleurs, ou le score d'une proposition d'Android
-                {TABLE_IDS.LABEL.toString(), MindTableDataFields.inputParams.PEGS.LABEL(), MindTableDataFields.inputParams.COLORS.LABEL(), MindTableDataFields.inputParams.SCORE.LABEL()},
-                {TABLE_IDS.KEYBOARD.toString(), InputButtonsActivity.KEYBOARDS.INTEGER.toString(), InputButtonsActivity.KEYBOARDS.INTEGER.toString(), InputButtonsActivity.KEYBOARDS.INTEGER.toString()},
-                {TABLE_IDS.REGEXP.toString(), REGEXP_INTEGER_FROM_0, REGEXP_INTEGER_FROM_0, REGEXP_INTEGER_FROM_0},
-                {TABLE_IDS.REGEXP_ERROR_MESSAGE.toString(), REGEXP_INTEGER_FROM_0_ERROR_MESSAGE, REGEXP_INTEGER_FROM_0_ERROR_MESSAGE, REGEXP_INTEGER_FROM_0_ERROR_MESSAGE},
-                {TABLE_IDS.MIN.toString(), "1", "1", "0"},
-                {TABLE_IDS.MAX.toString(), String.valueOf(getPegsCount()), String.valueOf(MIND_TABLES.PALETTE_COLORS.getDataFieldsCount()), "99"},
-                {TABLE_IDS.DEFAULT.toString(), "4", "6", "0"}   //  4 pegs, 6 colors, Pas pertinent pour le score
+        final String[][] INPUT_PARAMS_INITS = {   //  Pour entrer le nombre de pegs, de couleurs, ou le score d'une proposition d'Android; Le score est entré via ScoreActivity et non InputButtonsActivity
+                {TABLE_IDS.LABEL.toString(), MindTableDataFields.inputParams.PEGS.LABEL(), MindTableDataFields.inputParams.COLORS.LABEL(), null},
+                {TABLE_IDS.KEYBOARD.toString(), InputButtonsActivity.KEYBOARDS.INTEGER.toString(), InputButtonsActivity.KEYBOARDS.INTEGER.toString(), null},
+                {TABLE_IDS.REGEXP.toString(), REGEXP_INTEGER_FROM_0, REGEXP_INTEGER_FROM_0, null},
+                {TABLE_IDS.REGEXP_ERROR_MESSAGE.toString(), REGEXP_INTEGER_FROM_0_ERROR_MESSAGE, REGEXP_INTEGER_FROM_0_ERROR_MESSAGE, null},
+                {TABLE_IDS.MIN.toString(), "1", "1", null},
+                {TABLE_IDS.MAX.toString(), String.valueOf(getPegsCount()), String.valueOf(MIND_TABLES.PALETTE_COLORS.getDataFieldsCount()), null},
+                {TABLE_IDS.DEFAULT.toString(), "4", "6", null}   //  4 pegs, 6 colors, Pas pertinent pour le score
         };
         return INPUT_PARAMS_INITS;
     }

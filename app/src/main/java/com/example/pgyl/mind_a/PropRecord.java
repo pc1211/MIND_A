@@ -50,6 +50,10 @@ public class PropRecord {
         this.score = score;
     }
 
+    public void resetScore() {
+        score = 0;
+    }
+
     public int getCombAtIndex(int index) {
         return comb[index];
     }

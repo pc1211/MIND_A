@@ -18,6 +18,10 @@
             </intent-filter>
         </activity>
         <activity
+            android:name="com.example.pgyl.mind_a.ScoreActivity"
+            android:label="ScoreActivity"
+            android:screenOrientation="portrait" />
+        <activity
             android:name="com.example.pgyl.pekislib_a.InputButtonsActivity"
             android:label="InputButtonsActivity" />
         <activity

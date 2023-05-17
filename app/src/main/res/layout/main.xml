@@ -27,7 +27,7 @@
             android:orientation="horizontal">
 
             <RadioButton
-                android:id="@+id/RADIO_USER_GUESS"
+                android:id="@+id/RADIO_GUESS_USER"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="4dp"
@@ -35,7 +35,7 @@
                 android:text="User" />
 
             <RadioButton
-                android:id="@+id/RADIO_ANDROID_GUESS"
+                android:id="@+id/RADIO_GUESS_ANDROID"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="4dp"
