@@ -259,13 +259,13 @@ public class MainActivity extends Activity {
                 ret = true;
             }
             if (inputParamsIndex == getInputParamsScoreIndex()) {
-                int n = v / 10;   //  Noirs
-                int b = v % 10;   //  Blancs
-                if ((n <= pegs) && (b <= pegs) && ((n + b) <= pegs) && (v <= (10 * pegs)) && (v != (10 * (pegs - 1) + 1))) {
+                int b = v / 10;   //  Noirs
+                int w = v % 10;   //  Blancs
+                if ((b <= pegs) && (w <= pegs) && ((b + w) <= pegs) && (v <= (10 * pegs)) && (v != (10 * (pegs - 1) + 1))) {
                     inputParams[inputParamsIndex] = value;
                     ret = true;
                 } else {   //  Bad guy
-                    msgBox("Invalid score: " + n + " Blacks and " + b + " Whites", this);
+                    msgBox("Invalid score: " + b + " black" + (b > 1 ? "s" : "") + " and " + w + " white" + (w > 1 ? "s" : ""), this);
                 }
             }
         }

@@ -163,7 +163,7 @@ public class ScoreActivity extends Activity {
     }
 
     private void updateDisplayText() {
-        lbldisplay.setText(blacks + " Blacks and " + whites + " Whites");
+        lbldisplay.setText(blacks + " black" + (blacks > 1 ? "s" : "") + " and " + whites + " white" + (whites > 1 ? "s" : ""));
     }
 
     private void updateDisplayRadioButtons() {
@@ -221,7 +221,7 @@ public class ScoreActivity extends Activity {
 
     private void setupBlackRadioButtonsVisibility() {
         for (int i = 0; i <= (blackRadioButtons.length - 1); i = i + 1) {
-            blackRadioButtons[i].setVisibility((i <= pegs) ? View.VISIBLE : View.GONE);
+            blackRadioButtons[i].setVisibility((i < pegs) ? View.VISIBLE : View.GONE);   //  Empêcher d'entrer un nombre de noirs égal à pegs car signifie victoire
         }
     }
 
@@ -249,7 +249,7 @@ public class ScoreActivity extends Activity {
     }
 
     private void setupWhiteRadioButtonsVisibility() {
-        for (int i = 0; i <= (whiteRadioButtons.length - 1); i = i + 1) {
+        for (int i = 0; i <= (whiteRadioButtons.length - 1); i = i + 1) {   //  Autoriser un nombre de blancs au maximum égal à pegs
             whiteRadioButtons[i].setVisibility((i <= pegs) ? View.VISIBLE : View.GONE);
         }
     }
