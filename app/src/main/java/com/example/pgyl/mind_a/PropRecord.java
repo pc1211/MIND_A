@@ -2,10 +2,10 @@ package com.example.pgyl.mind_a;
 
 import static com.example.pgyl.mind_a.MainActivity.colors;
 import static com.example.pgyl.mind_a.MainActivity.pegs;
+import static com.example.pgyl.pekislib_a.Constants.UNDEFINED;
 
 public class PropRecord {
     //region Constantes
-    public static final int COLOR_NUM_EMPTY = -1;
     private static final String SEPARATOR = "-";
     public static final String MAX_SCORE_DISPLAY_SIZE = "9" + SEPARATOR + "9";
     //endregion
@@ -51,7 +51,7 @@ public class PropRecord {
     }
 
     public void resetScore() {
-        score = 0;
+        score = UNDEFINED;
     }
 
     public int getCombAtIndex(int index) {
@@ -65,14 +65,14 @@ public class PropRecord {
     public void resetComb() {
         this.comb = new int[pegs];
         for (int i = 0; i <= (pegs - 1); i = i + 1) {
-            this.comb[i] = COLOR_NUM_EMPTY;
+            this.comb[i] = UNDEFINED;
         }
     }
 
     public boolean hasValidComb() {
         boolean ret = true;
         for (int i = 0; i <= (pegs - 1); i = i + 1) {
-            if (comb[i] == COLOR_NUM_EMPTY) {
+            if (comb[i] == UNDEFINED) {
                 ret = false;
                 break;
             }
@@ -91,6 +91,6 @@ public class PropRecord {
     }
 
     public String getStringScore() {
-        return String.valueOf(score / 10) + SEPARATOR + String.valueOf(score % 10);
+        return (score == UNDEFINED ? "B" + SEPARATOR + "W" : String.valueOf(score / 10) + SEPARATOR + String.valueOf(score % 10));
     }
 }

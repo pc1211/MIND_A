@@ -47,7 +47,7 @@ public class CandRecordsHandler {
         return candRecords[index].getComb();
     }
 
-    public int getScore(int[] comb, int[] secrComb) {
+    public int getScoreByComparing(int[] comb, int[] secrComb) {
         final int FREE = 0;
         final int BLACK = 1;
         final int WHITE = 2;
@@ -83,7 +83,7 @@ public class CandRecordsHandler {
         int solIndex = UNDEFINED;
         for (int i = 0; i <= (candRecords.length - 1); i = i + 1) {
             if (candRecords[i].isSelected()) {
-                if (getScore(candRecords[i].getComb(), comb) != score) {
+                if (getScoreByComparing(candRecords[i].getComb(), comb) != score) {
                     candRecords[i].setSelected(false);
                 } else {   //  Score OK
                     solIndex = i;
@@ -105,7 +105,7 @@ public class CandRecordsHandler {
             candRecords[i].resetNbScores();
             for (int j = 0; j <= (candRecords.length - 1); j = j + 1) {
                 if (candRecords[j].isSelected()) {
-                    int nbScoresIndex = getScore(candRecords[i].getComb(), candRecords[j].getComb());   //  Le score lui-même est utilisé comme index dans nbScores; Si pegs = 4 => les nombres de score de chaque candidat seront stockés dans candRecords().nbScores aux index 00,01,02,03,04,10,11,12,13,20,21,22,30,40
+                    int nbScoresIndex = getScoreByComparing(candRecords[i].getComb(), candRecords[j].getComb());   //  Le score lui-même est utilisé comme index dans nbScores; Si pegs = 4 => les nombres de score de chaque candidat seront stockés dans candRecords().nbScores aux index 00,01,02,03,04,10,11,12,13,20,21,22,30,40
                     candRecords[i].incNbScoresAtIndex(nbScoresIndex);
                 }
             }
@@ -130,7 +130,7 @@ public class CandRecordsHandler {
             if (i != 0) {
                 int j = pegs - 1;
                 do {
-                    comb[j] = comb[j] + 1;   //   L'array comb (de longueur pegs) est calculé an base couleurs (p.ex. en base 6 si couleurs = 6), de 0 à (colors ^ pegs - 1)
+                    comb[j] = comb[j] + 1;   //   L'array comb (de longueur pegs) est calculé an Base couleurs (p.ex. en base 6 si couleurs = 6), de 0 à (colors ^ pegs - 1)
                     if (comb[j] >= colors) {
                         comb[j] = 0;
                         j = j - 1;

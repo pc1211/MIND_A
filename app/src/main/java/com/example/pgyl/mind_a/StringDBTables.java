@@ -5,11 +5,11 @@ import com.example.pgyl.pekislib_a.InputButtonsActivity;
 import java.util.ArrayList;
 
 import static com.example.pgyl.mind_a.MainActivity.pegs;
-import static com.example.pgyl.mind_a.PropRecord.COLOR_NUM_EMPTY;
 import static com.example.pgyl.pekislib_a.Constants.REGEXP_INTEGER_FROM_0;
 import static com.example.pgyl.pekislib_a.Constants.REGEXP_INTEGER_FROM_0_ERROR_MESSAGE;
 import static com.example.pgyl.pekislib_a.Constants.REGEXP_SIX_CHARS;
 import static com.example.pgyl.pekislib_a.Constants.REGEXP_SIX_CHARS_ERROR_MESSAGE;
+import static com.example.pgyl.pekislib_a.Constants.UNDEFINED;
 import static com.example.pgyl.pekislib_a.StringDB.TABLE_ID_INDEX;
 import static com.example.pgyl.pekislib_a.StringDBTables.TABLE_IDS;
 
@@ -211,7 +211,7 @@ public class StringDBTables {
 
         propRow[TABLE_ID_INDEX] = String.valueOf(propRecord.getId());
         for (int i = 0; i <= (getPegsCount() - 1); i = i + 1) {    //  Les pions, partie utilisée (via getcomb()) et partie non utilisée (via couleur vide)
-            propRow[MindTableDataFields.props.valueOf(COMB_NAME_PREFIX + i).INDEX()] = String.valueOf((i < propRecord.getComb().length) ? propRecord.getComb()[i] : COLOR_NUM_EMPTY);
+            propRow[MindTableDataFields.props.valueOf(COMB_NAME_PREFIX + i).INDEX()] = String.valueOf((i < propRecord.getComb().length) ? propRecord.getComb()[i] : UNDEFINED);
         }
         propRow[MindTableDataFields.props.PROP_SCORE.INDEX()] = String.valueOf(propRecord.getScore());   //  Le score
 

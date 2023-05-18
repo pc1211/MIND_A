@@ -27,6 +27,7 @@ import static com.example.pgyl.mind_a.StringDBTables.getInputParamsTableName;
 import static com.example.pgyl.mind_a.StringDBTables.getPegsCount;
 import static com.example.pgyl.pekislib_a.Constants.ACTIVITY_EXTRA_KEYS;
 import static com.example.pgyl.pekislib_a.Constants.COLOR_PREFIX;
+import static com.example.pgyl.pekislib_a.Constants.UNDEFINED;
 import static com.example.pgyl.pekislib_a.HelpActivity.HELP_ACTIVITY_EXTRA_KEYS;
 import static com.example.pgyl.pekislib_a.HelpActivity.HELP_ACTIVITY_TITLE;
 import static com.example.pgyl.pekislib_a.R.menu.menu_help_only;
@@ -99,6 +100,9 @@ public class ScoreActivity extends Activity {
         onStartUp = true;
         setupStringDB();
         int score = Integer.parseInt(getCurrentFromActivity(stringDB, MIND_ACTIVITIES.SCORE.toString(), getInputParamsTableName(), getInputParamsScoreIndex()));
+        if (score == UNDEFINED) {
+            score = 0;
+        }
         blacks = score / 10;
         whites = score % 10;
         updateDisplayRadioButtons();

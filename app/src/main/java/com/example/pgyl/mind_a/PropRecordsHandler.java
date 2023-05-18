@@ -97,7 +97,7 @@ public class PropRecordsHandler {
         PropRecord propRecord = new PropRecord();
         propRecord.setId(id);
         propRecord.resetComb();
-        propRecord.setScore(0);
+        propRecord.resetScore();
         return propRecord;
     }
 

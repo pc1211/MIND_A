@@ -13,9 +13,9 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import static com.example.pgyl.mind_a.MainActivity.pegs;
-import static com.example.pgyl.mind_a.PropRecord.COLOR_NUM_EMPTY;
 import static com.example.pgyl.mind_a.StringDBTables.getPaletteColorsAtIndex;
 import static com.example.pgyl.mind_a.StringDBTables.getPegsCount;
+import static com.example.pgyl.pekislib_a.Constants.UNDEFINED;
 
 public class MainPropListItemAdapter extends BaseAdapter {
     //region Variables
@@ -89,7 +89,7 @@ public class MainPropListItemAdapter extends BaseAdapter {
         int[] comb = propRecords.get(pos).getComb();
         for (int i = 0; i <= (getPegsCount() - 1); i = i + 1) {
             if (i <= (pegs - 1)) {
-                String color = ((comb[i] != COLOR_NUM_EMPTY) ? paletteColors[getPaletteColorsAtIndex(comb[i])] : EMPTY_COLOR);
+                String color = ((comb[i] != UNDEFINED) ? paletteColors[getPaletteColorsAtIndex(comb[i])] : EMPTY_COLOR);
                 viewHolder.buttonColors[i].setColors(color, BACK_COLOR_NORMAL, color, BACK_COLOR_INVERSE);
             } else {  //  Ne rendre visibles que <pegs> boutons de couleur
                 viewHolder.buttonColors[i].setVisibility(View.GONE);

@@ -30,7 +30,6 @@ import java.util.logging.Logger;
 
 import static com.example.pgyl.mind_a.Constants.MIND_ACTIVITIES;
 import static com.example.pgyl.mind_a.Constants.MIND_ACTIVITIES_REQUEST_CODE_MULTIPLIER;
-import static com.example.pgyl.mind_a.PropRecord.COLOR_NUM_EMPTY;
 import static com.example.pgyl.mind_a.StringDBTables.MIND_TABLES;
 import static com.example.pgyl.mind_a.StringDBTables.getInputParamsColorsIndex;
 import static com.example.pgyl.mind_a.StringDBTables.getInputParamsPegsIndex;
@@ -515,7 +514,7 @@ public class MainActivity extends Activity {
                 PropRecord newPropRecord = propRecordsHandler.createPropRecordWithNewId();
                 propRecordsHandler.addPropRecord(newPropRecord);
                 newPropRecord.setComb(currentPropRecord.getComb());
-                newPropRecord.setScore(candRecordsHandler.getScore(currentPropRecord.getComb(), secrPropRecord.getComb()));
+                newPropRecord.setScore(candRecordsHandler.getScoreByComparing(currentPropRecord.getComb(), secrPropRecord.getComb()));
                 currentPropRecord.resetComb();
                 currentPropRecord.resetScore();
                 mainPropListUpdater.rebuild();
@@ -557,7 +556,7 @@ public class MainActivity extends Activity {
         final String BACK_COLOR_INVERSE = "FFFFFF";
         final String EMPTY_COLOR = "808080";
 
-        String color = (currentPropRecord.getCombAtIndex(index) != COLOR_NUM_EMPTY) ? paletteColors[getPaletteColorsAtIndex(currentPropRecord.getCombAtIndex(index))] : EMPTY_COLOR;
+        String color = (currentPropRecord.getCombAtIndex(index) != UNDEFINED) ? paletteColors[getPaletteColorsAtIndex(currentPropRecord.getCombAtIndex(index))] : EMPTY_COLOR;
         if (colorMode.equals(COLOR_MODES.NORMAL)) {
             currentPropPegButtons[index].setColors(color, BACK_COLOR_NORMAL, color, BACK_COLOR_INVERSE);
         } else {   // Inverse
@@ -569,7 +568,7 @@ public class MainActivity extends Activity {
         if (guessMode.equals(GUESS_MODES.USER)) {
             currentPropDotMatrixDisplayScore.setVisibility(View.INVISIBLE);
         } else {   //  Android Guess
-            dotMatrixDisplayUpdater.displayText(currentPropRecord.getStringScore());   //  0-0  (En attente d'entrée du score)
+            dotMatrixDisplayUpdater.displayText(currentPropRecord.getStringScore());   //  "*-*" (En attente d'entrée du score)
             currentPropDotMatrixDisplayScore.setVisibility(View.VISIBLE);
         }
         dotMatrixDisplayUpdater.displayText(currentPropRecord.getStringScore());
