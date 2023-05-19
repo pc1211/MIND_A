@@ -65,7 +65,7 @@ public class ScoreActivity extends Activity {
     private Button[] buttons;
     private RadioButton[] blackRadioButtons;
     private RadioButton[] whiteRadioButtons;
-    private TextView lbldisplay;
+    private TextView lblDisplay;
     private boolean onStartUp;
     private StringDB stringDB;
     //endregion
@@ -167,7 +167,7 @@ public class ScoreActivity extends Activity {
     }
 
     private void updateDisplayText() {
-        lbldisplay.setText(blacks + " black" + (blacks > 1 ? "s" : "") + " and " + whites + " white" + (whites > 1 ? "s" : ""));
+        lblDisplay.setText(blacks + " black" + (blacks > 1 ? "s" : "") + " and " + whites + " white" + (whites > 1 ? "s" : ""));
     }
 
     private void updateDisplayRadioButtons() {
@@ -211,7 +211,7 @@ public class ScoreActivity extends Activity {
                 blackRadioButtons[i] = findViewById(rid.getField(BUTTON_XML_PREFIX + i).getInt(rid));
                 blackRadioButtons[i].setTextColor(Color.parseColor(COLOR_PREFIX + TXT_COLOR));
             } catch (IllegalAccessException | IllegalArgumentException | NoSuchFieldException | SecurityException ex) {
-                Logger.getLogger(com.example.pgyl.mind_a.MainActivity.class.getName()).log(Level.SEVERE, null, ex);
+                Logger.getLogger(MainActivity.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
         RadioGroup grpg = findViewById(R.id.GROUP_BLACKS);
@@ -240,7 +240,7 @@ public class ScoreActivity extends Activity {
                 whiteRadioButtons[i] = findViewById(rid.getField(BUTTON_XML_PREFIX + i).getInt(rid));
                 whiteRadioButtons[i].setTextColor(Color.parseColor(COLOR_PREFIX + TXT_COLOR));
             } catch (IllegalAccessException | IllegalArgumentException | NoSuchFieldException | SecurityException ex) {
-                Logger.getLogger(com.example.pgyl.mind_a.MainActivity.class.getName()).log(Level.SEVERE, null, ex);
+                Logger.getLogger(MainActivity.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
         RadioGroup grpg = findViewById(R.id.GROUP_WHITES);
@@ -259,14 +259,13 @@ public class ScoreActivity extends Activity {
     }
 
     private void setupLblDisplay() {
-        lbldisplay = findViewById(com.example.pgyl.mind_a.R.id.LBL_DISPLAY);
+        lblDisplay = findViewById(R.id.LBL_DISPLAY);
     }
 
     private void setupStringDB() {
         stringDB = new StringDB(this);
         stringDB.open();
     }
-
 
     private void launchHelpActivity() {
         Intent callingIntent = new Intent(this, HelpActivity.class);

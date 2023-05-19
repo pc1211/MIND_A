@@ -190,18 +190,18 @@ public class MainActivity extends Activity {
         String newParamValue = null;
         if (validReturnFromCalledActivity) {
             validReturnFromCalledActivity = false;
-            if (calledActivityName.equals(PEKISLIB_ACTIVITIES.INPUT_BUTTONS.toString())) {
+            if (calledActivityName.equals(PEKISLIB_ACTIVITIES.INPUT_BUTTONS.toString())) {   //  Pour Entrée de pegs ou colors
                 newParamValue = getCurrentFromActivity(stringDB, PEKISLIB_ACTIVITIES.INPUT_BUTTONS.toString(), getInputParamsTableName(), inputParamsIndex);
             }
-            if (calledActivityName.equals(MIND_ACTIVITIES.SCORE.toString())) {
+            if (calledActivityName.equals(MIND_ACTIVITIES.SCORE.toString())) {   //  Pour Entrée du score si Android Guess
                 newParamValue = getCurrentFromActivity(stringDB, MIND_ACTIVITIES.SCORE.toString(), getInputParamsTableName(), inputParamsIndex);
             }
-            if (calledActivityName.equals(PEKISLIB_ACTIVITIES.COLOR_PICKER.toString())) {
+            if (calledActivityName.equals(PEKISLIB_ACTIVITIES.COLOR_PICKER.toString())) {   //  Pour Edition de la palette de couleurs
                 paletteColors = getCurrentsFromActivity(stringDB, PEKISLIB_ACTIVITIES.COLOR_PICKER.toString(), getPaletteColorsTableName());
             }
         }
 
-        handleNewParamFollowUp(isValidNewParam(newParamValue));
+        handleActivityReturn(newParamValue);
         setupMainPropList();
         setupMainPropListUpdater();
         setupDotMatrixDisplayUpdater();
@@ -243,79 +243,45 @@ public class MainActivity extends Activity {
         }
     }
 
-    private boolean isValidNewParam(String value) {
-        boolean ret = false;
-        if (value != null) {
-            int v = Integer.parseInt(value);
+    private void handleActivityReturn(String sValue) {
+        if (sValue != null) {
+            int value = Integer.parseInt(sValue);
             if (inputParamsIndex == getInputParamsPegsIndex()) {
-                inputParams[inputParamsIndex] = value;
-                pegs = v;
-                ret = true;
+                inputParams[inputParamsIndex] = sValue;
+                pegs = value;
+                resetPropsAndCands();
             }
             if (inputParamsIndex == getInputParamsColorsIndex()) {
-                inputParams[inputParamsIndex] = value;
-                colors = v;
-                ret = true;
+                inputParams[inputParamsIndex] = sValue;
+                colors = value;
+                resetPropsAndCands();
             }
             if (inputParamsIndex == getInputParamsScoreIndex()) {
-                int b = v / 10;   //  Noirs
-                int w = v % 10;   //  Blancs
-                if ((b <= pegs) && (w <= pegs) && ((b + w) <= pegs) && (v <= (10 * pegs)) && (v != (10 * (pegs - 1) + 1))) {
-                    inputParams[inputParamsIndex] = value;
-                    ret = true;
-                } else {   //  Bad guy
-                    msgBox("Invalid score: " + b + " black" + (b > 1 ? "s" : "") + " and " + w + " white" + (w > 1 ? "s" : ""), this);
-                }
-            }
-        }
-        return ret;
-    }
-
-    private void handleNewParamFollowUp(boolean isValidNewParam) {
-        if (isValidNewParam) {
-            if ((inputParamsIndex == getInputParamsPegsIndex()) || (inputParamsIndex == getInputParamsColorsIndex())) {
-                try {
-                    resetPropsAndCands();
-                } catch (OutOfMemoryError e) {   // Pas assez de RAM
-                    candRecordsHandler = null;   //  Libérer ce qui fâche
-                    propRecordsHandler = null;
-                    msgBox("Out of Memory Error. Now Trying to go back to previous state", this);
-                    inputParams = getCurrentsFromActivity(stringDB, MIND_ACTIVITIES.MAIN.toString(), getInputParamsTableName());   //  Restaurer les anciennes valeurs de pegs et colors
-                    pegs = Integer.parseInt(inputParams[getInputParamsPegsIndex()]);
-                    colors = Integer.parseInt(inputParams[getInputParamsColorsIndex()]);
-                    setupPropRecords();   //  Restaurer à partir de la DB
-                    setupCandRecords();   //  Reconstruire les candidats
-                }
-            }
-            if (inputParamsIndex == getInputParamsScoreIndex()) {
-                currentPropRecord.setScore(Integer.parseInt(inputParams[inputParamsIndex]));
-                PropRecord newPropRecord = propRecordsHandler.createPropRecordWithNewId();
-                propRecordsHandler.addPropRecord(newPropRecord);
-                newPropRecord.setComb(currentPropRecord.getComb());
-                newPropRecord.setScore(currentPropRecord.getScore());
-                int solIndex = candRecordsHandler.getSolutionCandRecordsIndex(currentPropRecord.getComb(), currentPropRecord.getScore());
-                if (solIndex == UNDEFINED) {   //  Encore plusieurs solutions possibles
-                    currentPropRecord.setComb(candRecordsHandler.getGuessComb());
-                } else {   //  Trouvé !
-                    newPropRecord = propRecordsHandler.createPropRecordWithNewId();
+                int score = value;
+                int blacks = score / 10;   //  Noirs
+                int whites = score % 10;   //  Blancs
+                if ((blacks <= pegs) && (whites <= pegs) && ((blacks + whites) <= pegs) && (score <= (10 * pegs)) && (score != (10 * (pegs - 1) + 1))) {
+                    inputParams[inputParamsIndex] = sValue;
+                    currentPropRecord.setScore(score);
+                    PropRecord newPropRecord = propRecordsHandler.createPropRecordWithNewId();
                     propRecordsHandler.addPropRecord(newPropRecord);
-                    newPropRecord.setComb(candRecordsHandler.getCombAtIndex(solIndex));
-                    newPropRecord.setScore(10 * pegs);
-                    currentPropRecord.resetComb();
+                    newPropRecord.setComb(currentPropRecord.getComb());
+                    newPropRecord.setScore(currentPropRecord.getScore());
+                    int solIndex = candRecordsHandler.getSolutionCandRecordsIndex(currentPropRecord.getComb(), currentPropRecord.getScore());
+                    if (solIndex == UNDEFINED) {   //  Encore plusieurs solutions possibles
+                        currentPropRecord.setComb(candRecordsHandler.getGuessComb());
+                    } else {   //  Trouvé !
+                        newPropRecord = propRecordsHandler.createPropRecordWithNewId();
+                        propRecordsHandler.addPropRecord(newPropRecord);
+                        newPropRecord.setComb(candRecordsHandler.getCombAtIndex(solIndex));
+                        newPropRecord.setScore(10 * pegs);
+                        currentPropRecord.resetComb();
+                    }
+                    currentPropRecord.resetScore();
+                } else {   //  Bad guy
+                    msgBox("Invalid score: " + blacks + " black" + (blacks > 1 ? "s" : "") + " and " + whites + " white" + (whites > 1 ? "s" : ""), this);
                 }
-                currentPropRecord.resetScore();
             }
-        }
-    }
-
-    private void resetPropsAndCands() {
-        propRecordsHandler.clearPropRecords();                 //  Vider propRecords et nuller currentPropRecord et secrPropRecord
-        propRecordsHandler.setupCurrentAndSecrPropRecords();   //  Reconstruire currentPropRecord et secrPropRecord
-        currentPropRecord = propRecordsHandler.getCurrentPropRecord();
-        secrPropRecord = propRecordsHandler.getSecrPropRecord();
-        candRecordsHandler = new CandRecordsHandler();   // Reconstruire tous les candidats
-        if (guessMode.equals(GUESS_MODES.ANDROID)) {
-            currentPropRecord.setComb(candRecordsHandler.getGuessComb());
         }
     }
 
@@ -597,6 +563,30 @@ public class MainActivity extends Activity {
 
     private void updateDisplayGuessMode() {
         guessModeRadios[guessMode.INDEX()].setChecked(true);
+    }
+
+    private void resetPropsAndCands() {
+        try {
+            propRecordsHandler.clearPropRecords();                 //  Vider propRecords et nuller currentPropRecord et secrPropRecord
+            propRecordsHandler.setupCurrentAndSecrPropRecords();   //  Reconstruire currentPropRecord et secrPropRecord
+            currentPropRecord = propRecordsHandler.getCurrentPropRecord();
+            secrPropRecord = propRecordsHandler.getSecrPropRecord();
+            candRecordsHandler = new CandRecordsHandler();   // Reconstruire tous les candidats
+            if (guessMode.equals(GUESS_MODES.ANDROID)) {
+                currentPropRecord.setComb(candRecordsHandler.getGuessComb());
+            }
+        } catch (OutOfMemoryError e) {    // Pas assez de RAM
+            candRecordsHandler.close();   //  Libérer ce qui fâche
+            candRecordsHandler = null;
+            propRecordsHandler.clearPropRecords();
+            propRecordsHandler = null;
+            msgBox("Out of Memory Error. Now Trying to go back to saved state", this);
+            inputParams = getCurrentsFromActivity(stringDB, MIND_ACTIVITIES.MAIN.toString(), getInputParamsTableName());   //  Restaurer les anciennes valeurs de pegs et colors
+            pegs = Integer.parseInt(inputParams[getInputParamsPegsIndex()]);
+            colors = Integer.parseInt(inputParams[getInputParamsColorsIndex()]);
+            setupPropRecords();   //  Restaurer à partir de la DB
+            setupCandRecords();   //  Reconstruire les candidats
+        }
     }
 
     private void savePreferences() {

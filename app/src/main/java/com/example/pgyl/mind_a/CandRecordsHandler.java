@@ -48,31 +48,27 @@ public class CandRecordsHandler {
     }
 
     public int getScoreByComparing(int[] comb, int[] secrComb) {
-        final int FREE = 0;
-        final int BLACK = 1;
-        final int WHITE = 2;
-
-
         int blacks = 0;
         int whites = 0;
-        int[] tempComb = new int[pegs];
         for (int i = 0; i <= (pegs - 1); i = i + 1) {
             if (comb[i] == secrComb[i]) {
-                tempComb[i] = BLACK;
                 blacks = blacks + 1;
-            } else {
-                tempComb[i] = FREE;
             }
         }
-        for (int i = 0; i <= (pegs - 1); i = i + 1) {
-            for (int j = 0; j <= (pegs - 1); j = j + 1) {
-                if ((tempComb[j] == FREE) && (tempComb[i] != BLACK)) {
-                    if (comb[i] == secrComb[j]) {
-                        tempComb[j] = WHITE;
-                        whites = whites + 1;
-                        break;
+        if (blacks != pegs) {
+            whites = -blacks;
+            for (int i = 0; i <= (colors - 1); i = i + 1) {
+                int wc = 0;
+                int ws = 0;
+                for (int j = 0; j <= (pegs - 1); j = j + 1) {
+                    if (comb[j] == i) {
+                        wc = wc + 1;
+                    }
+                    if (secrComb[j] == i) {
+                        ws = ws + 1;
                     }
                 }
+                whites = whites + (Math.min(wc, ws));
             }
         }
         return 10 * blacks + whites;
@@ -122,7 +118,7 @@ public class CandRecordsHandler {
         return miniMaxCandRecordsIndex;
     }
 
-    private void setupCandRecords() {
+    private void setupCandRecords() {   // Enumérer toutes les solutions possibles pour pegs pions et colors couleurs   (Utilisées dans le cas Android Guess)
         candRecords = new CandRecord[(int) Math.pow(colors, pegs)];
         int[] comb = new int[pegs];
         for (int i = 0; i <= (candRecords.length - 1); i = i + 1) {
