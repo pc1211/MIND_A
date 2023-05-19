@@ -210,12 +210,9 @@ public class MainActivity extends Activity {
         setupCurrentPropPegButtonsVisibility();
         updateDisplayKeepScreen();
         updateDisplayGuessMode();
-        updateDisplayPaletteButtonColors();
-        updateDisplayCurrentPropButtonColors();
-        updateDisplayCurrentPropDotMatrixDisplayScore();
         updateDisplayCommandButtonTexts();
-        mainPropListUpdater.rebuild();
-        mainPropListUpdater.repaint();
+        updateDisplayPaletteButtonColors();
+        updateDisplayCurrentPropAndPropList();
         invalidateOptionsMenu();
         onStartUp = false;
     }
@@ -303,6 +300,8 @@ public class MainActivity extends Activity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+        resetEditMode();
+
         if (item.getItemId() == R.id.MENU_ITEM_PEGS) {
             inputParamsIndex = getInputParamsPegsIndex();
             launchInputButtonsActivity(inputParamsIndex);
@@ -404,6 +403,7 @@ public class MainActivity extends Activity {
 
     private void onGuessModeRadioChanged(int checkedId) {
         if (!onStartUp) {   //  Ne pas réagir aux manipulations de radioButtons dans le onResume
+            resetEditMode();
             if (checkedId == R.id.RADIO_GUESS_USER) {
                 guessMode = GUESS_MODES.USER;
             }
@@ -411,11 +411,13 @@ public class MainActivity extends Activity {
                 guessMode = GUESS_MODES.ANDROID;
             }
             updateDisplayCommandButtonTexts();
-            onButtonClickNew();
+            resetPropsAndCands();
+            updateDisplayCurrentPropAndPropList();
         }
     }
 
     private void onCommandButtonClick(COMMANDS command) {
+        resetEditMode();
         if (command.equals(COMMANDS.CLEAR)) {
             onButtonClickClear();
         }
@@ -431,14 +433,13 @@ public class MainActivity extends Activity {
         if (command.equals(COMMANDS.SUBMIT)) {
             onButtonClickSubmit();
         }
+        updateDisplayCurrentPropAndPropList();
     }
 
     private void onButtonClickClear() {
         if (guessMode.equals(GUESS_MODES.USER)) {
             currentPropRecord.resetComb();
             currentPropRecord.resetScore();
-            updateDisplayCurrentPropButtonColors();
-            updateDisplayCurrentPropDotMatrixDisplayScore();
         }
     }
 
@@ -448,29 +449,17 @@ public class MainActivity extends Activity {
             candRecordsHandler.updateCandRecordsToPropRecords(propRecordsHandler);
             currentPropRecord.setComb(candRecordsHandler.getGuessComb());
             currentPropRecord.resetScore();
-            updateDisplayCurrentPropButtonColors();
-            updateDisplayCurrentPropDotMatrixDisplayScore();
         }
-        mainPropListUpdater.rebuild();
-        mainPropListUpdater.repaint();
     }
 
     private void onButtonClickNew() {
         resetPropsAndCands();
-        updateDisplayCurrentPropButtonColors();
-        updateDisplayCurrentPropDotMatrixDisplayScore();
-        mainPropListUpdater.rebuild();
-        mainPropListUpdater.repaint();
     }
 
     private void onButtonClickCheat() {
         if (guessMode.equals(GUESS_MODES.USER)) {
             currentPropRecord.setComb(secrPropRecord.getComb());
             currentPropRecord.setScore(10 * pegs);
-            updateDisplayCurrentPropButtonColors();
-            updateDisplayCurrentPropDotMatrixDisplayScore();
-        } else {
-            msgBox("I cannot read human memory", this);
         }
     }
 
@@ -483,14 +472,17 @@ public class MainActivity extends Activity {
                 newPropRecord.setScore(candRecordsHandler.getScoreByComparing(currentPropRecord.getComb(), secrPropRecord.getComb()));
                 currentPropRecord.resetComb();
                 currentPropRecord.resetScore();
-                mainPropListUpdater.rebuild();
-                mainPropListUpdater.repaint();
-                updateDisplayCurrentPropButtonColors();
-                updateDisplayCurrentPropDotMatrixDisplayScore();
             } else {
                 msgBox("Invalid proposal", this);
             }
         }
+    }
+
+    private void updateDisplayCurrentPropAndPropList() {
+        updateDisplayCurrentPropButtonColors();
+        updateDisplayCurrentPropDotMatrixDisplayScore();
+        mainPropListUpdater.rebuild();
+        mainPropListUpdater.repaint();
     }
 
     private void updateDisplayPaletteButtonColors() {
@@ -563,6 +555,12 @@ public class MainActivity extends Activity {
 
     private void updateDisplayGuessMode() {
         guessModeRadios[guessMode.INDEX()].setChecked(true);
+    }
+
+    private void resetEditMode() {
+        editMode = EDIT_MODES.NONE;
+        updateDisplayPaletteButtonColors();
+        updateDisplayCurrentPropButtonColors();
     }
 
     private void resetPropsAndCands() {
