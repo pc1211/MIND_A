@@ -3,6 +3,7 @@ package com.example.pgyl.mind_a;
 import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Color;
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -182,7 +183,7 @@ public class ScoreActivity extends Activity {
         final String BUTTON_XML_PREFIX = "BTN_";
 
         buttons = new Button[COMMANDS.values().length];
-        Class rid = com.example.pgyl.pekislib_a.R.id.class;
+        Class rid = R.id.class;
         for (COMMANDS command : COMMANDS.values()) {
             try {
                 buttons[command.INDEX()] = findViewById(rid.getField(BUTTON_XML_PREFIX + command.toString()).getInt(rid));   //  1, 2, 3 ... dans le XML
@@ -210,6 +211,8 @@ public class ScoreActivity extends Activity {
             try {
                 blackRadioButtons[i] = findViewById(rid.getField(BUTTON_XML_PREFIX + i).getInt(rid));
                 blackRadioButtons[i].setTextColor(Color.parseColor(COLOR_PREFIX + TXT_COLOR));
+                blackRadioButtons[i].setTypeface(null, Typeface.BOLD);
+                blackRadioButtons[i].setPadding(20, 0, 0, 0);   //  Décaler le texte un peu vers la droite
             } catch (IllegalAccessException | IllegalArgumentException | NoSuchFieldException | SecurityException ex) {
                 Logger.getLogger(MainActivity.class.getName()).log(Level.SEVERE, null, ex);
             }
@@ -239,6 +242,9 @@ public class ScoreActivity extends Activity {
             try {
                 whiteRadioButtons[i] = findViewById(rid.getField(BUTTON_XML_PREFIX + i).getInt(rid));
                 whiteRadioButtons[i].setTextColor(Color.parseColor(COLOR_PREFIX + TXT_COLOR));
+                whiteRadioButtons[i].setTypeface(null, Typeface.BOLD);
+                whiteRadioButtons[i].setPadding(20, 0, 0, 0);   //  Décaler le texte un peu vers la droite
+
             } catch (IllegalAccessException | IllegalArgumentException | NoSuchFieldException | SecurityException ex) {
                 Logger.getLogger(MainActivity.class.getName()).log(Level.SEVERE, null, ex);
             }

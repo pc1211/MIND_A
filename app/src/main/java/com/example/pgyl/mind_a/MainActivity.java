@@ -636,6 +636,7 @@ public class MainActivity extends Activity {
             try {
                 guessModeRadios[gm.INDEX()] = findViewById(rid.getField(BUTTON_XML_PREFIX + gm.toString()).getInt(rid));
                 guessModeRadios[gm.INDEX()].setTextColor(Color.parseColor(COLOR_PREFIX + TXT_COLOR));
+                guessModeRadios[gm.INDEX()].setPadding(20, 0, 0, 0);   //  Décaler le texte un peu vers la droite
             } catch (IllegalAccessException | IllegalArgumentException | NoSuchFieldException | SecurityException ex) {
                 Logger.getLogger(MainActivity.class.getName()).log(Level.SEVERE, null, ex);
             }

@@ -35,14 +35,15 @@
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_weight="9"
-                android:background="@drawable/border"
+                android:background="@drawable/border2"
                 android:orientation="vertical">
 
                 <RadioGroup
                     android:id="@+id/GROUP_BLACKS"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:orientation="vertical">
+                    android:orientation="vertical"
+                    android:textStyle="bold">
 
                     <RadioButton
                         android:id="@+id/BTN_B_0"
@@ -142,7 +143,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_weight="9"
-                android:background="@drawable/border"
+                android:background="@drawable/border2"
                 android:orientation="vertical">
 
                 <RadioGroup
