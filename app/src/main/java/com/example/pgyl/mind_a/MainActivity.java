@@ -515,10 +515,11 @@ public class MainActivity extends Activity {
         final String EMPTY_COLOR = "808080";
 
         String color = (currentPropRecord.getCombAtIndex(index) != UNDEFINED) ? paletteColors[getPaletteColorsAtIndex(currentPropRecord.getCombAtIndex(index))] : EMPTY_COLOR;
+        String BackColor = (!color.equals(EMPTY_COLOR) ? BACK_COLOR_NORMAL : EMPTY_COLOR);
         if (colorMode.equals(COLOR_MODES.NORMAL)) {
-            currentPropPegButtons[index].setColors(color, BACK_COLOR_NORMAL, color, BACK_COLOR_INVERSE);
+            currentPropPegButtons[index].setColors(color, BackColor, color, BACK_COLOR_INVERSE);
         } else {   // Inverse
-            currentPropPegButtons[index].setColors(color, BACK_COLOR_INVERSE, color, BACK_COLOR_NORMAL);
+            currentPropPegButtons[index].setColors(color, BACK_COLOR_INVERSE, color, BackColor);
         }
     }
 
