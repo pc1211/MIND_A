@@ -417,10 +417,10 @@ public class MainActivity extends Activity {
     }
 
     private void onCommandButtonClick(COMMANDS command) {
-        resetEditMode();
         if (command.equals(COMMANDS.CLEAR)) {
             onButtonClickClear();
         }
+        resetEditMode();
         if (command.equals(COMMANDS.DELETE_LAST)) {
             onButtonClickDeleteLast();
         }
@@ -438,8 +438,12 @@ public class MainActivity extends Activity {
 
     private void onButtonClickClear() {
         if (guessMode.equals(GUESS_MODES.USER)) {
-            currentPropRecord.resetComb();
-            currentPropRecord.resetScore();
+            if (editMode.equals(EDIT_MODES.CURRENT_PROP)) {
+                currentPropRecord.resetCombAtIndex(editIndex);
+            }
+            if (editMode.equals(EDIT_MODES.NONE)) {
+                currentPropRecord.resetComb();
+            }
         }
     }
 
@@ -471,7 +475,6 @@ public class MainActivity extends Activity {
                 newPropRecord.setComb(currentPropRecord.getComb());
                 newPropRecord.setScore(candRecordsHandler.getScoreByComparing(currentPropRecord.getComb(), secrPropRecord.getComb()));
                 currentPropRecord.resetComb();
-                currentPropRecord.resetScore();
             } else {
                 msgBox("Invalid proposal", this);
             }
@@ -532,10 +535,10 @@ public class MainActivity extends Activity {
         if (guessMode.equals(GUESS_MODES.USER)) {
             currentPropDotMatrixDisplayScore.setVisibility(View.INVISIBLE);
         } else {   //  Android Guess
-            dotMatrixDisplayUpdater.displayText(currentPropRecord.getStringScore());   //  "*-*" (En attente d'entrée du score)
+            dotMatrixDisplayUpdater.displayText(currentPropRecord.getDecoratedScore());   //  "*-*" (En attente d'entrée du score)
             currentPropDotMatrixDisplayScore.setVisibility(View.VISIBLE);
         }
-        dotMatrixDisplayUpdater.displayText(currentPropRecord.getStringScore());
+        dotMatrixDisplayUpdater.displayText(currentPropRecord.getDecoratedScore());
     }
 
     private void updateDisplayCommandButtonTexts() {
@@ -642,7 +645,7 @@ public class MainActivity extends Activity {
             try {
                 guessModeRadios[gm.INDEX()] = findViewById(rid.getField(BUTTON_XML_PREFIX + gm.toString()).getInt(rid));
                 guessModeRadios[gm.INDEX()].setTextColor(Color.parseColor(COLOR_PREFIX + TXT_COLOR));
-                guessModeRadios[gm.INDEX()].setPadding(20, 0, 0, 0);   //  Décaler le texte un peu vers la droite
+                guessModeRadios[gm.INDEX()].setPadding(16, 0, 0, 0);   //  Décaler le texte un peu vers la droite
             } catch (IllegalAccessException | IllegalArgumentException | NoSuchFieldException | SecurityException ex) {
                 Logger.getLogger(MainActivity.class.getName()).log(Level.SEVERE, null, ex);
             }

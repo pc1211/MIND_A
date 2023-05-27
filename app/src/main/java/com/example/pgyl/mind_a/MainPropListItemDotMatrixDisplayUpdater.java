@@ -41,7 +41,7 @@ public class MainPropListItemDotMatrixDisplayUpdater {
 
         dotMatrixDisplayView.fillRect(displayRect, LABEL_ON_COLOR, OFF_COLOR);    //  Pressed=ON  Unpressed=OFF
         dotMatrixDisplayView.setSymbolPos(displayRect.left + margins.left, displayRect.top + margins.top);
-        dotMatrixDisplayView.writeText(propRecord.getStringScore(), LABEL_ON_COLOR, defaultFont);
+        dotMatrixDisplayView.writeText(propRecord.getDecoratedScore(), LABEL_ON_COLOR, defaultFont);
         dotMatrixDisplayView.updateDisplay();
     }
 

@@ -62,10 +62,14 @@ public class PropRecord {
         comb[index] = value;
     }
 
+    public void resetCombAtIndex(int index) {
+        comb[index] = UNDEFINED;
+    }
+
     public void resetComb() {
-        this.comb = new int[pegs];
+        comb = new int[pegs];
         for (int i = 0; i <= (pegs - 1); i = i + 1) {
-            this.comb[i] = UNDEFINED;
+            comb[i] = UNDEFINED;
         }
     }
 
@@ -90,7 +94,7 @@ public class PropRecord {
         return SEPARATOR;
     }
 
-    public String getStringScore() {
+    public String getDecoratedScore() {
         return (score == UNDEFINED ? "B" + SEPARATOR + "W" : String.valueOf(score / 10) + SEPARATOR + String.valueOf(score % 10));
     }
 }
