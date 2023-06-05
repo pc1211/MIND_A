@@ -4,6 +4,8 @@ import com.example.pgyl.pekislib_a.InputButtonsActivity;
 
 import java.util.ArrayList;
 
+import static com.example.pgyl.mind_a.Constants.MAX_COLORS;
+import static com.example.pgyl.mind_a.Constants.MAX_PEGS;
 import static com.example.pgyl.mind_a.MainActivity.pegs;
 import static com.example.pgyl.pekislib_a.Constants.REGEXP_INTEGER_FROM_0;
 import static com.example.pgyl.pekislib_a.Constants.REGEXP_INTEGER_FROM_0_ERROR_MESSAGE;
@@ -131,7 +133,7 @@ public class StringDBTables {
                 {TABLE_IDS.REGEXP.toString(), REGEXP_INTEGER_FROM_0, REGEXP_INTEGER_FROM_0, null},
                 {TABLE_IDS.REGEXP_ERROR_MESSAGE.toString(), REGEXP_INTEGER_FROM_0_ERROR_MESSAGE, REGEXP_INTEGER_FROM_0_ERROR_MESSAGE, null},
                 {TABLE_IDS.MIN.toString(), "1", "1", null},
-                {TABLE_IDS.MAX.toString(), String.valueOf(getPegsCount()), String.valueOf(MIND_TABLES.PALETTE_COLORS.getDataFieldsCount()), null},
+                {TABLE_IDS.MAX.toString(), String.valueOf(MAX_PEGS), String.valueOf(MAX_COLORS), null},
                 {TABLE_IDS.DEFAULT.toString(), "4", "6", null}   //  4 pegs, 6 colors, Pas pertinent pour le score
         };
         return INPUT_PARAMS_INITS;
@@ -152,10 +154,6 @@ public class StringDBTables {
     //region PROPS
     public static String getPropsTableName() {
         return MIND_TABLES.PROPS.toString();
-    }
-
-    public static int getPegsCount() {
-        return MIND_TABLES.PROPS.getDataFieldsCount() - 1;   //  Ne pas prendre en compte le score
     }
 
     public static int getPropsCombAtIndex(int index) {
@@ -210,7 +208,7 @@ public class StringDBTables {
         String[] propRow = new String[1 + MindTableDataFields.props.values().length];  //  Champ ID + Données (9 pions + Score)
 
         propRow[TABLE_ID_INDEX] = String.valueOf(propRecord.getId());
-        for (int i = 0; i <= (getPegsCount() - 1); i = i + 1) {    //  Les pions, partie utilisée (via getcomb()) et partie non utilisée (via couleur vide)
+        for (int i = 0; i <= (MAX_PEGS - 1); i = i + 1) {    //  Les pions, partie utilisée (via getcomb()) et partie non utilisée (via couleur vide)
             propRow[MindTableDataFields.props.valueOf(COMB_NAME_PREFIX + i).INDEX()] = String.valueOf((i < propRecord.getComb().length) ? propRecord.getComb()[i] : UNDEFINED);
         }
         propRow[MindTableDataFields.props.PROP_SCORE.INDEX()] = String.valueOf(propRecord.getScore());   //  Le score

@@ -21,11 +21,11 @@ import com.example.pgyl.pekislib_a.StringDB;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import static com.example.pgyl.mind_a.Constants.MAX_PEGS;
 import static com.example.pgyl.mind_a.Constants.MIND_ACTIVITIES;
 import static com.example.pgyl.mind_a.MainActivity.pegs;
 import static com.example.pgyl.mind_a.StringDBTables.getInputParamsScoreIndex;
 import static com.example.pgyl.mind_a.StringDBTables.getInputParamsTableName;
-import static com.example.pgyl.mind_a.StringDBTables.getPegsCount;
 import static com.example.pgyl.pekislib_a.Constants.ACTIVITY_EXTRA_KEYS;
 import static com.example.pgyl.pekislib_a.Constants.COLOR_PREFIX;
 import static com.example.pgyl.pekislib_a.Constants.UNDEFINED;
@@ -205,7 +205,7 @@ public class ScoreActivity extends Activity {
         final String TXT_COLOR = "000000";
         final String BUTTON_XML_PREFIX = "BTN_B_";
 
-        blackRadioButtons = new RadioButton[1 + getPegsCount()];   //  p.ex si pegs = 4, il faut pouvoir sélectionner 0..4, cad 5 radioButtons
+        blackRadioButtons = new RadioButton[1 + MAX_PEGS];   //  p.ex si pegs = 4, il faut pouvoir sélectionner 0..4, cad 5 radioButtons
         Class rid = R.id.class;
         for (int i = 0; i <= (blackRadioButtons.length - 1); i = i + 1) {
             try {
@@ -236,7 +236,7 @@ public class ScoreActivity extends Activity {
         final String TXT_COLOR = "000000";
         final String BUTTON_XML_PREFIX = "BTN_W_";
 
-        whiteRadioButtons = new RadioButton[1 + getPegsCount()];   //  p.ex si pegs = 4, il faut pouvoir sélectionner 0..4, cad 5 radioButtons
+        whiteRadioButtons = new RadioButton[1 + MAX_PEGS];   //  p.ex si pegs = 4, il faut pouvoir sélectionner 0..4, cad 5 radioButtons
         Class rid = R.id.class;
         for (int i = 0; i <= (whiteRadioButtons.length - 1); i = i + 1) {
             try {

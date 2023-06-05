@@ -24,20 +24,21 @@ import com.example.pgyl.pekislib_a.HelpActivity;
 import com.example.pgyl.pekislib_a.InputButtonsActivity;
 import com.example.pgyl.pekislib_a.StringDB;
 import com.example.pgyl.pekislib_a.SymbolButtonView;
+import com.example.pgyl.pekislib_a.SymbolButtonView.SymbolButtonViewColorBox;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import static com.example.pgyl.mind_a.Constants.MAX_COLORS;
+import static com.example.pgyl.mind_a.Constants.MAX_PEGS;
 import static com.example.pgyl.mind_a.Constants.MIND_ACTIVITIES;
 import static com.example.pgyl.mind_a.Constants.MIND_ACTIVITIES_REQUEST_CODE_MULTIPLIER;
-import static com.example.pgyl.mind_a.StringDBTables.MIND_TABLES;
 import static com.example.pgyl.mind_a.StringDBTables.getInputParamsColorsIndex;
 import static com.example.pgyl.mind_a.StringDBTables.getInputParamsPegsIndex;
 import static com.example.pgyl.mind_a.StringDBTables.getInputParamsScoreIndex;
 import static com.example.pgyl.mind_a.StringDBTables.getInputParamsTableName;
 import static com.example.pgyl.mind_a.StringDBTables.getPaletteColorsAtIndex;
 import static com.example.pgyl.mind_a.StringDBTables.getPaletteColorsTableName;
-import static com.example.pgyl.mind_a.StringDBTables.getPegsCount;
 import static com.example.pgyl.mind_a.StringDBTables.getPropsTableName;
 import static com.example.pgyl.mind_a.StringDBUtils.createMindTableIfNotExists;
 import static com.example.pgyl.mind_a.StringDBUtils.initializeTableInputParams;
@@ -88,7 +89,7 @@ public class MainActivity extends Activity {
         }
     }
 
-    private enum EDIT_MODES {PALETTE, CURRENT_PROP, NONE}
+    private enum EDIT_MODES {PALETTE, CURRENT_PROP, ITEM_PROP, NONE}
 
     private enum COLOR_MODES {NORMAL, INVERSE}
 
@@ -109,8 +110,10 @@ public class MainActivity extends Activity {
     private MainDotMatrixDisplayUpdater dotMatrixDisplayUpdater;
     private RadioButton[] guessModeRadios;
     private EDIT_MODES editMode;
-    private int editIndex;
+    private int editPegIndex;
+    private int editItemPropPosition;
     private GUESS_MODES guessMode;
+    private SymbolButtonViewColorBox symbolButtonViewColorBox;
     private Menu menu;
     private MenuItem barMenuItemKeepScreen;
     private CandRecordsHandler candRecordsHandler;
@@ -138,9 +141,9 @@ public class MainActivity extends Activity {
         setupPaletteButtons();
         setupCurrentPropPegButtons();
         setupCommandButtons();
-        setupDotMatrixDisplay();
         setupGuessModeRadioButtons();
         setupTextViews();
+        setupDotMatrixDisplay();
         validReturnFromCalledActivity = false;
     }
 
@@ -164,6 +167,7 @@ public class MainActivity extends Activity {
         stringDB = null;
         inputParams = null;
         paletteColors = null;
+        symbolButtonViewColorBox = null;
         menu = null;
         savePreferences();
     }
@@ -177,16 +181,17 @@ public class MainActivity extends Activity {
         shpFileName = getPackageName() + "." + getClass().getSimpleName() + SHP_FILE_NAME_SUFFIX;
         keepScreen = getSHPKeepScreen();
         guessMode = getSHPGuessMode();
+        inputParamsIndex = getSHPInputParamsIndex();
         editMode = EDIT_MODES.NONE;
         setupStringDB();
         inputParams = getCurrentsFromActivity(stringDB, MIND_ACTIVITIES.MAIN.toString(), getInputParamsTableName());
         paletteColors = getCurrentsFromActivity(stringDB, MIND_ACTIVITIES.MAIN.toString(), getPaletteColorsTableName());
         pegs = Integer.parseInt(inputParams[getInputParamsPegsIndex()]);
         colors = Integer.parseInt(inputParams[getInputParamsColorsIndex()]);
+        symbolButtonViewColorBox = new SymbolButtonViewColorBox();
         setupPropRecords();   //  Charger à partir de la DB
         setupCandRecords();
 
-        inputParamsIndex = getSHPInputParamsIndex();
         String newParamValue = null;
         if (validReturnFromCalledActivity) {
             validReturnFromCalledActivity = false;
@@ -261,17 +266,17 @@ public class MainActivity extends Activity {
                     inputParams[inputParamsIndex] = sValue;
                     currentPropRecord.setScore(score);
                     PropRecord newPropRecord = propRecordsHandler.createPropRecordWithNewId();
-                    propRecordsHandler.addPropRecord(newPropRecord);
                     newPropRecord.setComb(currentPropRecord.getComb());
                     newPropRecord.setScore(currentPropRecord.getScore());
+                    propRecordsHandler.addPropRecord(newPropRecord);
                     int solIndex = candRecordsHandler.getSolutionCandRecordsIndex(currentPropRecord.getComb(), currentPropRecord.getScore());
                     if (solIndex == UNDEFINED) {   //  Encore plusieurs solutions possibles
                         currentPropRecord.setComb(candRecordsHandler.getGuessComb());
                     } else {   //  Trouvé !
                         newPropRecord = propRecordsHandler.createPropRecordWithNewId();
-                        propRecordsHandler.addPropRecord(newPropRecord);
                         newPropRecord.setComb(candRecordsHandler.getCombAtIndex(solIndex));
                         newPropRecord.setScore(10 * pegs);
+                        propRecordsHandler.addPropRecord(newPropRecord);
                         currentPropRecord.resetComb();
                     }
                     currentPropRecord.resetScore();
@@ -341,54 +346,65 @@ public class MainActivity extends Activity {
         return super.onOptionsItemSelected(item);
     }
 
-    private void onPaletteButtonClick(int index) {
+    private void onPaletteButtonClick(int pegIndex) {
         if (guessMode.equals(GUESS_MODES.USER)) {
             EDIT_MODES oldEditMode = editMode;
-            int oldEditIndex = editIndex;
+            int oldEditPegIndex = editPegIndex;
             editMode = EDIT_MODES.PALETTE;
-            editIndex = index;
+            editPegIndex = pegIndex;
             if (oldEditMode.equals(EDIT_MODES.PALETTE)) {   //  Click Palette puis Palette
-                if (editIndex != oldEditIndex) {
-                    updateDisplayPaletteButtonColor(editIndex, COLOR_MODES.INVERSE);
+                if (editPegIndex != oldEditPegIndex) {
+                    updateDisplayPaletteButtonColor(editPegIndex, COLOR_MODES.INVERSE);
                 } else {   //  Même bouton => L'édition en cours est annulée
                     editMode = EDIT_MODES.NONE;
                 }
-                updateDisplayPaletteButtonColor(oldEditIndex, COLOR_MODES.NORMAL);
+                updateDisplayPaletteButtonColor(oldEditPegIndex, COLOR_MODES.NORMAL);
             }
             if (oldEditMode.equals(EDIT_MODES.CURRENT_PROP)) {   //  Click Current Prop puis Palette
-                currentPropRecord.setCombAtIndex(oldEditIndex, editIndex);
-                updateDisplayPaletteButtonColor(editIndex, COLOR_MODES.NORMAL);
-                updateDisplayCurrentPropButtonColor(oldEditIndex, COLOR_MODES.NORMAL);
+                currentPropRecord.setCombAtIndex(oldEditPegIndex, editPegIndex);
+                updateDisplayPaletteButtonColor(editPegIndex, COLOR_MODES.NORMAL);
+                updateDisplayCurrentPropButtonColor(oldEditPegIndex, COLOR_MODES.NORMAL);
                 editMode = EDIT_MODES.NONE;
             }
+            if (oldEditMode.equals(EDIT_MODES.ITEM_PROP)) {   //  Click itemProp puis Palette
+                updateDisplayItemPropButtonColor(editItemPropPosition, oldEditPegIndex, COLOR_MODES.NORMAL);
+                updateDisplayPaletteButtonColor(editPegIndex, COLOR_MODES.INVERSE);
+            }
             if (oldEditMode.equals(EDIT_MODES.NONE)) {   //  Rien puis Click Palette
-                updateDisplayPaletteButtonColor(editIndex, COLOR_MODES.INVERSE);
+                updateDisplayPaletteButtonColor(editPegIndex, COLOR_MODES.INVERSE);
             }
         }
     }
 
-    private void onCurrentPropPegButtonClick(int index) {
+    private void onCurrentPropPegButtonClick(int pegIndex) {
         if (guessMode.equals(GUESS_MODES.USER)) {
             EDIT_MODES oldEditMode = editMode;
-            int oldEditIndex = editIndex;
+            int oldEditPegIndex = editPegIndex;
             editMode = EDIT_MODES.CURRENT_PROP;
-            editIndex = index;
+            editPegIndex = pegIndex;
             if (oldEditMode.equals(EDIT_MODES.CURRENT_PROP)) {   //  Click Current Prop puis Current Prop
-                if (editIndex != oldEditIndex) {
-                    updateDisplayCurrentPropButtonColor(editIndex, COLOR_MODES.INVERSE);
+                if (editPegIndex != oldEditPegIndex) {
+                    updateDisplayCurrentPropButtonColor(editPegIndex, COLOR_MODES.INVERSE);
                 } else {   //  Même bouton => L'édition en cours est annulée
                     editMode = EDIT_MODES.NONE;
                 }
-                updateDisplayCurrentPropButtonColor(oldEditIndex, COLOR_MODES.NORMAL);
+                updateDisplayCurrentPropButtonColor(oldEditPegIndex, COLOR_MODES.NORMAL);
             }
             if (oldEditMode.equals(EDIT_MODES.PALETTE)) {   //  Click Palette puis Current Prop
-                currentPropRecord.setCombAtIndex(editIndex, oldEditIndex);
-                updateDisplayCurrentPropButtonColor(editIndex, COLOR_MODES.NORMAL);
-                updateDisplayPaletteButtonColor(oldEditIndex, COLOR_MODES.NORMAL);
+                currentPropRecord.setCombAtIndex(editPegIndex, oldEditPegIndex);
+                updateDisplayCurrentPropButtonColor(editPegIndex, COLOR_MODES.NORMAL);
+                updateDisplayPaletteButtonColor(oldEditPegIndex, COLOR_MODES.NORMAL);
+                editMode = EDIT_MODES.NONE;
+            }
+            if (oldEditMode.equals(EDIT_MODES.ITEM_PROP)) {   //  Click itemProp puis Current Prop
+                PropRecord itemPropRecord = propRecordsHandler.getPropRecordAtIndex(editItemPropPosition);
+                currentPropRecord.setCombAtIndex(editPegIndex, itemPropRecord.getCombAtIndex(oldEditPegIndex));
+                updateDisplayItemPropButtonColor(editItemPropPosition, oldEditPegIndex, COLOR_MODES.NORMAL);
+                updateDisplayCurrentPropButtonColor(editPegIndex, COLOR_MODES.NORMAL);
                 editMode = EDIT_MODES.NONE;
             }
             if (oldEditMode.equals(EDIT_MODES.NONE)) {   //  Rien puis Click Current Prop
-                updateDisplayCurrentPropButtonColor(editIndex, COLOR_MODES.INVERSE);
+                updateDisplayCurrentPropButtonColor(editPegIndex, COLOR_MODES.INVERSE);
             }
         }
     }
@@ -439,7 +455,7 @@ public class MainActivity extends Activity {
     private void onButtonClickClear() {
         if (guessMode.equals(GUESS_MODES.USER)) {
             if (editMode.equals(EDIT_MODES.CURRENT_PROP)) {
-                currentPropRecord.resetCombAtIndex(editIndex);
+                currentPropRecord.resetCombAtIndex(editPegIndex);
             }
             if (editMode.equals(EDIT_MODES.NONE)) {
                 currentPropRecord.resetComb();
@@ -481,6 +497,43 @@ public class MainActivity extends Activity {
         }
     }
 
+    private void onItemPropClick(int position, int pegIndex) {
+        if (guessMode.equals(GUESS_MODES.USER)) {
+            EDIT_MODES oldEditMode = editMode;
+            int oldEditItemPropPosition = editItemPropPosition;
+            int oldEditPegIndex = editPegIndex;
+            editMode = EDIT_MODES.ITEM_PROP;
+            editItemPropPosition = position;
+            editPegIndex = pegIndex;
+            if (oldEditMode.equals(EDIT_MODES.CURRENT_PROP)) {   //  Click Current Prop puis itemProp
+                PropRecord itemPropRecord = propRecordsHandler.getPropRecordAtIndex(position);
+                currentPropRecord.setCombAtIndex(oldEditPegIndex, itemPropRecord.getCombAtIndex(editPegIndex));
+                updateDisplayItemPropButtonColor(editItemPropPosition, editPegIndex, COLOR_MODES.NORMAL);
+                updateDisplayCurrentPropButtonColor(oldEditPegIndex, COLOR_MODES.NORMAL);
+                editMode = EDIT_MODES.NONE;
+            }
+            if (oldEditMode.equals(EDIT_MODES.PALETTE)) {   //  Click Palette puis itemProp
+                updateDisplayPaletteButtonColor(oldEditPegIndex, COLOR_MODES.NORMAL);
+                updateDisplayItemPropButtonColor(editItemPropPosition, editPegIndex, COLOR_MODES.INVERSE);
+            }
+            if (oldEditMode.equals(EDIT_MODES.ITEM_PROP)) {   //  Click itemProp puis itemProp
+                if (editItemPropPosition != oldEditItemPropPosition) {  //  Sur un itemProp différent
+                    updateDisplayItemPropButtonColor(editItemPropPosition, editPegIndex, COLOR_MODES.INVERSE);
+                } else {   //  Même itemProp
+                    if (editPegIndex != oldEditPegIndex) {
+                        updateDisplayItemPropButtonColor(editItemPropPosition, editPegIndex, COLOR_MODES.INVERSE);
+                    } else {   //  Même bouton => L'édition en cours est annulée
+                        editMode = EDIT_MODES.NONE;
+                    }
+                }
+                updateDisplayItemPropButtonColor(oldEditItemPropPosition, oldEditPegIndex, COLOR_MODES.NORMAL);
+            }
+            if (oldEditMode.equals(EDIT_MODES.NONE)) {   //  Rien puis Click Item
+                updateDisplayItemPropButtonColor(position, editPegIndex, COLOR_MODES.INVERSE);
+            }
+        }
+    }
+
     private void updateDisplayCurrentPropAndPropList() {
         updateDisplayCurrentPropButtonColors();
         updateDisplayCurrentPropDotMatrixDisplayScore();
@@ -499,11 +552,11 @@ public class MainActivity extends Activity {
         final String BACK_COLOR_INVERSE = "FFFFFF";
 
         String color = paletteColors[getPaletteColorsAtIndex(index)];
-        if (colorMode.equals(COLOR_MODES.NORMAL)) {
-            paletteButtons[index].setColors(color, BACK_COLOR_NORMAL, color, BACK_COLOR_INVERSE);
-        } else {   // Inverse
-            paletteButtons[index].setColors(color, BACK_COLOR_INVERSE, color, BACK_COLOR_NORMAL);
-        }
+        symbolButtonViewColorBox.unpressedFrontColor = color;
+        symbolButtonViewColorBox.unpressedBackColor = colorMode.equals(COLOR_MODES.NORMAL) ? BACK_COLOR_NORMAL : BACK_COLOR_INVERSE;
+        symbolButtonViewColorBox.pressedFrontColor = color;
+        symbolButtonViewColorBox.pressedBackColor = BACK_COLOR_NORMAL;
+        paletteButtons[index].setColors(symbolButtonViewColorBox);
     }
 
     private void updateDisplayCurrentPropButtonColors() {
@@ -524,11 +577,25 @@ public class MainActivity extends Activity {
             frontColor = paletteColors[getPaletteColorsAtIndex(colorIndex)];
             backColor = BACK_COLOR_NORMAL;
         }
-        if (colorMode.equals(COLOR_MODES.NORMAL)) {
-            currentPropPegButtons[index].setColors(frontColor, backColor, frontColor, BACK_COLOR_INVERSE);
-        } else {   // Inverse
-            currentPropPegButtons[index].setColors(frontColor, BACK_COLOR_INVERSE, frontColor, backColor);
-        }
+        symbolButtonViewColorBox.unpressedFrontColor = frontColor;
+        symbolButtonViewColorBox.unpressedBackColor = colorMode.equals(COLOR_MODES.NORMAL) ? backColor : BACK_COLOR_INVERSE;
+        symbolButtonViewColorBox.pressedFrontColor = frontColor;
+        symbolButtonViewColorBox.pressedBackColor = colorMode.equals(COLOR_MODES.NORMAL) ? BACK_COLOR_INVERSE : backColor;
+        currentPropPegButtons[index].setColors(symbolButtonViewColorBox);
+    }
+
+    private void updateDisplayItemPropButtonColor(int position, int pegIndex, COLOR_MODES colorMode) {
+        final String BACK_COLOR_NORMAL = "000000";
+        final String BACK_COLOR_INVERSE = "FFFFFF";
+
+        PropRecord itemPropRecord = propRecordsHandler.getPropRecordAtIndex(position);
+        int colorIndex = itemPropRecord.getCombAtIndex(pegIndex);
+        String color = paletteColors[getPaletteColorsAtIndex(colorIndex)];
+        symbolButtonViewColorBox.unpressedFrontColor = color;
+        symbolButtonViewColorBox.unpressedBackColor = colorMode.equals(COLOR_MODES.NORMAL) ? BACK_COLOR_NORMAL : BACK_COLOR_INVERSE;
+        symbolButtonViewColorBox.pressedFrontColor = color;
+        symbolButtonViewColorBox.pressedBackColor = colorMode.equals(COLOR_MODES.NORMAL) ? BACK_COLOR_INVERSE : BACK_COLOR_NORMAL;
+        mainPropListUpdater.repaintAtPosAtPegIndex(position, pegIndex, symbolButtonViewColorBox);
     }
 
     private void updateDisplayCurrentPropDotMatrixDisplayScore() {
@@ -664,7 +731,7 @@ public class MainActivity extends Activity {
         final float BUTTON_SYMBOL_SIZE_COEFF = 0.75f;   //  Pour que le symbole ne frôle pas les bords de sa View
         final long BUTTON_MIN_CLICK_TIME_INTERVAL_MS = 500;
 
-        paletteButtons = new SymbolButtonView[MIND_TABLES.PALETTE_COLORS.getDataFieldsCount()];
+        paletteButtons = new SymbolButtonView[MAX_COLORS];
         Class rid = R.id.class;
         for (int i = 0; i <= (paletteButtons.length - 1); i = i + 1) {
             try {
@@ -696,7 +763,7 @@ public class MainActivity extends Activity {
         final float BUTTON_SYMBOL_SIZE_COEFF = 0.75f;   //  Pour que le symbole ne frôle pas les bords de sa View
         final long BUTTON_MIN_CLICK_TIME_INTERVAL_MS = 500;
 
-        currentPropPegButtons = new SymbolButtonView[getPegsCount()];
+        currentPropPegButtons = new SymbolButtonView[MAX_PEGS];
         Class rid = R.id.class;
         for (int i = 0; i <= (currentPropPegButtons.length - 1); i = i + 1) {
             try {
@@ -806,6 +873,12 @@ public class MainActivity extends Activity {
 
     private void setupMainPropList() {
         mainPropListItemAdapter = new MainPropListItemAdapter(this, paletteColors);
+        mainPropListItemAdapter.setOnButtonClick(new MainPropListItemAdapter.onButtonClickListener() {
+            @Override
+            public void onButtonClick(int position, int pegIndex) {
+                onItemPropClick(position, pegIndex);
+            }
+        });
         mainPropListView = findViewById(R.id.PROP_LIST);
         mainPropListView.setAdapter(mainPropListItemAdapter);
     }

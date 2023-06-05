@@ -84,6 +84,10 @@ public class PropRecordsHandler {
         return maxId;
     }
 
+    public PropRecord getPropRecordAtIndex(int index) {
+        return propRecords.get(index);
+    }
+
     private PropRecord getPropRecordAtId(int id) {
         PropRecord propRecord = null;
         int index = getPropRecordIndexOfId(id);
