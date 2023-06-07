@@ -12,7 +12,7 @@ public class PropRecord {
 
     //region Variables
     private int id;             //  Identifiant de la proposition (0, 1, 2, 3, ...)
-    private int[] comb;         //  Numéros de couleur (0..9) de la proposition (cf PALETTE_COLORS[])  (-1 si pas de couleur attribuée (COLOR_NUM_EMPTY))
+    private int[] comb;         //  Numéros de couleur (0..9) de la proposition (cf PALETTE_COLORS[])  (-1 si pas de couleur attribuée (UNDEFINED))
     private int score;          //  Score de la proposition p.ex. 2N1B => 21
     //endregion
 
