@@ -237,13 +237,13 @@
             android:text="Del Last" />
 
         <com.example.pgyl.pekislib_a.CustomButton
-            android:id="@+id/BTN_NEW"
+            android:id="@+id/BTN_NEW_GAME"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_marginTop="2dp"
             android:layout_marginBottom="6dp"
-            android:layout_weight="3"
-            android:text="New game" />
+            android:layout_weight="4"
+            android:text="New Game" />
 
         <com.example.pgyl.pekislib_a.CustomButton
             android:id="@+id/BTN_CHEAT"

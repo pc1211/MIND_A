@@ -1,6 +1,9 @@
 package com.example.pgyl.mind_a;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.Dialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
@@ -74,7 +77,17 @@ public class MainActivity extends Activity {
 
     //region Constantes
     private enum COMMANDS {
-        CLEAR, DELETE_LAST, NEW, CHEAT, SUBMIT;
+        CLEAR("Clear"), DELETE_LAST("Delete Last"), NEW_GAME("New Game"), CHEAT("Cheat"), SUBMIT("Submit");
+
+        private String label;
+
+        COMMANDS(String label) {
+            this.label = label;
+        }
+
+        public String LABEL() {
+            return label;
+        }
 
         public int INDEX() {
             return ordinal();
@@ -82,7 +95,17 @@ public class MainActivity extends Activity {
     }
 
     private enum GUESS_MODES {
-        USER, ANDROID;
+        USER("User guesses"), ANDROID("Android guesses");
+
+        private String label;
+
+        GUESS_MODES(String label) {
+            this.label = label;
+        }
+
+        public String LABEL() {
+            return label;
+        }
 
         public int INDEX() {
             return ordinal();
@@ -138,12 +161,6 @@ public class MainActivity extends Activity {
         getWindow().requestFeature(Window.FEATURE_ACTION_BAR);
         getActionBar().setTitle(ACTIVITY_TITLE);
         setContentView(R.layout.main);
-        setupPaletteButtons();
-        setupCurrentPropPegButtons();
-        setupCommandButtons();
-        setupGuessModeRadioButtons();
-        setupTextViews();
-        setupDotMatrixDisplay();
         validReturnFromCalledActivity = false;
     }
 
@@ -176,6 +193,13 @@ public class MainActivity extends Activity {
     @Override
     protected void onResume() {
         super.onResume();
+
+        setupPaletteButtons();
+        setupCurrentPropPegButtons();
+        setupCommandButtons();
+        setupGuessModeRadioButtons();
+        setupTextViews();
+        setupDotMatrixDisplay();   //  Ces setup... ont été déplacés du onCreate au onResume pour éviter crash intermittent
 
         onStartUp = true;
         shpFileName = getPackageName() + "." + getClass().getSimpleName() + SHP_FILE_NAME_SUFFIX;
@@ -215,9 +239,7 @@ public class MainActivity extends Activity {
         setupCurrentPropPegButtonsVisibility();
         updateDisplayKeepScreen();
         updateDisplayGuessMode();
-        updateDisplayCommandButtonTexts();
-        updateDisplayPaletteButtonColors();
-        updateDisplayCurrentPropAndPropList();
+        updateDisplayColors();
         invalidateOptionsMenu();
         onStartUp = false;
     }
@@ -305,8 +327,6 @@ public class MainActivity extends Activity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        resetColorSelection();
-
         if (item.getItemId() == R.id.MENU_ITEM_PEGS) {
             inputParamsIndex = getInputParamsPegsIndex();
             launchInputButtonsActivity(inputParamsIndex);
@@ -358,7 +378,7 @@ public class MainActivity extends Activity {
         }
     }
 
-    private void onDotMatrixDisplayScoreCustomClick() {
+    private void onCurrentPropDotMatrixDisplayScoreCustomClick() {
         if (guessMode.equals(GUESS_MODES.ANDROID)) {
             inputParamsIndex = getInputParamsScoreIndex();
             inputParams[inputParamsIndex] = String.valueOf(currentPropRecord.getScore());
@@ -366,42 +386,40 @@ public class MainActivity extends Activity {
         }
     }
 
+    private void onItemPropClick(int position, int pegIndex) {
+        if (guessMode.equals(GUESS_MODES.USER)) {
+            selectColor(COLOR_OBJECTS.ITEM_PROP, pegIndex, position);
+        }
+    }
+
     private void onGuessModeRadioChanged(int checkedId) {
         if (!onStartUp) {   //  Ne pas réagir aux manipulations de radioButtons dans le onResume
-            resetColorSelection();
-            if (checkedId == R.id.RADIO_GUESS_USER) {
-                guessMode = GUESS_MODES.USER;
-            }
-            if (checkedId == R.id.RADIO_GUESS_ANDROID) {
-                guessMode = GUESS_MODES.ANDROID;
-            }
-            updateDisplayCommandButtonTexts();
-            resetPropsAndCands();
-            updateDisplayCurrentPropAndPropList();
+            confirm((checkedId == R.id.RADIO_GUESS_USER) ? GUESS_MODES.USER.LABEL() : GUESS_MODES.ANDROID.LABEL());
+            colorObject = COLOR_OBJECTS.NONE;
         }
     }
 
     private void onCommandButtonClick(COMMANDS command) {
-        if (command.equals(COMMANDS.CLEAR)) {
-            onButtonClickClear();
+        if ((command.equals(COMMANDS.CLEAR)) || (command.equals(COMMANDS.SUBMIT))) {
+            if (command.equals(COMMANDS.CLEAR)) {
+                onButtonClickClear();
+            }
+            if (command.equals(COMMANDS.SUBMIT)) {
+                onButtonClickSubmit();
+            }
+            updateDisplayColors();
+        } else {   //  Del Last, New Game, Cheat: A confirmer Yes/No, avec updateDisplayColors()
+            confirm(command.LABEL());
         }
-        resetColorSelection();
-        if (command.equals(COMMANDS.DELETE_LAST)) {
-            onButtonClickDeleteLast();
-        }
-        if (command.equals(COMMANDS.NEW)) {
-            onButtonClickNew();
-        }
-        if (command.equals(COMMANDS.CHEAT)) {
-            onButtonClickCheat();
-        }
-        if (command.equals(COMMANDS.SUBMIT)) {
-            onButtonClickSubmit();
-        }
-        updateDisplayCurrentPropAndPropList();
+        colorObject = COLOR_OBJECTS.NONE;
     }
 
-    private void onButtonClickClear() {
+    private void onRadioGuessModeClick(GUESS_MODES guessMode) {   //  Appelé par confirm()
+        this.guessMode = guessMode;
+        resetPropsAndCands();
+    }
+
+    private void onButtonClickClear() {    //  Appelé par onCommandButtonClick()
         if (guessMode.equals(GUESS_MODES.USER)) {
             if (colorObject.equals(COLOR_OBJECTS.CURRENT_PROP)) {
                 currentPropRecord.resetCombAtIndex(colorObjectPegIndex);
@@ -412,7 +430,7 @@ public class MainActivity extends Activity {
         }
     }
 
-    private void onButtonClickDeleteLast() {
+    private void onButtonClickDeleteLast() {   //  Appelé par confirm()
         propRecordsHandler.removePropRecordAtMaxId();   //  Enlever le dernier PropRecord (cad avec le id le plus élevé)
         if (guessMode.equals(GUESS_MODES.ANDROID)) {
             candRecordsHandler.updateCandRecordsToPropRecords(propRecordsHandler);
@@ -421,18 +439,18 @@ public class MainActivity extends Activity {
         }
     }
 
-    private void onButtonClickNew() {
+    private void onButtonClickNewGame() {
         resetPropsAndCands();
-    }
+    }   //  Appelé par confirm()
 
-    private void onButtonClickCheat() {
+    private void onButtonClickCheat() {   //  Appelé par confirm()
         if (guessMode.equals(GUESS_MODES.USER)) {
             currentPropRecord.setComb(secrPropRecord.getComb());
             currentPropRecord.setScore(10 * pegs);
         }
     }
 
-    private void onButtonClickSubmit() {
+    private void onButtonClickSubmit() {   //  Appelé par onCommandButtonClick()
         if (guessMode.equals(GUESS_MODES.USER)) {
             if (currentPropRecord.hasValidComb()) {   //  Valide si aucune couleur UNDEFINED
                 PropRecord newPropRecord = propRecordsHandler.createPropRecordWithNewId();
@@ -446,22 +464,15 @@ public class MainActivity extends Activity {
         }
     }
 
-    private void onItemPropClick(int position, int pegIndex) {
-        if (guessMode.equals(GUESS_MODES.USER)) {
-            selectColor(COLOR_OBJECTS.ITEM_PROP, pegIndex, position);
-        }
-    }
-
-    private void updateDisplayCurrentPropAndPropList() {
-        updateDisplayCurrentPropButtonColors();
-        updateDisplayCurrentPropDotMatrixDisplayScore();
-        mainPropListUpdater.rebuild();
-        mainPropListUpdater.repaint();
-    }
-
     private void updateDisplayPaletteButtonColors() {
         for (int i = 0; i <= (colors - 1); i = i + 1) {
             updateDisplayPaletteButtonColor(i, COLOR_MODES.NORMAL);
+        }
+    }
+
+    private void updateDisplayCurrentPropButtonColors() {
+        for (int i = 0; i <= (pegs - 1); i = i + 1) {
+            updateDisplayCurrentPropButtonColor(i, COLOR_MODES.NORMAL);
         }
     }
 
@@ -475,12 +486,6 @@ public class MainActivity extends Activity {
         symbolButtonViewColorBox.pressedFrontColor = color;
         symbolButtonViewColorBox.pressedBackColor = BACK_COLOR_NORMAL;
         paletteButtons[index].setColors(symbolButtonViewColorBox);
-    }
-
-    private void updateDisplayCurrentPropButtonColors() {
-        for (int i = 0; i <= (pegs - 1); i = i + 1) {
-            updateDisplayCurrentPropButtonColor(i, COLOR_MODES.NORMAL);
-        }
     }
 
     private void updateDisplayCurrentPropButtonColor(int index, COLOR_MODES colorMode) {
@@ -520,7 +525,7 @@ public class MainActivity extends Activity {
         if (guessMode.equals(GUESS_MODES.USER)) {
             currentPropDotMatrixDisplayScore.setVisibility(View.INVISIBLE);
         } else {   //  Android Guess
-            dotMatrixDisplayUpdater.displayText(currentPropRecord.getDecoratedScore());   //  "*-*" (En attente d'entrée du score)
+            dotMatrixDisplayUpdater.displayText(currentPropRecord.getDecoratedScore());   //  "B-W" (En attente d'entrée du score)
             currentPropDotMatrixDisplayScore.setVisibility(View.VISIBLE);
         }
         dotMatrixDisplayUpdater.displayText(currentPropRecord.getDecoratedScore());
@@ -549,6 +554,72 @@ public class MainActivity extends Activity {
 
     private void updateDisplayGuessMode() {
         guessModeRadios[guessMode.INDEX()].setChecked(true);
+    }
+
+    private void updateDisplayColors() {
+        updateDisplayPaletteButtonColors();
+        updateDisplayCurrentPropButtonColors();
+        updateDisplayCurrentPropDotMatrixDisplayScore();
+        updateDisplayCommandButtonTexts();
+        mainPropListUpdater.rebuild();
+        mainPropListUpdater.repaint();
+    }
+
+    private void resetPropsAndCands() {
+        try {
+            propRecordsHandler.clearPropRecords();                 //  Vider propRecords et nuller currentPropRecord et secrPropRecord
+            propRecordsHandler.setupCurrentAndSecrPropRecords();   //  Reconstruire currentPropRecord et secrPropRecord
+            currentPropRecord = propRecordsHandler.getCurrentPropRecord();
+            secrPropRecord = propRecordsHandler.getSecrPropRecord();
+            candRecordsHandler = new CandRecordsHandler();   // Reconstruire tous les candidats
+            if (guessMode.equals(GUESS_MODES.ANDROID)) {
+                currentPropRecord.setComb(candRecordsHandler.getGuessComb());
+            }
+        } catch (OutOfMemoryError e) {    // Pas assez de RAM
+            candRecordsHandler.close();   //  Libérer ce qui fâche
+            candRecordsHandler = null;
+            propRecordsHandler.clearPropRecords();
+            propRecordsHandler = null;
+            msgBox("Out of Memory Error. Now Trying to go back to saved state", this);
+            inputParams = getCurrentsFromActivity(stringDB, MIND_ACTIVITIES.MAIN.toString(), getInputParamsTableName());   //  Restaurer les anciennes valeurs de pegs et colors
+            pegs = Integer.parseInt(inputParams[getInputParamsPegsIndex()]);
+            colors = Integer.parseInt(inputParams[getInputParamsColorsIndex()]);
+            setupPropRecords();   //  Restaurer à partir de la DB
+            setupCandRecords();   //  Reconstruire les candidats
+        }
+    }
+
+    private void confirm(String title) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle(title);
+        builder.setMessage("Are you sure ?");
+        builder.setCancelable(false);
+        builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int id) {
+                if (title.equals(COMMANDS.DELETE_LAST.LABEL())) {
+                    onButtonClickDeleteLast();
+                }
+                if (title.equals(COMMANDS.NEW_GAME.LABEL())) {
+                    onButtonClickNewGame();
+                }
+                if (title.equals(COMMANDS.CHEAT.LABEL())) {
+                    onButtonClickCheat();
+                }
+                if ((title.equals(GUESS_MODES.USER.LABEL()) || (title.equals(GUESS_MODES.ANDROID.LABEL())))) {
+                    onRadioGuessModeClick(title.equals(GUESS_MODES.USER.LABEL()) ? GUESS_MODES.USER : GUESS_MODES.ANDROID);
+                }
+            }
+        });
+        builder.setNegativeButton("No", null);
+        Dialog dialog = builder.create();
+        dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {   // OK pour modifier UI sous-jacente à la boîte de dialogue
+            @Override
+            public void onDismiss(DialogInterface dialogInterface) {    // OK pour modifier UI sous-jacente à la boîte de dialogue
+                updateDisplayColors();
+            }
+        });
+        dialog.show();
     }
 
     private void selectColor(COLOR_OBJECTS newColorObject, int newColorObjectPegIndex, int newColorObjectListPosition) {
@@ -641,36 +712,6 @@ public class MainActivity extends Activity {
                         break;
                 }
                 break;
-        }
-    }
-
-    private void resetColorSelection() {
-        colorObject = COLOR_OBJECTS.NONE;
-        updateDisplayPaletteButtonColors();
-        updateDisplayCurrentPropButtonColors();
-    }
-
-    private void resetPropsAndCands() {
-        try {
-            propRecordsHandler.clearPropRecords();                 //  Vider propRecords et nuller currentPropRecord et secrPropRecord
-            propRecordsHandler.setupCurrentAndSecrPropRecords();   //  Reconstruire currentPropRecord et secrPropRecord
-            currentPropRecord = propRecordsHandler.getCurrentPropRecord();
-            secrPropRecord = propRecordsHandler.getSecrPropRecord();
-            candRecordsHandler = new CandRecordsHandler();   // Reconstruire tous les candidats
-            if (guessMode.equals(GUESS_MODES.ANDROID)) {
-                currentPropRecord.setComb(candRecordsHandler.getGuessComb());
-            }
-        } catch (OutOfMemoryError e) {    // Pas assez de RAM
-            candRecordsHandler.close();   //  Libérer ce qui fâche
-            candRecordsHandler = null;
-            propRecordsHandler.clearPropRecords();
-            propRecordsHandler = null;
-            msgBox("Out of Memory Error. Now Trying to go back to saved state", this);
-            inputParams = getCurrentsFromActivity(stringDB, MIND_ACTIVITIES.MAIN.toString(), getInputParamsTableName());   //  Restaurer les anciennes valeurs de pegs et colors
-            pegs = Integer.parseInt(inputParams[getInputParamsPegsIndex()]);
-            colors = Integer.parseInt(inputParams[getInputParamsColorsIndex()]);
-            setupPropRecords();   //  Restaurer à partir de la DB
-            setupCandRecords();   //  Reconstruire les candidats
         }
     }
 
@@ -837,7 +878,7 @@ public class MainActivity extends Activity {
         currentPropDotMatrixDisplayScore.setOnCustomClickListener(new DotMatrixDisplayView.onCustomClickListener() {
             @Override
             public void onCustomClick() {
-                onDotMatrixDisplayScoreCustomClick();
+                onCurrentPropDotMatrixDisplayScoreCustomClick();
             }
         });
     }
