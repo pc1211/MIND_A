@@ -189,19 +189,23 @@
                 android:layout_weight="1" />
         </LinearLayout>
 
-        <LinearLayout
+        <FrameLayout
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_marginRight="4dp"
             android:layout_weight="1"
             android:orientation="horizontal">
 
+            <com.example.pgyl.pekislib_a.CustomButton
+                android:id="@+id/BTN_CLEAR"
+                android:layout_width="match_parent"
+                android:layout_height="36dp"
+                android:text="Clear" />
+
             <com.example.pgyl.pekislib_a.DotMatrixDisplayView
                 android:id="@+id/BTN_DOT_MATRIX_SCORE"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1" />
-        </LinearLayout>
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
+        </FrameLayout>
     </LinearLayout>
 
     <LinearLayout
@@ -209,15 +213,6 @@
         android:layout_height="48dp"
         android:layout_marginTop="16dp"
         android:orientation="horizontal">
-
-        <com.example.pgyl.pekislib_a.CustomButton
-            android:id="@+id/BTN_CLEAR"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_marginTop="2dp"
-            android:layout_marginBottom="6dp"
-            android:layout_weight="4"
-            android:text="Clear" />
 
         <com.example.pgyl.pekislib_a.CustomButton
             android:id="@+id/BTN_DELETE_LAST"
@@ -234,7 +229,7 @@
             android:layout_height="match_parent"
             android:layout_marginTop="2dp"
             android:layout_marginBottom="6dp"
-            android:layout_weight="6"
+            android:layout_weight="5"
             android:text="New Game" />
 
         <com.example.pgyl.pekislib_a.CustomButton
@@ -243,7 +238,7 @@
             android:layout_height="match_parent"
             android:layout_marginTop="2dp"
             android:layout_marginBottom="6dp"
-            android:layout_weight="4"
+            android:layout_weight="5"
             android:text="Cheat" />
 
         <com.example.pgyl.pekislib_a.CustomButton
@@ -252,7 +247,7 @@
             android:layout_height="match_parent"
             android:layout_marginTop="2dp"
             android:layout_marginBottom="6dp"
-            android:layout_weight="4"
+            android:layout_weight="5"
             android:text="Submit" />
 
     </LinearLayout>

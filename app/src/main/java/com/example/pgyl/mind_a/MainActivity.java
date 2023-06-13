@@ -236,7 +236,6 @@ public class MainActivity extends Activity {
         setupCurrentPropPegButtonsVisibility();
         updateDisplayKeepScreen();
         updateDisplay();
-        updateDisplayGuessModeRadios();
         invalidateOptionsMenu();
     }
 
@@ -510,19 +509,15 @@ public class MainActivity extends Activity {
         currentPropPegButtons[index].setColors(symbolButtonViewColorBox);
     }
 
-    private void updateDisplayCurrentPropDotMatrixDisplayScore() {
-        if (guessMode.equals(GUESS_MODES.USER)) {
-            currentPropDotMatrixDisplayScore.setVisibility(View.INVISIBLE);
-        } else {   //  Android Guess
+    private void updateDisplayCurrentPropScore() {
+        if (guessMode.equals(GUESS_MODES.ANDROID)) {
             dotMatrixDisplayUpdater.displayText(currentPropRecord.getDecoratedScore());   //  "B-W" (En attente d'entrée du score)
-            currentPropDotMatrixDisplayScore.setVisibility(View.VISIBLE);
         }
-        dotMatrixDisplayUpdater.displayText(currentPropRecord.getDecoratedScore());
     }
 
     private void updateDisplayCommandButtonTexts() {
         final String ACTIVE_COLOR = "000000";
-        final String INACTIVE_COLOR = "808080";
+        final String INACTIVE_COLOR = "606060";
 
         commandButtons[COMMANDS.SUBMIT.INDEX()].setTextColor(Color.parseColor(COLOR_PREFIX + (guessMode.equals(GUESS_MODES.USER) ? ACTIVE_COLOR : INACTIVE_COLOR)));
         commandButtons[COMMANDS.CLEAR.INDEX()].setTextColor(Color.parseColor(COLOR_PREFIX + (guessMode.equals(GUESS_MODES.USER) ? ACTIVE_COLOR : INACTIVE_COLOR)));
@@ -547,7 +542,8 @@ public class MainActivity extends Activity {
         updateDisplayGuessModeRadios();
         updateDisplayPaletteButtonColors();
         updateDisplayCurrentPropButtonColors();
-        updateDisplayCurrentPropDotMatrixDisplayScore();
+        setupCurrentPropScoreAndClearVisibility();
+        updateDisplayCurrentPropScore();
         updateDisplayCommandButtonTexts();
         mainPropListUpdater.rebuild();
         mainPropListUpdater.repaint();
@@ -884,6 +880,16 @@ public class MainActivity extends Activity {
 
     private void setupDotMatrixDisplayUpdater() {
         dotMatrixDisplayUpdater = new MainDotMatrixDisplayUpdater(currentPropDotMatrixDisplayScore);
+    }
+
+    private void setupCurrentPropScoreAndClearVisibility() {
+        if (guessMode.equals(GUESS_MODES.USER)) {
+            commandButtons[COMMANDS.CLEAR.INDEX()].setVisibility(View.VISIBLE);
+            currentPropDotMatrixDisplayScore.setVisibility(View.INVISIBLE);
+        } else {   //  Android Guess
+            currentPropDotMatrixDisplayScore.setVisibility(View.VISIBLE);
+            commandButtons[COMMANDS.CLEAR.INDEX()].setVisibility(View.INVISIBLE);
+        }
     }
 
     private void setupPropRecords() {
