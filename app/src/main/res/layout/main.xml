@@ -17,31 +17,23 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginLeft="8dp"
-            android:layout_marginTop="12dp"
             android:text="Who guesses ? " />
 
-        <RadioGroup
-            android:id="@+id/GROUP_GUESS"
+        <RadioButton
+            android:id="@+id/RADIO_GUESS_USER"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="horizontal">
+            android:layout_marginLeft="2dp"
+            android:layout_marginRight="4dp"
+            android:text="User" />
 
-            <RadioButton
-                android:id="@+id/RADIO_GUESS_USER"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="2dp"
-                android:layout_marginRight="4dp"
-                android:text="User" />
-
-            <RadioButton
-                android:id="@+id/RADIO_GUESS_ANDROID"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="20dp"
-                android:checked="false"
-                android:text="Android" />
-        </RadioGroup>
+        <RadioButton
+            android:id="@+id/RADIO_GUESS_ANDROID"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="20dp"
+            android:checked="false"
+            android:text="Android" />
     </LinearLayout>
 
     <LinearLayout
@@ -224,7 +216,7 @@
             android:layout_height="match_parent"
             android:layout_marginTop="2dp"
             android:layout_marginBottom="6dp"
-            android:layout_weight="2"
+            android:layout_weight="4"
             android:text="Clear" />
 
         <com.example.pgyl.pekislib_a.CustomButton
@@ -233,7 +225,7 @@
             android:layout_height="match_parent"
             android:layout_marginTop="2dp"
             android:layout_marginBottom="6dp"
-            android:layout_weight="3"
+            android:layout_weight="5"
             android:text="Del Last" />
 
         <com.example.pgyl.pekislib_a.CustomButton
@@ -242,7 +234,7 @@
             android:layout_height="match_parent"
             android:layout_marginTop="2dp"
             android:layout_marginBottom="6dp"
-            android:layout_weight="3"
+            android:layout_weight="6"
             android:text="New Game" />
 
         <com.example.pgyl.pekislib_a.CustomButton
@@ -251,7 +243,7 @@
             android:layout_height="match_parent"
             android:layout_marginTop="2dp"
             android:layout_marginBottom="6dp"
-            android:layout_weight="2"
+            android:layout_weight="4"
             android:text="Cheat" />
 
         <com.example.pgyl.pekislib_a.CustomButton
@@ -260,7 +252,7 @@
             android:layout_height="match_parent"
             android:layout_marginTop="2dp"
             android:layout_marginBottom="6dp"
-            android:layout_weight="3"
+            android:layout_weight="4"
             android:text="Submit" />
 
     </LinearLayout>

@@ -17,7 +17,6 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.ListView;
 import android.widget.RadioButton;
-import android.widget.RadioGroup;
 import android.widget.TextView;
 
 import com.example.pgyl.pekislib_a.ColorPickerActivity;
@@ -122,7 +121,6 @@ public class MainActivity extends Activity {
     //endregion
 
     //region Variables
-    private boolean onStartUp;
     private String[] inputParams;
     private int inputParamsIndex;
     private String[] paletteColors;
@@ -201,7 +199,6 @@ public class MainActivity extends Activity {
         setupTextViews();
         setupDotMatrixDisplay();   //  Ces setup... ont été déplacés du onCreate au onResume pour éviter crash intermittent
 
-        onStartUp = true;
         shpFileName = getPackageName() + "." + getClass().getSimpleName() + SHP_FILE_NAME_SUFFIX;
         keepScreen = getSHPKeepScreen();
         guessMode = getSHPGuessMode();
@@ -238,10 +235,9 @@ public class MainActivity extends Activity {
         setupPaletteButtonsVisibility();
         setupCurrentPropPegButtonsVisibility();
         updateDisplayKeepScreen();
-        updateDisplayGuessMode();
-        updateDisplayColors();
+        updateDisplay();
+        updateDisplayGuessModeRadios();
         invalidateOptionsMenu();
-        onStartUp = false;
     }
 
     @Override
@@ -366,6 +362,20 @@ public class MainActivity extends Activity {
         return super.onOptionsItemSelected(item);
     }
 
+    private void onGuessModeRadioClick(GUESS_MODES guessMode) {
+        GUESS_MODES oldGuessMode = this.guessMode;
+        if (!guessMode.equals(oldGuessMode)) {
+            guessModeRadios[1 - guessMode.INDEX()].setChecked(false);   //  L'autre bouton Radio
+            confirm(guessMode.LABEL());
+            colorObject = COLOR_OBJECTS.NONE;
+        }
+    }
+
+    private void onGuessModeRadioChange(GUESS_MODES guessMode) {   //  Appelé par confirm()
+        this.guessMode = guessMode;
+        resetPropsAndCands();
+    }
+
     private void onPaletteButtonClick(int pegIndex) {
         if (guessMode.equals(GUESS_MODES.USER)) {
             selectColor(COLOR_OBJECTS.PALETTE, pegIndex, UNDEFINED);
@@ -386,19 +396,6 @@ public class MainActivity extends Activity {
         }
     }
 
-    private void onItemPropClick(int position, int pegIndex) {
-        if (guessMode.equals(GUESS_MODES.USER)) {
-            selectColor(COLOR_OBJECTS.ITEM_PROP, pegIndex, position);
-        }
-    }
-
-    private void onGuessModeRadioChanged(int checkedId) {
-        if (!onStartUp) {   //  Ne pas réagir aux manipulations de radioButtons dans le onResume
-            confirm((checkedId == R.id.RADIO_GUESS_USER) ? GUESS_MODES.USER.LABEL() : GUESS_MODES.ANDROID.LABEL());
-            colorObject = COLOR_OBJECTS.NONE;
-        }
-    }
-
     private void onCommandButtonClick(COMMANDS command) {
         if ((command.equals(COMMANDS.CLEAR)) || (command.equals(COMMANDS.SUBMIT))) {
             if (command.equals(COMMANDS.CLEAR)) {
@@ -407,16 +404,11 @@ public class MainActivity extends Activity {
             if (command.equals(COMMANDS.SUBMIT)) {
                 onButtonClickSubmit();
             }
-            updateDisplayColors();
+            updateDisplay();
         } else {   //  Del Last, New Game, Cheat: A confirmer Yes/No, avec updateDisplayColors()
             confirm(command.LABEL());
         }
         colorObject = COLOR_OBJECTS.NONE;
-    }
-
-    private void onRadioGuessModeClick(GUESS_MODES guessMode) {   //  Appelé par confirm()
-        this.guessMode = guessMode;
-        resetPropsAndCands();
     }
 
     private void onButtonClickClear() {    //  Appelé par onCommandButtonClick()
@@ -464,15 +456,20 @@ public class MainActivity extends Activity {
         }
     }
 
-    private void updateDisplayPaletteButtonColors() {
-        for (int i = 0; i <= (colors - 1); i = i + 1) {
-            updateDisplayPaletteButtonColor(i, COLOR_MODES.NORMAL);
+    private void onItemPropClick(int position, int pegIndex) {
+        if (guessMode.equals(GUESS_MODES.USER)) {
+            selectColor(COLOR_OBJECTS.ITEM_PROP, pegIndex, position);
         }
     }
 
-    private void updateDisplayCurrentPropButtonColors() {
-        for (int i = 0; i <= (pegs - 1); i = i + 1) {
-            updateDisplayCurrentPropButtonColor(i, COLOR_MODES.NORMAL);
+    private void updateDisplayGuessModeRadios() {
+        guessModeRadios[guessMode.INDEX()].setChecked(true);
+        guessModeRadios[1 - guessMode.INDEX()].setChecked(false);   //  L'autre bouton Radio
+    }
+
+    private void updateDisplayPaletteButtonColors() {
+        for (int i = 0; i <= (colors - 1); i = i + 1) {
+            updateDisplayPaletteButtonColor(i, COLOR_MODES.NORMAL);
         }
     }
 
@@ -486,6 +483,12 @@ public class MainActivity extends Activity {
         symbolButtonViewColorBox.pressedFrontColor = color;
         symbolButtonViewColorBox.pressedBackColor = BACK_COLOR_NORMAL;
         paletteButtons[index].setColors(symbolButtonViewColorBox);
+    }
+
+    private void updateDisplayCurrentPropButtonColors() {
+        for (int i = 0; i <= (pegs - 1); i = i + 1) {
+            updateDisplayCurrentPropButtonColor(i, COLOR_MODES.NORMAL);
+        }
     }
 
     private void updateDisplayCurrentPropButtonColor(int index, COLOR_MODES colorMode) {
@@ -507,20 +510,6 @@ public class MainActivity extends Activity {
         currentPropPegButtons[index].setColors(symbolButtonViewColorBox);
     }
 
-    private void updateDisplayItemPropButtonColor(int position, int pegIndex, COLOR_MODES colorMode) {
-        final String BACK_COLOR_NORMAL = "000000";
-        final String BACK_COLOR_INVERSE = "FFFFFF";
-
-        PropRecord itemPropRecord = propRecordsHandler.getPropRecordAtIndex(position);
-        int colorIndex = itemPropRecord.getCombAtIndex(pegIndex);
-        String color = paletteColors[getPaletteColorsAtIndex(colorIndex)];
-        symbolButtonViewColorBox.unpressedFrontColor = color;
-        symbolButtonViewColorBox.unpressedBackColor = colorMode.equals(COLOR_MODES.NORMAL) ? BACK_COLOR_NORMAL : BACK_COLOR_INVERSE;
-        symbolButtonViewColorBox.pressedFrontColor = color;
-        symbolButtonViewColorBox.pressedBackColor = colorMode.equals(COLOR_MODES.NORMAL) ? BACK_COLOR_INVERSE : BACK_COLOR_NORMAL;
-        mainPropListUpdater.repaintAtPosAtPegIndex(position, pegIndex, symbolButtonViewColorBox);
-    }
-
     private void updateDisplayCurrentPropDotMatrixDisplayScore() {
         if (guessMode.equals(GUESS_MODES.USER)) {
             currentPropDotMatrixDisplayScore.setVisibility(View.INVISIBLE);
@@ -540,6 +529,30 @@ public class MainActivity extends Activity {
         commandButtons[COMMANDS.CHEAT.INDEX()].setTextColor(Color.parseColor(COLOR_PREFIX + (guessMode.equals(GUESS_MODES.USER) ? ACTIVE_COLOR : INACTIVE_COLOR)));
     }
 
+    private void updateDisplayItemPropButtonColor(int position, int pegIndex, COLOR_MODES colorMode) {
+        final String BACK_COLOR_NORMAL = "000000";
+        final String BACK_COLOR_INVERSE = "FFFFFF";
+
+        PropRecord itemPropRecord = propRecordsHandler.getPropRecordAtIndex(position);
+        int colorIndex = itemPropRecord.getCombAtIndex(pegIndex);
+        String color = paletteColors[getPaletteColorsAtIndex(colorIndex)];
+        symbolButtonViewColorBox.unpressedFrontColor = color;
+        symbolButtonViewColorBox.unpressedBackColor = colorMode.equals(COLOR_MODES.NORMAL) ? BACK_COLOR_NORMAL : BACK_COLOR_INVERSE;
+        symbolButtonViewColorBox.pressedFrontColor = color;
+        symbolButtonViewColorBox.pressedBackColor = colorMode.equals(COLOR_MODES.NORMAL) ? BACK_COLOR_INVERSE : BACK_COLOR_NORMAL;
+        mainPropListUpdater.repaintAtPosAtPegIndex(position, pegIndex, symbolButtonViewColorBox);
+    }
+
+    private void updateDisplay() {
+        updateDisplayGuessModeRadios();
+        updateDisplayPaletteButtonColors();
+        updateDisplayCurrentPropButtonColors();
+        updateDisplayCurrentPropDotMatrixDisplayScore();
+        updateDisplayCommandButtonTexts();
+        mainPropListUpdater.rebuild();
+        mainPropListUpdater.repaint();
+    }
+
     private void updateDisplayKeepScreenBarMenuItemIcon(boolean keepScreen) {
         barMenuItemKeepScreen.setIcon((keepScreen ? R.drawable.main_light_on : R.drawable.main_light_off));
     }
@@ -550,19 +563,6 @@ public class MainActivity extends Activity {
         } else {
             getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         }
-    }
-
-    private void updateDisplayGuessMode() {
-        guessModeRadios[guessMode.INDEX()].setChecked(true);
-    }
-
-    private void updateDisplayColors() {
-        updateDisplayPaletteButtonColors();
-        updateDisplayCurrentPropButtonColors();
-        updateDisplayCurrentPropDotMatrixDisplayScore();
-        updateDisplayCommandButtonTexts();
-        mainPropListUpdater.rebuild();
-        mainPropListUpdater.repaint();
     }
 
     private void resetPropsAndCands() {
@@ -607,7 +607,7 @@ public class MainActivity extends Activity {
                     onButtonClickCheat();
                 }
                 if ((title.equals(GUESS_MODES.USER.LABEL()) || (title.equals(GUESS_MODES.ANDROID.LABEL())))) {
-                    onRadioGuessModeClick(title.equals(GUESS_MODES.USER.LABEL()) ? GUESS_MODES.USER : GUESS_MODES.ANDROID);
+                    onGuessModeRadioChange(title.equals(GUESS_MODES.USER.LABEL()) ? GUESS_MODES.USER : GUESS_MODES.ANDROID);
                 }
             }
         });
@@ -615,8 +615,8 @@ public class MainActivity extends Activity {
         Dialog dialog = builder.create();
         dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {   // OK pour modifier UI sous-jacente à la boîte de dialogue
             @Override
-            public void onDismiss(DialogInterface dialogInterface) {    // OK pour modifier UI sous-jacente à la boîte de dialogue
-                updateDisplayColors();
+            public void onDismiss(DialogInterface dialogInterface) {
+                updateDisplay();
             }
         });
         dialog.show();
@@ -765,17 +765,16 @@ public class MainActivity extends Activity {
                 guessModeRadios[gm.INDEX()] = findViewById(rid.getField(BUTTON_XML_PREFIX + gm.toString()).getInt(rid));
                 guessModeRadios[gm.INDEX()].setTextColor(Color.parseColor(COLOR_PREFIX + TXT_COLOR));
                 guessModeRadios[gm.INDEX()].setPadding(16, 0, 0, 0);   //  Décaler le texte un peu vers la droite
+                guessModeRadios[gm.INDEX()].setOnClickListener(new View.OnClickListener() {   // Radiogroup non utilisé
+                    @Override
+                    public void onClick(View view) {
+                        onGuessModeRadioClick(gm);
+                    }
+                });
             } catch (IllegalAccessException | IllegalArgumentException | NoSuchFieldException | SecurityException ex) {
                 Logger.getLogger(MainActivity.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
-        RadioGroup grpg = findViewById(R.id.GROUP_GUESS);
-        grpg.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(RadioGroup group, int checkedId) {
-                onGuessModeRadioChanged(checkedId);
-            }
-        });
     }
 
     private void setupPaletteButtons() {
