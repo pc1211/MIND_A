@@ -425,6 +425,7 @@ public class MainActivity extends Activity {
         if (colorObject.equals(COLOR_OBJECTS.NONE)) {
             currentPropRecord.resetComb();
         }
+        currentPropRecord.resetScore();
     }
 
     private void onButtonClickDeleteLast() {   //  Appelé par confirm()
