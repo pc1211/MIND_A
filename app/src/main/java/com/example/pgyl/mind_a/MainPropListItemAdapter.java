@@ -5,8 +5,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.ImageView;
 
-import com.example.pgyl.pekislib_a.SymbolButtonView;
+import com.example.pgyl.pekislib_a.ColorUtils.ButtonColorBox;
+import com.example.pgyl.pekislib_a.CustomImageButton;
 
 import java.util.ArrayList;
 import java.util.logging.Level;
@@ -16,7 +18,6 @@ import static com.example.pgyl.mind_a.Constants.MAX_PEGS;
 import static com.example.pgyl.mind_a.MainActivity.pegs;
 import static com.example.pgyl.mind_a.StringDBTables.getPaletteColorsAtIndex;
 import static com.example.pgyl.pekislib_a.Constants.UNDEFINED;
-import static com.example.pgyl.pekislib_a.SymbolButtonView.SymbolButtonViewColorBox;
 
 public class MainPropListItemAdapter extends BaseAdapter {
     public interface onButtonClickListener {
@@ -33,9 +34,8 @@ public class MainPropListItemAdapter extends BaseAdapter {
     private Context context;
     private ArrayList<PropRecord> propRecords;
     private String[] paletteColors;
-    private SymbolButtonViewColorBox symbolButtonViewColorBox;
+    private ButtonColorBox buttonColorBox;
     private MainPropListItemViewHolder viewHolder;
-    private MainPropListItemDotMatrixDisplayUpdater mainPropListItemDotMatrixDisplayUpdater;
     //endregion
 
     public MainPropListItemAdapter(Context context, String[] paletteColors) {
@@ -48,15 +48,12 @@ public class MainPropListItemAdapter extends BaseAdapter {
 
     private void init() {
         propRecords = null;
-        setupMainPropListItemDotMatrixDisplayUpdater();
-        symbolButtonViewColorBox = new SymbolButtonViewColorBox();
+        buttonColorBox = new ButtonColorBox();
     }
 
     public void close() {
-        mainPropListItemDotMatrixDisplayUpdater.close();
-        mainPropListItemDotMatrixDisplayUpdater = null;
         propRecords = null;
-        symbolButtonViewColorBox = null;
+        buttonColorBox = null;
         context = null;
     }
 
@@ -89,11 +86,12 @@ public class MainPropListItemAdapter extends BaseAdapter {
     public View getView(final int position, View rowView, ViewGroup parent) {   //  Viewholder pattern non utilisé à cause de la custom view DotMatrixDisplayView (ses variables globales ne sont pas récupérées par un getTag())
         LayoutInflater inflater = LayoutInflater.from(context);
         rowView = inflater.inflate(R.layout.mainproplistitem, null);
-        setupViewHolder(rowView, position);
+        setupViewHolder();
         rowView.setTag(viewHolder);
 
-        setupViewHolderButtonAttributes();
-        setupViewHolderDotMatrixDisplayAttributes();
+        setupViewHolderButtons(rowView, position);
+        setupViewHolderDotMatrixDisplay(rowView);
+        setupViewHolderDotMatrixDisplayUpdater();
         paintView(rowView, position);
         return rowView;
     }
@@ -110,55 +108,40 @@ public class MainPropListItemAdapter extends BaseAdapter {
         for (int i = 0; i <= (MAX_PEGS - 1); i = i + 1) {
             if (i <= (pegs - 1)) {
                 String color = ((comb[i] != UNDEFINED) ? paletteColors[getPaletteColorsAtIndex(comb[i])] : EMPTY_COLOR);
-                symbolButtonViewColorBox.unpressedFrontColor = color;
-                symbolButtonViewColorBox.unpressedBackColor = BACK_COLOR_NORMAL;
-                symbolButtonViewColorBox.pressedFrontColor = color;
-                symbolButtonViewColorBox.pressedBackColor = BACK_COLOR_INVERSE;
-                viewHolder.buttonColors[i].setColors(symbolButtonViewColorBox);
+                buttonColorBox.unpressedFrontColor = color;
+                buttonColorBox.unpressedBackColor = BACK_COLOR_NORMAL;
+                buttonColorBox.pressedFrontColor = color;
+                buttonColorBox.pressedBackColor = BACK_COLOR_INVERSE;
+                viewHolder.buttonColors[i].setColors(buttonColorBox);
             } else {  //  Ne rendre visibles que <pegs> boutons de couleur
                 viewHolder.buttonColors[i].setVisibility(View.GONE);
             }
         }
-        mainPropListItemDotMatrixDisplayUpdater.displayText(viewHolder.buttonDotMatrixDisplayScore, propRecord);
+        viewHolder.dotMatrixDisplayUpdater.displayText(propRecord.getDecoratedScore());
     }
 
-    public void paintViewAtPegIndex(View rowView, int pegIndex, SymbolButtonViewColorBox symbolButtonViewColorBox) {
+    public void paintViewAtPegIndex(View rowView, int pegIndex, ButtonColorBox buttonColorBox) {
         MainPropListItemViewHolder viewHolder = (MainPropListItemViewHolder) rowView.getTag();
-        viewHolder.buttonColors[pegIndex].setColors(symbolButtonViewColorBox);
+        viewHolder.buttonColors[pegIndex].setColors(buttonColorBox);
     }
 
-    private void setupViewHolderButtonAttributes() {
-        final long BUTTON_MIN_CLICK_TIME_INTERVAL_MS = 500;
-        final float STATE_BUTTON_SYMBOL_SIZE_COEFF = 0.75f;   //  Pour que le symbole ne frôle pas les bords de sa View
-
-        for (int i = 0; i <= (MAX_PEGS - 1); i = i + 1) {
-            viewHolder.buttonColors[i].setSVGImageResource(R.raw.disk);
-            viewHolder.buttonColors[i].setSymbolSizeCoeff(STATE_BUTTON_SYMBOL_SIZE_COEFF);
-            viewHolder.buttonColors[i].setMinClickTimeInterval(BUTTON_MIN_CLICK_TIME_INTERVAL_MS);
-        }
-    }
-
-    private void setupViewHolderDotMatrixDisplayAttributes() {
-        mainPropListItemDotMatrixDisplayUpdater.setupDimensions(viewHolder.buttonDotMatrixDisplayScore);
-        mainPropListItemDotMatrixDisplayUpdater.setupBackColor(viewHolder.buttonDotMatrixDisplayScore);
-    }
-
-    private void setupViewHolder(View rowView, int position) {
+    private void setupViewHolderButtons(View rowView, int position) {
         final String BUTTON_XML_NAME_PREFIX = "BTN_ITEM_COMB_";
         final long BUTTON_MIN_CLICK_TIME_INTERVAL_MS = 500;
 
-        viewHolder = new MainPropListItemViewHolder();
-
-        viewHolder.buttonColors = new SymbolButtonView[MAX_PEGS];
+        viewHolder.buttonColors = new CustomImageButton[MAX_PEGS];
         Class rid = R.id.class;
         for (int i = 0; i <= (MAX_PEGS - 1); i = i + 1) {
             try {
                 viewHolder.buttonColors[i] = rowView.findViewById(rid.getField(BUTTON_XML_NAME_PREFIX + i).getInt(rid));
+                viewHolder.buttonColors[i].setImageResource(R.drawable.disk);
+                viewHolder.buttonColors[i].setScaleType(ImageView.ScaleType.FIT_CENTER);
+                viewHolder.buttonColors[i].setAdjustViewBounds(true);
                 viewHolder.buttonColors[i].setMinClickTimeInterval(BUTTON_MIN_CLICK_TIME_INTERVAL_MS);
                 final int pegIndex = i;
-                viewHolder.buttonColors[i].setCustomOnClickListener(new SymbolButtonView.onCustomClickListener() {
+                viewHolder.buttonColors[i].setOnClickListener(new View.OnClickListener() {
                     @Override
-                    public void onCustomClick() {
+                    public void onClick(View v) {
                         onButtonClick(position, pegIndex);
                     }
                 });
@@ -166,11 +149,17 @@ public class MainPropListItemAdapter extends BaseAdapter {
                 Logger.getLogger(MainActivity.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
-        viewHolder.buttonDotMatrixDisplayScore = rowView.findViewById(R.id.BTN_ITEM_DOT_MATRIX_SCORE);
     }
 
-    private void setupMainPropListItemDotMatrixDisplayUpdater() {
-        mainPropListItemDotMatrixDisplayUpdater = new MainPropListItemDotMatrixDisplayUpdater();
+    private void setupViewHolderDotMatrixDisplay(View rowView) {
+        viewHolder.dotMatrixDisplayScore = rowView.findViewById(R.id.BTN_ITEM_DOT_MATRIX_SCORE);
     }
 
+    private void setupViewHolderDotMatrixDisplayUpdater() {
+        viewHolder.dotMatrixDisplayUpdater = new DotMatrixDisplayUpdater(viewHolder.dotMatrixDisplayScore);
+    }
+
+    private void setupViewHolder() {
+        viewHolder = new MainPropListItemViewHolder();
+    }
 }

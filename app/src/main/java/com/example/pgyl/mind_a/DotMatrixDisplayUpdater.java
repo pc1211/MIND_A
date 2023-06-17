@@ -12,7 +12,7 @@ import static com.example.pgyl.pekislib_a.DotMatrixFontUtils.getFontTextDimensio
 import static com.example.pgyl.pekislib_a.MiscUtils.BiDimensions;
 import static com.example.pgyl.pekislib_a.PointRectUtils.ALIGN_LEFT_HEIGHT;
 
-public class MainDotMatrixDisplayUpdater {
+public class DotMatrixDisplayUpdater {
 
     //region Variables
     private DotMatrixDisplayView dotMatrixDisplayView;
@@ -21,7 +21,7 @@ public class MainDotMatrixDisplayUpdater {
     private Rect displayRect;
     //endregion
 
-    public MainDotMatrixDisplayUpdater(DotMatrixDisplayView dotMatrixDisplayView) {
+    public DotMatrixDisplayUpdater(DotMatrixDisplayView dotMatrixDisplayView) {
         super();
 
         this.dotMatrixDisplayView = dotMatrixDisplayView;

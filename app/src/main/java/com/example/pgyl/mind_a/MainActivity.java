@@ -15,18 +15,18 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.RadioButton;
 import android.widget.TextView;
 
 import com.example.pgyl.pekislib_a.ColorPickerActivity;
 import com.example.pgyl.pekislib_a.CustomButton;
+import com.example.pgyl.pekislib_a.CustomImageButton;
 import com.example.pgyl.pekislib_a.DotMatrixDisplayView;
 import com.example.pgyl.pekislib_a.HelpActivity;
 import com.example.pgyl.pekislib_a.InputButtonsActivity;
 import com.example.pgyl.pekislib_a.StringDB;
-import com.example.pgyl.pekislib_a.SymbolButtonView;
-import com.example.pgyl.pekislib_a.SymbolButtonView.SymbolButtonViewColorBox;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -45,6 +45,7 @@ import static com.example.pgyl.mind_a.StringDBTables.getPropsTableName;
 import static com.example.pgyl.mind_a.StringDBUtils.createMindTableIfNotExists;
 import static com.example.pgyl.mind_a.StringDBUtils.initializeTableInputParams;
 import static com.example.pgyl.mind_a.StringDBUtils.initializeTablePaletteColors;
+import static com.example.pgyl.pekislib_a.ColorUtils.ButtonColorBox;
 import static com.example.pgyl.pekislib_a.Constants.ACTIVITY_EXTRA_KEYS;
 import static com.example.pgyl.pekislib_a.Constants.COLOR_PREFIX;
 import static com.example.pgyl.pekislib_a.Constants.PEKISLIB_ACTIVITIES;
@@ -76,7 +77,7 @@ public class MainActivity extends Activity {
 
     //region Constantes
     private enum COMMANDS {
-        CLEAR("Clear"), DELETE_LAST("Delete Last"), NEW_GAME("New Game"), CHEAT("Cheat"), SUBMIT("Submit");
+        CLEAR("Clear"), DELETE_LAST("Delete Last"), NEW_GAME("New Game"), CHEAT("Cheat");
 
         private String label;
 
@@ -117,24 +118,24 @@ public class MainActivity extends Activity {
 
     public enum MIND_SHP_KEY_NAMES {KEEP_SCREEN, GUESS_MODE, INPUT_PARAMS_INDEX}
 
-    public final int COLOR_BUTTON_SVG_ID = R.raw.disk;
+    public final int DISK_PNG_ID = R.drawable.disk;
     //endregion
 
     //region Variables
     private String[] inputParams;
     private int inputParamsIndex;
     private String[] paletteColors;
-    private CustomButton[] commandButtons;
-    private SymbolButtonView[] paletteButtons;
-    private SymbolButtonView[] currentPropPegButtons;
+    private CustomImageButton[] commandButtons;
+    private CustomImageButton[] paletteButtons;
+    private CustomImageButton[] currentPropPegButtons;
     private DotMatrixDisplayView currentPropDotMatrixDisplayScore;
-    private MainDotMatrixDisplayUpdater dotMatrixDisplayUpdater;
+    private DotMatrixDisplayUpdater dotMatrixDisplayUpdater;
     private RadioButton[] guessModeRadios;
     private COLOR_OBJECTS colorObject;
     private int colorObjectPegIndex;
     private int colorObjectListPosition;
+    private ButtonColorBox buttonColorBox;
     private GUESS_MODES guessMode;
-    private SymbolButtonViewColorBox symbolButtonViewColorBox;
     private Menu menu;
     private MenuItem barMenuItemKeepScreen;
     private CandRecordsHandler candRecordsHandler;
@@ -182,7 +183,7 @@ public class MainActivity extends Activity {
         stringDB = null;
         inputParams = null;
         paletteColors = null;
-        symbolButtonViewColorBox = null;
+        buttonColorBox = null;
         menu = null;
         savePreferences();
     }
@@ -209,7 +210,7 @@ public class MainActivity extends Activity {
         paletteColors = getCurrentsFromActivity(stringDB, MIND_ACTIVITIES.MAIN.toString(), getPaletteColorsTableName());
         pegs = Integer.parseInt(inputParams[getInputParamsPegsIndex()]);
         colors = Integer.parseInt(inputParams[getInputParamsColorsIndex()]);
-        symbolButtonViewColorBox = new SymbolButtonViewColorBox();
+        buttonColorBox = new ButtonColorBox();
         setupPropRecords();   //  Charger à partir de la DB
         setupCandRecords();
 
@@ -231,7 +232,6 @@ public class MainActivity extends Activity {
         setupMainPropList();
         setupMainPropListUpdater();
         setupDotMatrixDisplayUpdater();
-        setupCommandButtonColors();
         setupPaletteButtonsVisibility();
         setupCurrentPropPegButtonsVisibility();
         updateDisplayKeepScreen();
@@ -366,7 +366,6 @@ public class MainActivity extends Activity {
         if (!guessMode.equals(oldGuessMode)) {
             guessModeRadios[1 - guessMode.INDEX()].setChecked(false);   //  L'autre bouton Radio
             confirm(guessMode.LABEL());
-            colorObject = COLOR_OBJECTS.NONE;
         }
     }
 
@@ -392,32 +391,40 @@ public class MainActivity extends Activity {
             inputParamsIndex = getInputParamsScoreIndex();
             inputParams[inputParamsIndex] = String.valueOf(currentPropRecord.getScore());
             launchScoreActivity(inputParamsIndex);
+        } else {   //  USER
+            onButtonClickSubmit();
+            colorObject = COLOR_OBJECTS.NONE;
+            updateDisplay();
         }
     }
 
     private void onCommandButtonClick(COMMANDS command) {
-        if ((command.equals(COMMANDS.CLEAR)) || (command.equals(COMMANDS.SUBMIT))) {
-            if (command.equals(COMMANDS.CLEAR)) {
+        if (command.equals(COMMANDS.CLEAR)) {
+            if (guessMode.equals(GUESS_MODES.USER)) {
                 onButtonClickClear();
             }
-            if (command.equals(COMMANDS.SUBMIT)) {
-                onButtonClickSubmit();
-            }
+            colorObject = COLOR_OBJECTS.NONE;
             updateDisplay();
-        } else {   //  Del Last, New Game, Cheat: A confirmer Yes/No, avec updateDisplayColors()
-            confirm(command.LABEL());
+        } else {   //  Del Last, New Game, Cheat: A confirmer Yes/No, avec updateDisplay() et colorObject NONE
+            if (guessMode.equals(GUESS_MODES.USER)) {
+                confirm(command.LABEL());
+            } else {   //  Android
+                if (!command.equals(COMMANDS.CHEAT)) {
+                    confirm(command.LABEL());
+                } else {   //  Cheat
+                    colorObject = COLOR_OBJECTS.NONE;   //  Ne rien faire
+                    updateDisplay();
+                }
+            }
         }
-        colorObject = COLOR_OBJECTS.NONE;
     }
 
     private void onButtonClickClear() {    //  Appelé par onCommandButtonClick()
-        if (guessMode.equals(GUESS_MODES.USER)) {
-            if (colorObject.equals(COLOR_OBJECTS.CURRENT_PROP)) {
-                currentPropRecord.resetCombAtIndex(colorObjectPegIndex);
-            }
-            if (colorObject.equals(COLOR_OBJECTS.NONE)) {
-                currentPropRecord.resetComb();
-            }
+        if (colorObject.equals(COLOR_OBJECTS.CURRENT_PROP)) {
+            currentPropRecord.resetCombAtIndex(colorObjectPegIndex);
+        }
+        if (colorObject.equals(COLOR_OBJECTS.NONE)) {
+            currentPropRecord.resetComb();
         }
     }
 
@@ -435,23 +442,20 @@ public class MainActivity extends Activity {
     }   //  Appelé par confirm()
 
     private void onButtonClickCheat() {   //  Appelé par confirm()
-        if (guessMode.equals(GUESS_MODES.USER)) {
-            currentPropRecord.setComb(secrPropRecord.getComb());
-            currentPropRecord.setScore(10 * pegs);
-        }
+        currentPropRecord.setComb(secrPropRecord.getComb());
+        currentPropRecord.setScore(10 * pegs);
     }
 
-    private void onButtonClickSubmit() {   //  Appelé par onCommandButtonClick()
-        if (guessMode.equals(GUESS_MODES.USER)) {
-            if (currentPropRecord.hasValidComb()) {   //  Valide si aucune couleur UNDEFINED
-                PropRecord newPropRecord = propRecordsHandler.createPropRecordWithNewId();
-                propRecordsHandler.addPropRecord(newPropRecord);
-                newPropRecord.setComb(currentPropRecord.getComb());
-                newPropRecord.setScore(candRecordsHandler.getScoreByComparing(currentPropRecord.getComb(), secrPropRecord.getComb()));
-                currentPropRecord.resetComb();
-            } else {
-                msgBox("Invalid proposal", this);
-            }
+    private void onButtonClickSubmit() {   //  Appelé par onCurrentPropDotMatrixDisplayScoreCustomClick()
+        if (currentPropRecord.hasValidComb()) {   //  Valide si aucune couleur UNDEFINED
+            PropRecord newPropRecord = propRecordsHandler.createPropRecordWithNewId();
+            propRecordsHandler.addPropRecord(newPropRecord);
+            newPropRecord.setComb(currentPropRecord.getComb());
+            newPropRecord.setScore(candRecordsHandler.getScoreByComparing(currentPropRecord.getComb(), secrPropRecord.getComb()));
+            currentPropRecord.resetComb();
+            currentPropRecord.resetScore();
+        } else {
+            msgBox("Invalid proposal", this);
         }
     }
 
@@ -477,11 +481,11 @@ public class MainActivity extends Activity {
         final String BACK_COLOR_INVERSE = "FFFFFF";
 
         String color = paletteColors[getPaletteColorsAtIndex(index)];
-        symbolButtonViewColorBox.unpressedFrontColor = color;
-        symbolButtonViewColorBox.unpressedBackColor = colorMode.equals(COLOR_MODES.NORMAL) ? BACK_COLOR_NORMAL : BACK_COLOR_INVERSE;
-        symbolButtonViewColorBox.pressedFrontColor = color;
-        symbolButtonViewColorBox.pressedBackColor = BACK_COLOR_NORMAL;
-        paletteButtons[index].setColors(symbolButtonViewColorBox);
+        buttonColorBox.unpressedFrontColor = color;
+        buttonColorBox.unpressedBackColor = colorMode.equals(COLOR_MODES.NORMAL) ? BACK_COLOR_NORMAL : BACK_COLOR_INVERSE;
+        buttonColorBox.pressedFrontColor = color;
+        buttonColorBox.pressedBackColor = BACK_COLOR_NORMAL;
+        paletteButtons[index].setColors(buttonColorBox);
     }
 
     private void updateDisplayCurrentPropButtonColors() {
@@ -502,26 +506,33 @@ public class MainActivity extends Activity {
             frontColor = paletteColors[getPaletteColorsAtIndex(colorIndex)];
             backColor = BACK_COLOR_NORMAL;
         }
-        symbolButtonViewColorBox.unpressedFrontColor = frontColor;
-        symbolButtonViewColorBox.unpressedBackColor = colorMode.equals(COLOR_MODES.NORMAL) ? backColor : BACK_COLOR_INVERSE;
-        symbolButtonViewColorBox.pressedFrontColor = frontColor;
-        symbolButtonViewColorBox.pressedBackColor = colorMode.equals(COLOR_MODES.NORMAL) ? BACK_COLOR_INVERSE : backColor;
-        currentPropPegButtons[index].setColors(symbolButtonViewColorBox);
+        buttonColorBox.unpressedFrontColor = frontColor;
+        buttonColorBox.unpressedBackColor = colorMode.equals(COLOR_MODES.NORMAL) ? backColor : BACK_COLOR_INVERSE;
+        buttonColorBox.pressedFrontColor = frontColor;
+        buttonColorBox.pressedBackColor = colorMode.equals(COLOR_MODES.NORMAL) ? BACK_COLOR_INVERSE : backColor;
+        currentPropPegButtons[index].setColors(buttonColorBox);
     }
 
     private void updateDisplayCurrentPropScore() {
-        if (guessMode.equals(GUESS_MODES.ANDROID)) {
-            dotMatrixDisplayUpdater.displayText(currentPropRecord.getDecoratedScore());   //  "B-W" (En attente d'entrée du score)
-        }
+        dotMatrixDisplayUpdater.displayText(currentPropRecord.getDecoratedScore());   //  "B-W" (En attente d'entrée du score)
     }
 
-    private void updateDisplayCommandButtonTexts() {
+    private void updateDisplayCommandButtonColors() {
         final String ACTIVE_COLOR = "000000";
-        final String INACTIVE_COLOR = "606060";
+        final String INACTIVE_COLOR = "B0B0B0";
+        final String COLOR_PRESSED = "FF9A22";
 
-        commandButtons[COMMANDS.SUBMIT.INDEX()].setTextColor(Color.parseColor(COLOR_PREFIX + (guessMode.equals(GUESS_MODES.USER) ? ACTIVE_COLOR : INACTIVE_COLOR)));
-        commandButtons[COMMANDS.CLEAR.INDEX()].setTextColor(Color.parseColor(COLOR_PREFIX + (guessMode.equals(GUESS_MODES.USER) ? ACTIVE_COLOR : INACTIVE_COLOR)));
-        commandButtons[COMMANDS.CHEAT.INDEX()].setTextColor(Color.parseColor(COLOR_PREFIX + (guessMode.equals(GUESS_MODES.USER) ? ACTIVE_COLOR : INACTIVE_COLOR)));
+        buttonColorBox.unpressedFrontColor = ACTIVE_COLOR;
+        buttonColorBox.unpressedBackColor = null;
+        buttonColorBox.pressedFrontColor = ACTIVE_COLOR;
+        buttonColorBox.pressedBackColor = COLOR_PRESSED;
+        commandButtons[COMMANDS.DELETE_LAST.INDEX()].setColors(buttonColorBox);
+        commandButtons[COMMANDS.NEW_GAME.INDEX()].setColors(buttonColorBox);
+
+        buttonColorBox.unpressedFrontColor = guessMode.equals(GUESS_MODES.USER) ? ACTIVE_COLOR : INACTIVE_COLOR;
+        buttonColorBox.pressedFrontColor = guessMode.equals(GUESS_MODES.USER) ? ACTIVE_COLOR : INACTIVE_COLOR;
+        commandButtons[COMMANDS.CLEAR.INDEX()].setColors(buttonColorBox);
+        commandButtons[COMMANDS.CHEAT.INDEX()].setColors(buttonColorBox);
     }
 
     private void updateDisplayItemPropButtonColor(int position, int pegIndex, COLOR_MODES colorMode) {
@@ -531,20 +542,19 @@ public class MainActivity extends Activity {
         PropRecord itemPropRecord = propRecordsHandler.getPropRecordAtIndex(position);
         int colorIndex = itemPropRecord.getCombAtIndex(pegIndex);
         String color = paletteColors[getPaletteColorsAtIndex(colorIndex)];
-        symbolButtonViewColorBox.unpressedFrontColor = color;
-        symbolButtonViewColorBox.unpressedBackColor = colorMode.equals(COLOR_MODES.NORMAL) ? BACK_COLOR_NORMAL : BACK_COLOR_INVERSE;
-        symbolButtonViewColorBox.pressedFrontColor = color;
-        symbolButtonViewColorBox.pressedBackColor = colorMode.equals(COLOR_MODES.NORMAL) ? BACK_COLOR_INVERSE : BACK_COLOR_NORMAL;
-        mainPropListUpdater.repaintAtPosAtPegIndex(position, pegIndex, symbolButtonViewColorBox);
+        buttonColorBox.unpressedFrontColor = color;
+        buttonColorBox.unpressedBackColor = colorMode.equals(COLOR_MODES.NORMAL) ? BACK_COLOR_NORMAL : BACK_COLOR_INVERSE;
+        buttonColorBox.pressedFrontColor = color;
+        buttonColorBox.pressedBackColor = colorMode.equals(COLOR_MODES.NORMAL) ? BACK_COLOR_INVERSE : BACK_COLOR_NORMAL;
+        mainPropListUpdater.repaintAtPosAtPegIndex(position, pegIndex, buttonColorBox);
     }
 
     private void updateDisplay() {
         updateDisplayGuessModeRadios();
         updateDisplayPaletteButtonColors();
         updateDisplayCurrentPropButtonColors();
-        setupCurrentPropScoreAndClearVisibility();
         updateDisplayCurrentPropScore();
-        updateDisplayCommandButtonTexts();
+        updateDisplayCommandButtonColors();
         mainPropListUpdater.rebuild();
         mainPropListUpdater.repaint();
     }
@@ -612,6 +622,7 @@ public class MainActivity extends Activity {
         dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {   // OK pour modifier UI sous-jacente à la boîte de dialogue
             @Override
             public void onDismiss(DialogInterface dialogInterface) {
+                colorObject = COLOR_OBJECTS.NONE;
                 updateDisplay();
             }
         });
@@ -775,21 +786,21 @@ public class MainActivity extends Activity {
 
     private void setupPaletteButtons() {
         final String BUTTON_XML_PREFIX = "BTN_PAL_";
-        final float BUTTON_SYMBOL_SIZE_COEFF = 0.75f;   //  Pour que le symbole ne frôle pas les bords de sa View
         final long BUTTON_MIN_CLICK_TIME_INTERVAL_MS = 500;
 
-        paletteButtons = new SymbolButtonView[MAX_COLORS];
+        paletteButtons = new CustomImageButton[MAX_COLORS];
         Class rid = R.id.class;
         for (int i = 0; i <= (paletteButtons.length - 1); i = i + 1) {
             try {
                 paletteButtons[i] = findViewById(rid.getField(BUTTON_XML_PREFIX + i).getInt(rid));
-                paletteButtons[i].setSymbolSizeCoeff(BUTTON_SYMBOL_SIZE_COEFF);
-                paletteButtons[i].setSVGImageResource(COLOR_BUTTON_SVG_ID);
+                paletteButtons[i].setImageResource(DISK_PNG_ID);
+                paletteButtons[i].setScaleType(ImageView.ScaleType.FIT_CENTER);
+                paletteButtons[i].setAdjustViewBounds(true);
                 paletteButtons[i].setMinClickTimeInterval(BUTTON_MIN_CLICK_TIME_INTERVAL_MS);
                 final int index = i;
-                paletteButtons[i].setCustomOnClickListener(new SymbolButtonView.onCustomClickListener() {
+                paletteButtons[i].setOnClickListener(new View.OnClickListener() {
                     @Override
-                    public void onCustomClick() {
+                    public void onClick(View v) {
                         onPaletteButtonClick(index);
                     }
                 });
@@ -807,21 +818,21 @@ public class MainActivity extends Activity {
 
     private void setupCurrentPropPegButtons() {
         final String BUTTON_XML_PREFIX = "BTN_CUR_PROP_";
-        final float BUTTON_SYMBOL_SIZE_COEFF = 0.75f;   //  Pour que le symbole ne frôle pas les bords de sa View
         final long BUTTON_MIN_CLICK_TIME_INTERVAL_MS = 500;
 
-        currentPropPegButtons = new SymbolButtonView[MAX_PEGS];
+        currentPropPegButtons = new CustomImageButton[MAX_PEGS];
         Class rid = R.id.class;
         for (int i = 0; i <= (currentPropPegButtons.length - 1); i = i + 1) {
             try {
                 currentPropPegButtons[i] = findViewById(rid.getField(BUTTON_XML_PREFIX + i).getInt(rid));
-                currentPropPegButtons[i].setSymbolSizeCoeff(BUTTON_SYMBOL_SIZE_COEFF);
-                currentPropPegButtons[i].setSVGImageResource(COLOR_BUTTON_SVG_ID);
+                currentPropPegButtons[i].setImageResource(DISK_PNG_ID);
+                currentPropPegButtons[i].setScaleType(ImageView.ScaleType.FIT_CENTER);
+                currentPropPegButtons[i].setAdjustViewBounds(true);
                 currentPropPegButtons[i].setMinClickTimeInterval(BUTTON_MIN_CLICK_TIME_INTERVAL_MS);
                 final int index = i;
-                currentPropPegButtons[i].setCustomOnClickListener(new SymbolButtonView.onCustomClickListener() {
+                currentPropPegButtons[i].setOnClickListener(new View.OnClickListener() {
                     @Override
-                    public void onCustomClick() {
+                    public void onClick(View v) {
                         onCurrentPropPegButtonClick(index);
                     }
                 });
@@ -842,7 +853,7 @@ public class MainActivity extends Activity {
         final String BUTTON_COMMAND_XML_PREFIX = "BTN_";
         final long BUTTON_MIN_CLICK_TIME_INTERVAL_MS = 500;
 
-        commandButtons = new CustomButton[COMMANDS.values().length];
+        commandButtons = new CustomImageButton[COMMANDS.values().length];
         Class rid = R.id.class;
         for (COMMANDS c : COMMANDS.values())
             try {
@@ -860,14 +871,6 @@ public class MainActivity extends Activity {
             }
     }
 
-    private void setupCommandButtonColors() {
-        final String COLOR_PRESSED = "FF9A22";
-
-        for (COMMANDS f : COMMANDS.values()) {
-            commandButtons[f.INDEX()].setColors(COLOR_PRESSED, null);
-        }
-    }
-
     private void setupDotMatrixDisplay() {
         currentPropDotMatrixDisplayScore = findViewById(R.id.BTN_DOT_MATRIX_SCORE);
         currentPropDotMatrixDisplayScore.setOnCustomClickListener(new DotMatrixDisplayView.onCustomClickListener() {
@@ -879,17 +882,7 @@ public class MainActivity extends Activity {
     }
 
     private void setupDotMatrixDisplayUpdater() {
-        dotMatrixDisplayUpdater = new MainDotMatrixDisplayUpdater(currentPropDotMatrixDisplayScore);
-    }
-
-    private void setupCurrentPropScoreAndClearVisibility() {
-        if (guessMode.equals(GUESS_MODES.USER)) {
-            commandButtons[COMMANDS.CLEAR.INDEX()].setVisibility(View.VISIBLE);
-            currentPropDotMatrixDisplayScore.setVisibility(View.INVISIBLE);
-        } else {   //  Android Guess
-            currentPropDotMatrixDisplayScore.setVisibility(View.VISIBLE);
-            commandButtons[COMMANDS.CLEAR.INDEX()].setVisibility(View.INVISIBLE);
-        }
+        dotMatrixDisplayUpdater = new DotMatrixDisplayUpdater(currentPropDotMatrixDisplayScore);
     }
 
     private void setupPropRecords() {

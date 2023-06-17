@@ -2,7 +2,7 @@ package com.example.pgyl.mind_a;
 
 import android.widget.ListView;
 
-import com.example.pgyl.pekislib_a.SymbolButtonView.SymbolButtonViewColorBox;
+import com.example.pgyl.pekislib_a.ColorUtils.ButtonColorBox;
 
 public class MainPropListUpdater {
     //region Variables
@@ -54,13 +54,13 @@ public class MainPropListUpdater {
         }
     }
 
-    public void repaintAtPosAtPegIndex(int position, int pegIndex, SymbolButtonViewColorBox symbolButtonViewColorBox) {
+    public void repaintAtPosAtPegIndex(int position, int pegIndex, ButtonColorBox buttonColorBox) {
         if (mainPropListView.getChildCount() > 0) {
             int firstVisiblePos = mainPropListView.getFirstVisiblePosition();
             int lastVisiblePos = mainPropListView.getLastVisiblePosition();
             for (int i = firstVisiblePos; i <= lastVisiblePos; i = i + 1) {
                 if (i == position) {
-                    mainPropListItemAdapter.paintViewAtPegIndex(mainPropListView.getChildAt(i - firstVisiblePos), pegIndex, symbolButtonViewColorBox);
+                    mainPropListItemAdapter.paintViewAtPegIndex(mainPropListView.getChildAt(i - firstVisiblePos), pegIndex, buttonColorBox);
                 }
             }
         }
