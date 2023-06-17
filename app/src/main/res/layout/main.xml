@@ -234,18 +234,6 @@
             android:text="Del Last" />
 
         <com.example.pgyl.pekislib_a.CustomImageButton
-            android:id="@+id/BTN_NEW_GAME"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_marginTop="2dp"
-            android:layout_marginBottom="6dp"
-            android:layout_weight="1"
-            android:adjustViewBounds="true"
-            android:scaleType="fitCenter"
-            android:src="@drawable/main_new_game"
-            android:text="New Game" />
-
-        <com.example.pgyl.pekislib_a.CustomImageButton
             android:id="@+id/BTN_CHEAT"
             android:layout_width="0dp"
             android:layout_height="match_parent"
@@ -256,6 +244,18 @@
             android:scaleType="fitCenter"
             android:src="@drawable/main_cheat"
             android:text="Cheat" />
+
+        <com.example.pgyl.pekislib_a.CustomImageButton
+            android:id="@+id/BTN_NEW_GAME"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_marginTop="2dp"
+            android:layout_marginBottom="6dp"
+            android:layout_weight="1"
+            android:adjustViewBounds="true"
+            android:scaleType="fitCenter"
+            android:src="@drawable/main_new_game"
+            android:text="New Game" />
 
     </LinearLayout>
 

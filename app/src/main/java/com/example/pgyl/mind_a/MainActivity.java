@@ -21,7 +21,6 @@ import android.widget.RadioButton;
 import android.widget.TextView;
 
 import com.example.pgyl.pekislib_a.ColorPickerActivity;
-import com.example.pgyl.pekislib_a.CustomButton;
 import com.example.pgyl.pekislib_a.CustomImageButton;
 import com.example.pgyl.pekislib_a.DotMatrixDisplayView;
 import com.example.pgyl.pekislib_a.HelpActivity;
@@ -860,7 +859,7 @@ public class MainActivity extends Activity {
                 commandButtons[c.INDEX()] = findViewById(rid.getField(BUTTON_COMMAND_XML_PREFIX + c.toString()).getInt(rid));
                 commandButtons[c.INDEX()].setMinClickTimeInterval(BUTTON_MIN_CLICK_TIME_INTERVAL_MS);
                 final COMMANDS cc = c;
-                commandButtons[c.INDEX()].setOnClickListener(new CustomButton.OnClickListener() {
+                commandButtons[c.INDEX()].setOnClickListener(new CustomImageButton.OnClickListener() {
                     @Override
                     public void onClick(View v) {
                         onCommandButtonClick(cc);
