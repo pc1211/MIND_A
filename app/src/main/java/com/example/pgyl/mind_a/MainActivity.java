@@ -191,7 +191,7 @@ public class MainActivity extends Activity {
     protected void onResume() {
         super.onResume();
 
-        setContentView(R.layout.main);   //  Normalement dans onCreate() mais problèmes de stabilité des drawables des customImageButtons
+        setContentView(R.layout.main);   //  Normalement dans onCreate() mais problèmes de stabilité des drawables des customImageButtons quand leur nombre varie (pegs, colors)
         setupCommandButtons();
         setupGuessModeRadioButtons();
         setupTextViews();
