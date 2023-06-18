@@ -76,16 +76,22 @@ public class MainActivity extends Activity {
 
     //region Constantes
     private enum COMMANDS {
-        CLEAR("Clear"), DELETE_LAST("Delete Last"), NEW_GAME("New Game"), CHEAT("Cheat");
+        CLEAR("Clear", R.drawable.main_clear), DELETE_LAST("Delete Last", R.drawable.main_del_last), NEW_GAME("New Game", R.drawable.main_new_game), CHEAT("Cheat", R.drawable.main_cheat);
 
         private String label;
+        private int id;
 
-        COMMANDS(String label) {
+        COMMANDS(String label, int id) {
             this.label = label;
+            this.id = id;
         }
 
         public String LABEL() {
             return label;
+        }
+
+        public int ID() {
+            return id;
         }
 
         public int INDEX() {
@@ -191,7 +197,7 @@ public class MainActivity extends Activity {
     protected void onResume() {
         super.onResume();
 
-        setContentView(R.layout.main);   //  Normalement dans onCreate() mais problèmes de stabilité des drawables des customImageButtons quand leur nombre varie (pegs, colors)
+        setContentView(R.layout.main);   //  Normalement dans onCreate() mais problèmes de stabilité des drawables des customImageButtons quand leur nombre varie (selon pegs, colors)
         setupCommandButtons();
         setupGuessModeRadioButtons();
         setupTextViews();
@@ -854,6 +860,9 @@ public class MainActivity extends Activity {
         for (COMMANDS cv : COMMANDS.values())
             try {
                 commandButtons[cv.INDEX()] = findViewById(rid.getField(BUTTON_COMMAND_XML_PREFIX + cv.toString()).getInt(rid));
+                commandButtons[cv.INDEX()].setImageResource(cv.ID());
+                commandButtons[cv.INDEX()].setScaleType(ImageView.ScaleType.FIT_CENTER);
+                commandButtons[cv.INDEX()].setAdjustViewBounds(true);
                 commandButtons[cv.INDEX()].setMinClickTimeInterval(BUTTON_MIN_CLICK_TIME_INTERVAL_MS);
                 final COMMANDS c = cv;
                 commandButtons[cv.INDEX()].setOnClickListener(new CustomImageButton.OnClickListener() {
