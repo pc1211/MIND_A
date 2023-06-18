@@ -158,7 +158,6 @@ public class MainActivity extends Activity {
 
         getWindow().requestFeature(Window.FEATURE_ACTION_BAR);
         getActionBar().setTitle(ACTIVITY_TITLE);
-        setContentView(R.layout.main);
         validReturnFromCalledActivity = false;
     }
 
@@ -192,6 +191,7 @@ public class MainActivity extends Activity {
     protected void onResume() {
         super.onResume();
 
+        setContentView(R.layout.main);   //  Normalement dans onCreate() mais problèmes de stabilité des drawables des customImageButtons
         setupCommandButtons();
         setupGuessModeRadioButtons();
         setupTextViews();
