@@ -192,8 +192,6 @@ public class MainActivity extends Activity {
     protected void onResume() {
         super.onResume();
 
-        setupPaletteButtons();
-        setupCurrentPropPegButtons();
         setupCommandButtons();
         setupGuessModeRadioButtons();
         setupTextViews();
@@ -228,11 +226,11 @@ public class MainActivity extends Activity {
         }
 
         handleActivityReturn(newParamValue);
+        setupPaletteButtons();
+        setupCurrentPropPegButtons();
         setupMainPropList();
         setupMainPropListUpdater();
         setupDotMatrixDisplayUpdater();
-        setupPaletteButtonsVisibility();
-        setupCurrentPropPegButtonsVisibility();
         updateDisplayKeepScreen();
         updateDisplay();
         invalidateOptionsMenu();
@@ -793,26 +791,25 @@ public class MainActivity extends Activity {
         for (int i = 0; i <= (paletteButtons.length - 1); i = i + 1) {
             try {
                 paletteButtons[i] = findViewById(rid.getField(BUTTON_XML_PREFIX + i).getInt(rid));
-                paletteButtons[i].setImageResource(DISK_PNG_ID);
-                paletteButtons[i].setScaleType(ImageView.ScaleType.FIT_CENTER);
-                paletteButtons[i].setAdjustViewBounds(true);
-                paletteButtons[i].setMinClickTimeInterval(BUTTON_MIN_CLICK_TIME_INTERVAL_MS);
-                final int index = i;
-                paletteButtons[i].setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        onPaletteButtonClick(index);
-                    }
-                });
+                if (i <= (colors - 1)) {
+                    paletteButtons[i].setImageResource(DISK_PNG_ID);
+                    paletteButtons[i].setScaleType(ImageView.ScaleType.FIT_CENTER);
+                    paletteButtons[i].setAdjustViewBounds(true);
+                    paletteButtons[i].setMinClickTimeInterval(BUTTON_MIN_CLICK_TIME_INTERVAL_MS);
+                    final int index = i;
+                    paletteButtons[i].setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            onPaletteButtonClick(index);
+                        }
+                    });
+                    paletteButtons[i].setVisibility(View.VISIBLE);
+                } else {
+                    paletteButtons[i].setVisibility(View.GONE);
+                }
             } catch (IllegalAccessException | IllegalArgumentException | NoSuchFieldException | SecurityException ex) {
                 Logger.getLogger(MainActivity.class.getName()).log(Level.SEVERE, null, ex);
             }
-        }
-    }
-
-    private void setupPaletteButtonsVisibility() {
-        for (int i = 0; i <= (paletteButtons.length - 1); i = i + 1) {
-            paletteButtons[i].setVisibility((i < colors) ? View.VISIBLE : View.GONE);
         }
     }
 
@@ -825,27 +822,26 @@ public class MainActivity extends Activity {
         for (int i = 0; i <= (currentPropPegButtons.length - 1); i = i + 1) {
             try {
                 currentPropPegButtons[i] = findViewById(rid.getField(BUTTON_XML_PREFIX + i).getInt(rid));
-                currentPropPegButtons[i].setImageResource(DISK_PNG_ID);
-                currentPropPegButtons[i].setScaleType(ImageView.ScaleType.FIT_CENTER);
-                currentPropPegButtons[i].setAdjustViewBounds(true);
-                currentPropPegButtons[i].setMinClickTimeInterval(BUTTON_MIN_CLICK_TIME_INTERVAL_MS);
-                final int index = i;
-                currentPropPegButtons[i].setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        onCurrentPropPegButtonClick(index);
-                    }
-                });
+                if (i <= (pegs - 1)) {
+                    currentPropPegButtons[i].setImageResource(DISK_PNG_ID);
+                    currentPropPegButtons[i].setScaleType(ImageView.ScaleType.FIT_CENTER);
+                    currentPropPegButtons[i].setAdjustViewBounds(true);
+                    currentPropPegButtons[i].setMinClickTimeInterval(BUTTON_MIN_CLICK_TIME_INTERVAL_MS);
+                    final int index = i;
+                    currentPropPegButtons[i].setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            onCurrentPropPegButtonClick(index);
+                        }
+                    });
+                    currentPropPegButtons[i].setVisibility(View.VISIBLE);
+                } else {
+                    currentPropPegButtons[i].setVisibility(View.GONE);
+                }
             } catch (IllegalAccessException | IllegalArgumentException | NoSuchFieldException |
                     SecurityException ex) {
                 Logger.getLogger(MainActivity.class.getName()).log(Level.SEVERE, null, ex);
             }
-        }
-    }
-
-    private void setupCurrentPropPegButtonsVisibility() {
-        for (int i = 0; i <= (currentPropPegButtons.length - 1); i = i + 1) {
-            currentPropPegButtons[i].setVisibility((i < pegs) ? View.VISIBLE : View.GONE);
         }
     }
 
@@ -855,15 +851,15 @@ public class MainActivity extends Activity {
 
         commandButtons = new CustomImageButton[COMMANDS.values().length];
         Class rid = R.id.class;
-        for (COMMANDS c : COMMANDS.values())
+        for (COMMANDS cv : COMMANDS.values())
             try {
-                commandButtons[c.INDEX()] = findViewById(rid.getField(BUTTON_COMMAND_XML_PREFIX + c.toString()).getInt(rid));
-                commandButtons[c.INDEX()].setMinClickTimeInterval(BUTTON_MIN_CLICK_TIME_INTERVAL_MS);
-                final COMMANDS cc = c;
-                commandButtons[c.INDEX()].setOnClickListener(new CustomImageButton.OnClickListener() {
+                commandButtons[cv.INDEX()] = findViewById(rid.getField(BUTTON_COMMAND_XML_PREFIX + cv.toString()).getInt(rid));
+                commandButtons[cv.INDEX()].setMinClickTimeInterval(BUTTON_MIN_CLICK_TIME_INTERVAL_MS);
+                final COMMANDS c = cv;
+                commandButtons[cv.INDEX()].setOnClickListener(new CustomImageButton.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        onCommandButtonClick(cc);
+                        onCommandButtonClick(c);
                     }
                 });
             } catch (IllegalAccessException | IllegalArgumentException | NoSuchFieldException | SecurityException ex) {
