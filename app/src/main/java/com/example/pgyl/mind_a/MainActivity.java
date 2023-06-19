@@ -22,7 +22,6 @@ import android.widget.TextView;
 
 import com.example.pgyl.pekislib_a.ColorPickerActivity;
 import com.example.pgyl.pekislib_a.CustomImageButton;
-import com.example.pgyl.pekislib_a.DotMatrixDisplayView;
 import com.example.pgyl.pekislib_a.HelpActivity;
 import com.example.pgyl.pekislib_a.InputButtonsActivity;
 import com.example.pgyl.pekislib_a.StringDB;
@@ -76,7 +75,7 @@ public class MainActivity extends Activity {
 
     //region Constantes
     private enum COMMANDS {
-        CLEAR("Clear", R.drawable.main_clear), DELETE_LAST("Delete Last", R.drawable.main_del_last), NEW_GAME("New Game", R.drawable.main_new_game), CHEAT("Cheat", R.drawable.main_cheat);
+        SCORE("Score", R.drawable.main_score), CLEAR("Clear", R.drawable.main_clear), DELETE_LAST("Delete Last", R.drawable.main_del_last), NEW_GAME("New Game", R.drawable.main_new_game), CHEAT("Cheat", R.drawable.main_cheat);
 
         private String label;
         private int id;
@@ -133,8 +132,6 @@ public class MainActivity extends Activity {
     private CustomImageButton[] commandButtons;
     private CustomImageButton[] paletteButtons;
     private CustomImageButton[] currentPropPegButtons;
-    private DotMatrixDisplayView currentPropDotMatrixDisplayScore;
-    private DotMatrixDisplayUpdater dotMatrixDisplayUpdater;
     private RadioButton[] guessModeRadios;
     private COLOR_OBJECTS colorObject;
     private int colorObjectPegIndex;
@@ -181,8 +178,6 @@ public class MainActivity extends Activity {
         mainPropListItemAdapter = null;
         propRecordsHandler.saveAndClose();
         propRecordsHandler = null;
-        dotMatrixDisplayUpdater.close();
-        dotMatrixDisplayUpdater = null;
         stringDB.close();
         stringDB = null;
         inputParams = null;
@@ -200,8 +195,7 @@ public class MainActivity extends Activity {
         setContentView(R.layout.main);   //  Normalement dans onCreate() mais problèmes de stabilité des drawables des customImageButtons quand leur nombre varie (selon pegs, colors)
         setupCommandButtons();
         setupGuessModeRadioButtons();
-        setupTextViews();
-        setupDotMatrixDisplay();   //  Ces setup... ont été déplacés du onCreate au onResume pour éviter crash intermittent
+        setupTextViews();    //  Ces setup... ont été déplacés du onCreate au onResume pour éviter crash intermittent
 
         shpFileName = getPackageName() + "." + getClass().getSimpleName() + SHP_FILE_NAME_SUFFIX;
         keepScreen = getSHPKeepScreen();
@@ -236,7 +230,6 @@ public class MainActivity extends Activity {
         setupCurrentPropPegButtons();
         setupMainPropList();
         setupMainPropListUpdater();
-        setupDotMatrixDisplayUpdater();
         updateDisplayKeepScreen();
         updateDisplay();
         invalidateOptionsMenu();
@@ -299,7 +292,7 @@ public class MainActivity extends Activity {
                         propRecordsHandler.addPropRecord(newPropRecord);
                         currentPropRecord.resetComb();
                     }
-                    currentPropRecord.resetScore();
+                    ;
                 } else {   //  Bad guy
                     msgBox("Invalid score: " + blacks + " black" + (blacks > 1 ? "s" : "") + " and " + whites + " white" + (whites > 1 ? "s" : ""), this);
                 }
@@ -389,36 +382,50 @@ public class MainActivity extends Activity {
         }
     }
 
-    private void onCurrentPropDotMatrixDisplayScoreCustomClick() {
-        if (guessMode.equals(GUESS_MODES.ANDROID)) {
-            inputParamsIndex = getInputParamsScoreIndex();
-            inputParams[inputParamsIndex] = String.valueOf(currentPropRecord.getScore());
-            launchScoreActivity(inputParamsIndex);
-        } else {   //  USER
-            onButtonClickSubmit();
-            colorObject = COLOR_OBJECTS.NONE;
-            updateDisplay();
-        }
-    }
-
     private void onCommandButtonClick(COMMANDS command) {
+        if (command.equals(COMMANDS.SCORE)) {
+            if (guessMode.equals(GUESS_MODES.ANDROID)) {
+                inputParamsIndex = getInputParamsScoreIndex();
+                inputParams[inputParamsIndex] = String.valueOf(currentPropRecord.getScore());
+                launchScoreActivity(inputParamsIndex);
+            } else {   //  User
+                onButtonClickScore();
+                colorObject = COLOR_OBJECTS.NONE;
+                updateDisplay();
+            }
+        }
         if (command.equals(COMMANDS.CLEAR)) {
             if (guessMode.equals(GUESS_MODES.USER)) {
                 onButtonClickClear();
             }
             colorObject = COLOR_OBJECTS.NONE;
             updateDisplay();
-        } else {   //  Del Last, New Game, Cheat: A confirmer Yes/No, avec updateDisplay() et colorObject NONE
+        }
+        if (command.equals(COMMANDS.DELETE_LAST)) {
+            confirm(command.LABEL());
+        }
+        if (command.equals(COMMANDS.CHEAT)) {
             if (guessMode.equals(GUESS_MODES.USER)) {
                 confirm(command.LABEL());
             } else {   //  Android
-                if (!command.equals(COMMANDS.CHEAT)) {
-                    confirm(command.LABEL());
-                } else {   //  Cheat
-                    colorObject = COLOR_OBJECTS.NONE;   //  Ne rien faire
-                    updateDisplay();
-                }
+                colorObject = COLOR_OBJECTS.NONE;
+                updateDisplay();
             }
+        }
+        if (command.equals(COMMANDS.NEW_GAME)) {
+            confirm(command.LABEL());
+        }
+    }
+
+    private void onButtonClickScore() {   //  Appelé par onCommandButtonClick()
+        if (currentPropRecord.hasValidComb()) {   //  Valide si aucune couleur UNDEFINED
+            PropRecord newPropRecord = propRecordsHandler.createPropRecordWithNewId();
+            propRecordsHandler.addPropRecord(newPropRecord);
+            newPropRecord.setComb(currentPropRecord.getComb());
+            newPropRecord.setScore(candRecordsHandler.getScoreByComparing(currentPropRecord.getComb(), secrPropRecord.getComb()));
+            currentPropRecord.resetComb();
+        } else {
+            msgBox("Invalid proposal", this);
         }
     }
 
@@ -429,7 +436,6 @@ public class MainActivity extends Activity {
         if (colorObject.equals(COLOR_OBJECTS.NONE)) {
             currentPropRecord.resetComb();
         }
-        currentPropRecord.resetScore();
     }
 
     private void onButtonClickDeleteLast() {   //  Appelé par confirm()
@@ -437,30 +443,15 @@ public class MainActivity extends Activity {
         if (guessMode.equals(GUESS_MODES.ANDROID)) {
             candRecordsHandler.updateCandRecordsToPropRecords(propRecordsHandler);
             currentPropRecord.setComb(candRecordsHandler.getGuessComb());
-            currentPropRecord.resetScore();
         }
     }
 
-    private void onButtonClickNewGame() {
+    private void onButtonClickNewGame() {   //  Appelé par confirm()
         resetPropsAndCands();
-    }   //  Appelé par confirm()
+    }
 
     private void onButtonClickCheat() {   //  Appelé par confirm()
         currentPropRecord.setComb(secrPropRecord.getComb());
-        currentPropRecord.setScore(10 * pegs);
-    }
-
-    private void onButtonClickSubmit() {   //  Appelé par onCurrentPropDotMatrixDisplayScoreCustomClick()
-        if (currentPropRecord.hasValidComb()) {   //  Valide si aucune couleur UNDEFINED
-            PropRecord newPropRecord = propRecordsHandler.createPropRecordWithNewId();
-            propRecordsHandler.addPropRecord(newPropRecord);
-            newPropRecord.setComb(currentPropRecord.getComb());
-            newPropRecord.setScore(candRecordsHandler.getScoreByComparing(currentPropRecord.getComb(), secrPropRecord.getComb()));
-            currentPropRecord.resetComb();
-            currentPropRecord.resetScore();
-        } else {
-            msgBox("Invalid proposal", this);
-        }
     }
 
     private void onItemPropClick(int position, int pegIndex) {
@@ -517,10 +508,6 @@ public class MainActivity extends Activity {
         currentPropPegButtons[index].setColors(buttonColorBox);
     }
 
-    private void updateDisplayCurrentPropScore() {
-        dotMatrixDisplayUpdater.displayText(currentPropRecord.getDecoratedScore());   //  "B-W" (En attente d'entrée du score)
-    }
-
     private void updateDisplayCommandButtonColors() {
         final String ACTIVE_COLOR = "000000";
         final String INACTIVE_COLOR = "B0B0B0";
@@ -530,6 +517,7 @@ public class MainActivity extends Activity {
         buttonColorBox.unpressedBackColor = null;
         buttonColorBox.pressedFrontColor = ACTIVE_COLOR;
         buttonColorBox.pressedBackColor = COLOR_PRESSED;
+        commandButtons[COMMANDS.SCORE.INDEX()].setColors(buttonColorBox);
         commandButtons[COMMANDS.DELETE_LAST.INDEX()].setColors(buttonColorBox);
         commandButtons[COMMANDS.NEW_GAME.INDEX()].setColors(buttonColorBox);
 
@@ -557,7 +545,6 @@ public class MainActivity extends Activity {
         updateDisplayGuessModeRadios();
         updateDisplayPaletteButtonColors();
         updateDisplayCurrentPropButtonColors();
-        updateDisplayCurrentPropScore();
         updateDisplayCommandButtonColors();
         mainPropListUpdater.rebuild();
         mainPropListUpdater.repaint();
@@ -874,20 +861,6 @@ public class MainActivity extends Activity {
             } catch (IllegalAccessException | IllegalArgumentException | NoSuchFieldException | SecurityException ex) {
                 Logger.getLogger(MainActivity.class.getName()).log(Level.SEVERE, null, ex);
             }
-    }
-
-    private void setupDotMatrixDisplay() {
-        currentPropDotMatrixDisplayScore = findViewById(R.id.BTN_DOT_MATRIX_SCORE);
-        currentPropDotMatrixDisplayScore.setOnCustomClickListener(new DotMatrixDisplayView.onCustomClickListener() {
-            @Override
-            public void onCustomClick() {
-                onCurrentPropDotMatrixDisplayScoreCustomClick();
-            }
-        });
-    }
-
-    private void setupDotMatrixDisplayUpdater() {
-        dotMatrixDisplayUpdater = new DotMatrixDisplayUpdater(currentPropDotMatrixDisplayScore);
     }
 
     private void setupPropRecords() {

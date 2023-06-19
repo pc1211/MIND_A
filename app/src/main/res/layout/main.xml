@@ -167,7 +167,7 @@
             <com.example.pgyl.pekislib_a.CustomImageButton
                 android:id="@+id/BTN_CUR_PROP_4"
                 android:layout_width="0dp"
-                android:layout_height="38dp"
+                android:layout_height="match_parent"
                 android:layout_weight="1" />
 
             <com.example.pgyl.pekislib_a.CustomImageButton
@@ -195,11 +195,12 @@
                 android:layout_weight="1" />
         </LinearLayout>
 
-        <com.example.pgyl.pekislib_a.DotMatrixDisplayView
-            android:id="@+id/BTN_DOT_MATRIX_SCORE"
+        <com.example.pgyl.pekislib_a.CustomImageButton
+            android:id="@+id/BTN_SCORE"
             android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1" />
+            android:layout_height="38dp"
+            android:layout_weight="1"
+            android:text="Score" />
 
     </LinearLayout>
 
