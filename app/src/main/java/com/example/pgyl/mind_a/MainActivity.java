@@ -276,7 +276,6 @@ public class MainActivity extends Activity {
                 int blacks = score / 10;   //  Noirs
                 int whites = score % 10;   //  Blancs
                 if ((blacks <= pegs) && (whites <= pegs) && ((blacks + whites) <= pegs) && (score <= (10 * pegs)) && (score != (10 * (pegs - 1) + 1))) {
-                    inputParams[inputParamsIndex] = sValue;
                     currentPropRecord.setScore(score);
                     PropRecord newPropRecord = propRecordsHandler.createPropRecordWithNewId();
                     newPropRecord.setComb(currentPropRecord.getComb());
@@ -384,14 +383,17 @@ public class MainActivity extends Activity {
 
     private void onCommandButtonClick(COMMANDS command) {
         if (command.equals(COMMANDS.SCORE)) {
-            if (guessMode.equals(GUESS_MODES.ANDROID)) {
-                inputParamsIndex = getInputParamsScoreIndex();
-                inputParams[inputParamsIndex] = String.valueOf(currentPropRecord.getScore());
-                launchScoreActivity(inputParamsIndex);
-            } else {   //  User
-                onButtonClickScore();
-                colorObject = COLOR_OBJECTS.NONE;
-                updateDisplay();
+            if (currentPropRecord.hasValidComb()) {   //  Valide si aucune couleur UNDEFINED
+                if (guessMode.equals(GUESS_MODES.ANDROID)) {
+                    inputParamsIndex = getInputParamsScoreIndex();
+                    launchScoreActivity(inputParamsIndex);
+                } else {   //  User
+                    onButtonClickScore();
+                    colorObject = COLOR_OBJECTS.NONE;
+                    updateDisplay();
+                }
+            } else {
+                msgBox("Invalid proposal", this);
             }
         }
         if (command.equals(COMMANDS.CLEAR)) {
@@ -402,7 +404,9 @@ public class MainActivity extends Activity {
             updateDisplay();
         }
         if (command.equals(COMMANDS.DELETE_LAST)) {
-            confirm(command.LABEL());
+            if (propRecordsHandler.getPropRecordsCount() > 0) {
+                confirm(command.LABEL());
+            }
         }
         if (command.equals(COMMANDS.CHEAT)) {
             if (guessMode.equals(GUESS_MODES.USER)) {
@@ -418,15 +422,11 @@ public class MainActivity extends Activity {
     }
 
     private void onButtonClickScore() {   //  Appelé par onCommandButtonClick()
-        if (currentPropRecord.hasValidComb()) {   //  Valide si aucune couleur UNDEFINED
-            PropRecord newPropRecord = propRecordsHandler.createPropRecordWithNewId();
-            propRecordsHandler.addPropRecord(newPropRecord);
-            newPropRecord.setComb(currentPropRecord.getComb());
-            newPropRecord.setScore(candRecordsHandler.getScoreByComparing(currentPropRecord.getComb(), secrPropRecord.getComb()));
-            currentPropRecord.resetComb();
-        } else {
-            msgBox("Invalid proposal", this);
-        }
+        PropRecord newPropRecord = propRecordsHandler.createPropRecordWithNewId();
+        propRecordsHandler.addPropRecord(newPropRecord);
+        newPropRecord.setComb(currentPropRecord.getComb());
+        newPropRecord.setScore(candRecordsHandler.getScoreByComparing(currentPropRecord.getComb(), secrPropRecord.getComb()));
+        currentPropRecord.resetComb();
     }
 
     private void onButtonClickClear() {    //  Appelé par onCommandButtonClick()
@@ -513,13 +513,17 @@ public class MainActivity extends Activity {
         final String INACTIVE_COLOR = "B0B0B0";
         final String COLOR_PRESSED = "FF9A22";
 
-        buttonColorBox.unpressedFrontColor = ACTIVE_COLOR;
-        buttonColorBox.unpressedBackColor = null;
-        buttonColorBox.pressedFrontColor = ACTIVE_COLOR;
+        buttonColorBox.unpressedBackColor = null;   //  Ces 2 lignes communes à tous les commandButtons
         buttonColorBox.pressedBackColor = COLOR_PRESSED;
+
+        buttonColorBox.unpressedFrontColor = ACTIVE_COLOR;
+        buttonColorBox.pressedFrontColor = ACTIVE_COLOR;
         commandButtons[COMMANDS.SCORE.INDEX()].setColors(buttonColorBox);
-        commandButtons[COMMANDS.DELETE_LAST.INDEX()].setColors(buttonColorBox);
         commandButtons[COMMANDS.NEW_GAME.INDEX()].setColors(buttonColorBox);
+
+        buttonColorBox.unpressedFrontColor = propRecordsHandler.getPropRecordsCount() > 0 ? ACTIVE_COLOR : INACTIVE_COLOR;
+        buttonColorBox.pressedFrontColor = propRecordsHandler.getPropRecordsCount() > 0 ? ACTIVE_COLOR : INACTIVE_COLOR;
+        commandButtons[COMMANDS.DELETE_LAST.INDEX()].setColors(buttonColorBox);
 
         buttonColorBox.unpressedFrontColor = guessMode.equals(GUESS_MODES.USER) ? ACTIVE_COLOR : INACTIVE_COLOR;
         buttonColorBox.pressedFrontColor = guessMode.equals(GUESS_MODES.USER) ? ACTIVE_COLOR : INACTIVE_COLOR;
@@ -937,6 +941,7 @@ public class MainActivity extends Activity {
     }
 
     private void launchScoreActivity(int inputParamsColumnIndex) {
+        inputParams[inputParamsIndex] = "0";    //  Par défaut toujours 0, cad 0 Blacks - 0 Whites
         setCurrentForActivity(stringDB, MIND_ACTIVITIES.SCORE.toString(), getInputParamsTableName(), inputParamsColumnIndex, inputParams[inputParamsColumnIndex]);
         setStartStatusOfActivity(stringDB, MIND_ACTIVITIES.SCORE.toString(), ACTIVITY_START_STATUS.COLD);
         Intent callingIntent = new Intent(this, ScoreActivity.class);

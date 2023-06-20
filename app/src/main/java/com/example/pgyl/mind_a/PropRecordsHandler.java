@@ -48,9 +48,13 @@ public class PropRecordsHandler {
         propRecords.clear();
     }
 
-    public ArrayList<PropRecord> getPropRecords() {
+    public ArrayList<PropRecord> getPropRecords() {   //  PropRecords sans currentPropRecord ni secrPropRecord
         return propRecords;
-    }   //  PropRecords sans currentPropRecord ni secrPropRecord
+    }
+
+    public int getPropRecordsCount() {   //  PropRecords sans currentPropRecord ni secrPropRecord
+        return propRecords.size();
+    }
 
     public void addPropRecord(PropRecord propRecord) {
         propRecords.add(propRecord);
