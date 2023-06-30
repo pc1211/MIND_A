@@ -5,10 +5,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
-import android.widget.ImageView;
 
-import com.example.pgyl.pekislib_a.ColorUtils.ButtonColorBox;
-import com.example.pgyl.pekislib_a.CustomImageButton;
+import com.example.pgyl.pekislib_a.ButtonColorBox;
+import com.example.pgyl.pekislib_a.ImageButtonView;
 
 import java.util.ArrayList;
 import java.util.logging.Level;
@@ -17,6 +16,7 @@ import java.util.logging.Logger;
 import static com.example.pgyl.mind_a.Constants.MAX_PEGS;
 import static com.example.pgyl.mind_a.MainActivity.pegs;
 import static com.example.pgyl.mind_a.StringDBTables.getPaletteColorsAtIndex;
+import static com.example.pgyl.pekislib_a.ButtonColorBox.COLOR_TYPES;
 import static com.example.pgyl.pekislib_a.Constants.UNDEFINED;
 
 public class MainPropListItemAdapter extends BaseAdapter {
@@ -34,7 +34,6 @@ public class MainPropListItemAdapter extends BaseAdapter {
     private Context context;
     private ArrayList<PropRecord> propRecords;
     private String[] paletteColors;
-    private ButtonColorBox buttonColorBox;
     private MainPropListItemViewHolder viewHolder;
     //endregion
 
@@ -48,12 +47,10 @@ public class MainPropListItemAdapter extends BaseAdapter {
 
     private void init() {
         propRecords = null;
-        buttonColorBox = new ButtonColorBox();
     }
 
     public void close() {
         propRecords = null;
-        buttonColorBox = null;
         context = null;
     }
 
@@ -108,11 +105,12 @@ public class MainPropListItemAdapter extends BaseAdapter {
         for (int i = 0; i <= (MAX_PEGS - 1); i = i + 1) {
             if (i <= (pegs - 1)) {
                 String color = ((comb[i] != UNDEFINED) ? paletteColors[getPaletteColorsAtIndex(comb[i])] : EMPTY_COLOR);
-                buttonColorBox.unpressedFrontColor = color;
-                buttonColorBox.unpressedBackColor = BACK_COLOR_NORMAL;
-                buttonColorBox.pressedFrontColor = color;
-                buttonColorBox.pressedBackColor = BACK_COLOR_INVERSE;
-                viewHolder.buttonColors[i].setColors(buttonColorBox);
+                ButtonColorBox buttonColorBox = viewHolder.buttonColors[i].getColorBox();
+                buttonColorBox.setColor(COLOR_TYPES.UNPRESSED_FRONT_COLOR, color);
+                buttonColorBox.setColor(COLOR_TYPES.UNPRESSED_BACK_COLOR, BACK_COLOR_NORMAL);
+                buttonColorBox.setColor(COLOR_TYPES.PRESSED_FRONT_COLOR, color);
+                buttonColorBox.setColor(COLOR_TYPES.PRESSED_BACK_COLOR, BACK_COLOR_INVERSE);
+                viewHolder.buttonColors[i].updateDisplayColors();
             } else {  //  Ne rendre visibles que <pegs> boutons de couleur
                 viewHolder.buttonColors[i].setVisibility(View.GONE);
             }
@@ -120,28 +118,31 @@ public class MainPropListItemAdapter extends BaseAdapter {
         viewHolder.dotMatrixDisplayUpdater.displayText(propRecord.getDecoratedScore());
     }
 
-    public void paintViewAtPegIndex(View rowView, int pegIndex, ButtonColorBox buttonColorBox) {
+    public void paintViewAtPegIndex(View rowView, int pegIndex) {
         MainPropListItemViewHolder viewHolder = (MainPropListItemViewHolder) rowView.getTag();
-        viewHolder.buttonColors[pegIndex].setColors(buttonColorBox);
+        viewHolder.buttonColors[pegIndex].updateDisplayColors();
+    }
+
+    public ButtonColorBox getButtonColorBoxAtPegIndex(View rowView, int pegIndex) {
+        MainPropListItemViewHolder viewHolder = (MainPropListItemViewHolder) rowView.getTag();
+        return viewHolder.buttonColors[pegIndex].getColorBox();
     }
 
     private void setupViewHolderButtons(View rowView, int position) {
         final String BUTTON_XML_NAME_PREFIX = "BTN_ITEM_COMB_";
         final long BUTTON_MIN_CLICK_TIME_INTERVAL_MS = 500;
 
-        viewHolder.buttonColors = new CustomImageButton[MAX_PEGS];
+        viewHolder.buttonColors = new ImageButtonView[MAX_PEGS];
         Class rid = R.id.class;
         for (int i = 0; i <= (MAX_PEGS - 1); i = i + 1) {
             try {
                 viewHolder.buttonColors[i] = rowView.findViewById(rid.getField(BUTTON_XML_NAME_PREFIX + i).getInt(rid));
-                viewHolder.buttonColors[i].setImageResource(R.drawable.disk);
-                viewHolder.buttonColors[i].setScaleType(ImageView.ScaleType.FIT_CENTER);
-                viewHolder.buttonColors[i].setAdjustViewBounds(true);
+                viewHolder.buttonColors[i].setPNGImageResource(R.drawable.disk);
                 viewHolder.buttonColors[i].setMinClickTimeInterval(BUTTON_MIN_CLICK_TIME_INTERVAL_MS);
                 final int pegIndex = i;
-                viewHolder.buttonColors[i].setOnClickListener(new View.OnClickListener() {
+                viewHolder.buttonColors[i].setCustomOnClickListener(new ImageButtonView.onCustomClickListener() {
                     @Override
-                    public void onClick(View v) {
+                    public void onCustomClick() {
                         onButtonClick(position, pegIndex);
                     }
                 });

@@ -1,8 +1,11 @@
 package com.example.pgyl.mind_a;
 
+import android.view.View;
 import android.widget.ListView;
 
-import com.example.pgyl.pekislib_a.ColorUtils.ButtonColorBox;
+import com.example.pgyl.pekislib_a.ButtonColorBox;
+
+import static com.example.pgyl.pekislib_a.Constants.UNDEFINED;
 
 public class MainPropListUpdater {
     //region Variables
@@ -54,16 +57,26 @@ public class MainPropListUpdater {
         }
     }
 
-    public void repaintAtPosAtPegIndex(int position, int pegIndex, ButtonColorBox buttonColorBox) {
+    public void repaintAtPosAtPegIndex(int position, int pegIndex) {
+        mainPropListItemAdapter.paintViewAtPegIndex(getItemViewAtPos(position), pegIndex);
+    }
+
+    public ButtonColorBox getButtonColorBoxAtPosAtPegIndex(int position, int pegIndex) {
+        return mainPropListItemAdapter.getButtonColorBoxAtPegIndex(getItemViewAtPos(position), pegIndex);
+    }
+
+    private View getItemViewAtPos(int position) {
+        int childIndex = UNDEFINED;
         if (mainPropListView.getChildCount() > 0) {
             int firstVisiblePos = mainPropListView.getFirstVisiblePosition();
             int lastVisiblePos = mainPropListView.getLastVisiblePosition();
             for (int i = firstVisiblePos; i <= lastVisiblePos; i = i + 1) {
                 if (i == position) {
-                    mainPropListItemAdapter.paintViewAtPegIndex(mainPropListView.getChildAt(i - firstVisiblePos), pegIndex, buttonColorBox);
+                    childIndex = i - firstVisiblePos;
                 }
             }
         }
+        return (childIndex != UNDEFINED ? mainPropListView.getChildAt(childIndex) : null);
     }
 
     public void checkNeedScrollBar() {
