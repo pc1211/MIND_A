@@ -477,7 +477,7 @@ public class MainActivity extends Activity {
         buttonColorBox.setColor(COLOR_TYPES.UNPRESSED_FRONT_COLOR, color);
         buttonColorBox.setColor(COLOR_TYPES.UNPRESSED_BACK_COLOR, colorMode.equals(COLOR_MODES.NORMAL) ? BACK_COLOR_NORMAL : BACK_COLOR_INVERSE);
         buttonColorBox.setColor(COLOR_TYPES.PRESSED_FRONT_COLOR, color);
-        buttonColorBox.setColor(COLOR_TYPES.PRESSED_BACK_COLOR, BACK_COLOR_INVERSE);
+        buttonColorBox.setColor(COLOR_TYPES.PRESSED_BACK_COLOR, colorMode.equals(COLOR_MODES.NORMAL) ? BACK_COLOR_INVERSE : BACK_COLOR_NORMAL);
         paletteButtons[index].updateDisplayColors();
     }
 
