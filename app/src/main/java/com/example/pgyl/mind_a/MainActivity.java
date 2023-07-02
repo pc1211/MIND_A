@@ -666,19 +666,29 @@ public class MainActivity extends Activity {
                     case PALETTE:
                         currentPropRecord.setCombAtIndex(oldColorObjectPegIndex, newColorObjectPegIndex);
                         updateDisplayPaletteButtonColor(newColorObjectPegIndex, COLOR_MODES.NORMAL);
+                        colorObject = COLOR_OBJECTS.NONE;
                         break;
                     case CURRENT_PROP:
                         if (newColorObjectPegIndex != oldColorObjectPegIndex) {
-                            currentPropRecord.setCombAtIndex(newColorObjectPegIndex, currentPropRecord.getCombAtIndex(oldColorObjectPegIndex));
-                            updateDisplayCurrentPropButtonColor(newColorObjectPegIndex, COLOR_MODES.NORMAL);
+                            int oldColor = currentPropRecord.getCombAtIndex(oldColorObjectPegIndex);
+                            int newColor = currentPropRecord.getCombAtIndex(newColorObjectPegIndex);
+                            if (newColor != oldColor) {
+                                currentPropRecord.setCombAtIndex(newColorObjectPegIndex, oldColor);
+                                updateDisplayCurrentPropButtonColor(newColorObjectPegIndex, COLOR_MODES.NORMAL);
+                                colorObject = COLOR_OBJECTS.NONE;
+                            } else {   //  Même couleur
+                                updateDisplayCurrentPropButtonColor(newColorObjectPegIndex, COLOR_MODES.INVERSE);
+                            }
+                        } else {   // Même index
+                            colorObject = COLOR_OBJECTS.NONE;
                         }
                         break;
                     case ITEM_PROP:
                         PropRecord itemPropRecord = propRecordsHandler.getPropRecordAtIndex(newColorObjectListPosition);
                         currentPropRecord.setCombAtIndex(oldColorObjectPegIndex, itemPropRecord.getCombAtIndex(newColorObjectPegIndex));
+                        colorObject = COLOR_OBJECTS.NONE;
                         break;
                 }
-                colorObject = COLOR_OBJECTS.NONE;
                 updateDisplayCurrentPropButtonColor(oldColorObjectPegIndex, COLOR_MODES.NORMAL);
                 break;
 
