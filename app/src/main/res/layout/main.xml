@@ -219,8 +219,7 @@
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_marginLeft="4dp"
-            android:layout_weight="1"
-            android:text="Score" />
+            android:layout_weight="1" />
 
     </LinearLayout>
 
@@ -236,32 +235,28 @@
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_marginLeft="4dp"
-            android:layout_weight="1"
-            android:text="Clear" />
+            android:layout_weight="1" />
 
         <com.example.pgyl.pekislib_a.ImageButtonView
             android:id="@+id/BTN_DELETE_LAST"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_marginLeft="4dp"
-            android:layout_weight="1"
-            android:text="Del Last" />
+            android:layout_weight="1" />
 
         <com.example.pgyl.pekislib_a.ImageButtonView
             android:id="@+id/BTN_CHEAT"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_marginLeft="4dp"
-            android:layout_weight="1"
-            android:text="Cheat" />
+            android:layout_weight="1" />
 
         <com.example.pgyl.pekislib_a.ImageButtonView
             android:id="@+id/BTN_NEW_GAME"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_marginLeft="4dp"
-            android:layout_weight="1"
-            android:text="New Game" />
+            android:layout_weight="1" />
 
     </LinearLayout>
 

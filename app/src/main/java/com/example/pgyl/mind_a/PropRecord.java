@@ -5,11 +5,6 @@ import static com.example.pgyl.mind_a.MainActivity.pegs;
 import static com.example.pgyl.pekislib_a.Constants.UNDEFINED;
 
 public class PropRecord {
-    //region Constantes
-    private static final String SEPARATOR = "-";
-    public static final String MAX_SCORE_DISPLAY_SIZE = "9" + SEPARATOR + "9";
-    //endregion
-
     //region Variables
     private int id;             //  Identifiant de la proposition (0, 1, 2, 3, ...)
     private int[] comb;         //  Numéros de couleur (0..9) de la proposition (cf PALETTE_COLORS[])  (-1 si pas de couleur attribuée (UNDEFINED))
@@ -44,6 +39,14 @@ public class PropRecord {
 
     public int getScore() {
         return score;
+    }
+
+    public int getScoreBlacks() {
+        return (score / 10);
+    }
+
+    public int getScoreWhites() {
+        return (score % 10);
     }
 
     public void setScore(int score) {
@@ -88,13 +91,5 @@ public class PropRecord {
         for (int i = 0; i <= (pegs - 1); i = i + 1) {
             comb[i] = (int) (colors * Math.random());
         }
-    }
-
-    public String getSeparator() {
-        return SEPARATOR;
-    }
-
-    public String getDecoratedScore() {
-        return (score == UNDEFINED ? "B" + SEPARATOR + "W" : String.valueOf(score / 10) + SEPARATOR + String.valueOf(score % 10));
     }
 }

@@ -115,7 +115,7 @@ public class MainPropListItemAdapter extends BaseAdapter {
                 viewHolder.buttonColors[i].setVisibility(View.GONE);
             }
         }
-        viewHolder.dotMatrixDisplayUpdater.displayText(propRecord.getDecoratedScore());
+        viewHolder.dotMatrixDisplayUpdater.displayScore(propRecord);
     }
 
     public void paintViewAtPegIndex(View rowView, int pegIndex) {
