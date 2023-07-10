@@ -806,6 +806,7 @@ public class MainActivity extends Activity {
             try {
                 paletteButtons[i] = findViewById(rid.getField(BUTTON_XML_PREFIX + i).getInt(rid));
                 if (i <= (colors - 1)) {
+                    paletteButtons[i].setOutlineStrokeWidthDp(0);
                     paletteButtons[i].setPNGImageResource(DISK_PNG_ID);
                     paletteButtons[i].setMinClickTimeInterval(BUTTON_MIN_CLICK_TIME_INTERVAL_MS);
                     final int index = i;
@@ -835,6 +836,7 @@ public class MainActivity extends Activity {
             try {
                 currentPropPegButtons[i] = findViewById(rid.getField(BUTTON_XML_PREFIX + i).getInt(rid));
                 if (i <= (pegs - 1)) {
+                    currentPropPegButtons[i].setOutlineStrokeWidthDp(0);
                     currentPropPegButtons[i].setPNGImageResource(DISK_PNG_ID);
                     currentPropPegButtons[i].setMinClickTimeInterval(BUTTON_MIN_CLICK_TIME_INTERVAL_MS);
                     final int index = i;
@@ -848,8 +850,7 @@ public class MainActivity extends Activity {
                 } else {
                     currentPropPegButtons[i].setVisibility(View.GONE);
                 }
-            } catch (IllegalAccessException | IllegalArgumentException | NoSuchFieldException |
-                    SecurityException ex) {
+            } catch (IllegalAccessException | IllegalArgumentException | NoSuchFieldException | SecurityException ex) {
                 Logger.getLogger(MainActivity.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
@@ -864,6 +865,7 @@ public class MainActivity extends Activity {
         for (COMMANDS cv : COMMANDS.values())
             try {
                 commandButtons[cv.INDEX()] = findViewById(rid.getField(BUTTON_COMMAND_XML_PREFIX + cv.toString()).getInt(rid));
+                commandButtons[cv.INDEX()].setOutlineStrokeWidthDp(0);
                 commandButtons[cv.INDEX()].setPNGImageResource(cv.ID());
                 commandButtons[cv.INDEX()].setMinClickTimeInterval(BUTTON_MIN_CLICK_TIME_INTERVAL_MS);
                 final COMMANDS c = cv;

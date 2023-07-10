@@ -214,12 +214,20 @@
                 android:layout_weight="1" />
         </LinearLayout>
 
-        <com.example.pgyl.pekislib_a.ImageButtonView
-            android:id="@+id/BTN_SCORE"
+        <LinearLayout
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_marginLeft="4dp"
-            android:layout_weight="1" />
+            android:layout_weight="1"
+            android:orientation="horizontal">
+
+            <com.example.pgyl.pekislib_a.ImageButtonView
+                android:id="@+id/BTN_SCORE"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_marginLeft="4dp"
+                android:layout_weight="1" />
+
+        </LinearLayout>
 
     </LinearLayout>
 

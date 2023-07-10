@@ -137,6 +137,7 @@ public class MainPropListItemAdapter extends BaseAdapter {
         for (int i = 0; i <= (MAX_PEGS - 1); i = i + 1) {
             try {
                 viewHolder.buttonColors[i] = rowView.findViewById(rid.getField(BUTTON_XML_NAME_PREFIX + i).getInt(rid));
+                viewHolder.buttonColors[i].setOutlineStrokeWidthDp(0);
                 viewHolder.buttonColors[i].setPNGImageResource(R.drawable.disk);
                 viewHolder.buttonColors[i].setMinClickTimeInterval(BUTTON_MIN_CLICK_TIME_INTERVAL_MS);
                 final int pegIndex = i;
