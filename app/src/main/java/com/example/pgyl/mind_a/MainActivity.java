@@ -33,6 +33,7 @@ import static com.example.pgyl.mind_a.Constants.MAX_COLORS;
 import static com.example.pgyl.mind_a.Constants.MAX_PEGS;
 import static com.example.pgyl.mind_a.Constants.MIND_ACTIVITIES;
 import static com.example.pgyl.mind_a.Constants.MIND_ACTIVITIES_REQUEST_CODE_MULTIPLIER;
+import static com.example.pgyl.mind_a.StringDBTables.DATA_VERSION;
 import static com.example.pgyl.mind_a.StringDBTables.getInputParamsColorsIndex;
 import static com.example.pgyl.mind_a.StringDBTables.getInputParamsPegsIndex;
 import static com.example.pgyl.mind_a.StringDBTables.getInputParamsScoreIndex;
@@ -55,12 +56,16 @@ import static com.example.pgyl.pekislib_a.MiscUtils.msgBox;
 import static com.example.pgyl.pekislib_a.StringDBTables.ACTIVITY_START_STATUS;
 import static com.example.pgyl.pekislib_a.StringDBTables.TABLE_EXTRA_KEYS;
 import static com.example.pgyl.pekislib_a.StringDBTables.getActivityInfosTableName;
+import static com.example.pgyl.pekislib_a.StringDBTables.getDataVersionsDataVersionIndex;
+import static com.example.pgyl.pekislib_a.StringDBTables.getDataVersionsTableName;
 import static com.example.pgyl.pekislib_a.StringDBUtils.createPekislibTableIfNotExists;
 import static com.example.pgyl.pekislib_a.StringDBUtils.createPresetWithDefaultValues;
+import static com.example.pgyl.pekislib_a.StringDBUtils.getCurrent;
 import static com.example.pgyl.pekislib_a.StringDBUtils.getCurrentFromActivity;
 import static com.example.pgyl.pekislib_a.StringDBUtils.getCurrentsFromActivity;
 import static com.example.pgyl.pekislib_a.StringDBUtils.getDefaults;
 import static com.example.pgyl.pekislib_a.StringDBUtils.getLabels;
+import static com.example.pgyl.pekislib_a.StringDBUtils.setCurrent;
 import static com.example.pgyl.pekislib_a.StringDBUtils.setCurrentForActivity;
 import static com.example.pgyl.pekislib_a.StringDBUtils.setCurrentsForActivity;
 import static com.example.pgyl.pekislib_a.StringDBUtils.setStartStatusOfActivity;
@@ -895,6 +900,20 @@ public class MainActivity extends Activity {
         stringDB = new StringDB(this);
         stringDB.open();
 
+        String DBDataVersion = (stringDB.tableExists(getDataVersionsTableName())) ? getCurrent(stringDB, getDataVersionsTableName(), getDataVersionsDataVersionIndex()) : null;
+        int ver = (DBDataVersion != null) ? Integer.parseInt(DBDataVersion) : 0;
+        if (ver < StringDBTables.DATA_VERSION) {   //  Données obsolètes => Tout réinitialiser, avec données par défaut
+            stringDB.deleteTableIfExists(getDataVersionsTableName());
+            stringDB.deleteTableIfExists(getActivityInfosTableName());
+            stringDB.deleteTableIfExists(getPropsTableName());
+            stringDB.deleteTableIfExists(getInputParamsTableName());
+            stringDB.deleteTableIfExists(getPaletteColorsTableName());
+        }
+
+        if (!stringDB.tableExists(getDataVersionsTableName())) {
+            createPekislibTableIfNotExists(stringDB, getDataVersionsTableName());    //  Réinitialiser
+            setCurrent(stringDB, getDataVersionsTableName(), getDataVersionsDataVersionIndex(), String.valueOf(DATA_VERSION));
+        }
         if (!stringDB.tableExists(getActivityInfosTableName())) {
             createPekislibTableIfNotExists(stringDB, getActivityInfosTableName());
         }
