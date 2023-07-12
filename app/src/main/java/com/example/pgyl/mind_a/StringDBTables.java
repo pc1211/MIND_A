@@ -17,7 +17,7 @@ import static com.example.pgyl.pekislib_a.StringDBTables.TABLE_IDS;
 
 public class StringDBTables {
 
-    public static final int DATA_VERSION = 2;   //   A augmenter dès que les données éventuelles dans la DB existante ne seront plus comptatibles après changements
+    public static final int DATA_VERSION = 3;   //   A augmenter dès que les données éventuelles dans la DB existante ne seront plus comptatibles après changements
 
     enum MIND_TABLES {   // Les tables, rattachées à leurs champs de data
         PROPS(MindTableDataFields.props.class, ""), PALETTE_COLORS(MindTableDataFields.paletteColors.class, ""), INPUT_PARAMS(MindTableDataFields.inputParams.class, "");   //  Table des propositions (chacune avec ses couleurs et son score)
