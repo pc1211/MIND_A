@@ -534,6 +534,7 @@ public class MainActivity extends Activity {
         buttonColorBox = commandButtons[COMMANDS.CLEAR.INDEX()].getColorBox();
         buttonColorBox.setColor(COLOR_TYPES.UNPRESSED_FRONT_COLOR, guessMode.equals(GUESS_MODES.USER) ? ACTIVE_COLOR : INACTIVE_COLOR);
         buttonColorBox.setColor(COLOR_TYPES.PRESSED_FRONT_COLOR, guessMode.equals(GUESS_MODES.USER) ? ACTIVE_COLOR : INACTIVE_COLOR);
+        commandButtons[COMMANDS.CLEAR.INDEX()].setHasFrontColorFilter(!guessMode.equals(GUESS_MODES.USER));   //  Griser l'image si ANDROID mode
         commandButtons[COMMANDS.CLEAR.INDEX()].updateDisplayColors();
 
         buttonColorBox = commandButtons[COMMANDS.CHEAT.INDEX()].getColorBox();
@@ -871,6 +872,9 @@ public class MainActivity extends Activity {
             try {
                 commandButtons[cv.INDEX()] = findViewById(rid.getField(BUTTON_COMMAND_XML_PREFIX + cv.toString()).getInt(rid));
                 commandButtons[cv.INDEX()].setOutlineStrokeWidthDp(0);
+                if (cv.equals(COMMANDS.CLEAR)) {
+                    commandButtons[cv.INDEX()].setHasFrontColorFilter(false);   //  Afficher l'image avec toutes ses couleurs
+                }
                 commandButtons[cv.INDEX()].setPNGImageResource(cv.ID());
                 commandButtons[cv.INDEX()].setMinClickTimeInterval(BUTTON_MIN_CLICK_TIME_INTERVAL_MS);
                 final COMMANDS c = cv;
