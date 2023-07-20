@@ -3,7 +3,7 @@ package com.example.pgyl.mind_a;
 import android.view.View;
 import android.widget.ListView;
 
-import com.example.pgyl.pekislib_a.ButtonColorBox;
+import com.example.pgyl.pekislib_a.ColorBox;
 
 import static com.example.pgyl.pekislib_a.Constants.UNDEFINED;
 
@@ -61,7 +61,7 @@ public class MainPropListUpdater {
         mainPropListItemAdapter.paintViewAtPegIndex(getItemViewAtPos(position), pegIndex);
     }
 
-    public ButtonColorBox getButtonColorBoxAtPosAtPegIndex(int position, int pegIndex) {
+    public ColorBox getColorBoxAtPosAtPegIndex(int position, int pegIndex) {
         return mainPropListItemAdapter.getButtonColorBoxAtPegIndex(getItemViewAtPos(position), pegIndex);
     }
 

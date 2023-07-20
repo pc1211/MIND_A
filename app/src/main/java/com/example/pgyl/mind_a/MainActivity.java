@@ -19,7 +19,7 @@ import android.widget.ListView;
 import android.widget.RadioButton;
 import android.widget.TextView;
 
-import com.example.pgyl.pekislib_a.ButtonColorBox;
+import com.example.pgyl.pekislib_a.ColorBox;
 import com.example.pgyl.pekislib_a.ColorPickerActivity;
 import com.example.pgyl.pekislib_a.HelpActivity;
 import com.example.pgyl.pekislib_a.ImageButtonView;
@@ -44,7 +44,7 @@ import static com.example.pgyl.mind_a.StringDBTables.getPropsTableName;
 import static com.example.pgyl.mind_a.StringDBUtils.createMindTableIfNotExists;
 import static com.example.pgyl.mind_a.StringDBUtils.initializeTableInputParams;
 import static com.example.pgyl.mind_a.StringDBUtils.initializeTablePaletteColors;
-import static com.example.pgyl.pekislib_a.ButtonColorBox.COLOR_TYPES;
+import static com.example.pgyl.pekislib_a.ColorUtils.BUTTON_COLOR_TYPES;
 import static com.example.pgyl.pekislib_a.Constants.ACTIVITY_EXTRA_KEYS;
 import static com.example.pgyl.pekislib_a.Constants.COLOR_PREFIX;
 import static com.example.pgyl.pekislib_a.Constants.PEKISLIB_ACTIVITIES;
@@ -478,11 +478,11 @@ public class MainActivity extends Activity {
         final String BACK_COLOR_INVERSE = "FFFFFF";
 
         String color = paletteColors[getPaletteColorsAtIndex(index)];
-        ButtonColorBox buttonColorBox = paletteButtons[index].getColorBox();
-        buttonColorBox.setColor(COLOR_TYPES.UNPRESSED_FRONT_COLOR, color);
-        buttonColorBox.setColor(COLOR_TYPES.UNPRESSED_BACK_COLOR, colorMode.equals(COLOR_MODES.NORMAL) ? BACK_COLOR_NORMAL : BACK_COLOR_INVERSE);
-        buttonColorBox.setColor(COLOR_TYPES.PRESSED_FRONT_COLOR, color);
-        buttonColorBox.setColor(COLOR_TYPES.PRESSED_BACK_COLOR, colorMode.equals(COLOR_MODES.NORMAL) ? BACK_COLOR_INVERSE : BACK_COLOR_NORMAL);
+        ColorBox colorBox = paletteButtons[index].getColorBox();
+        colorBox.setColor(BUTTON_COLOR_TYPES.UNPRESSED_FRONT_COLOR.INDEX(), color);
+        colorBox.setColor(BUTTON_COLOR_TYPES.UNPRESSED_BACK_COLOR.INDEX(), colorMode.equals(COLOR_MODES.NORMAL) ? BACK_COLOR_NORMAL : BACK_COLOR_INVERSE);
+        colorBox.setColor(BUTTON_COLOR_TYPES.PRESSED_FRONT_COLOR.INDEX(), color);
+        colorBox.setColor(BUTTON_COLOR_TYPES.PRESSED_BACK_COLOR.INDEX(), colorMode.equals(COLOR_MODES.NORMAL) ? BACK_COLOR_INVERSE : BACK_COLOR_NORMAL);
         paletteButtons[index].updateDisplayColors();
     }
 
@@ -504,11 +504,11 @@ public class MainActivity extends Activity {
             frontColor = paletteColors[getPaletteColorsAtIndex(colorIndex)];
             backColor = BACK_COLOR_NORMAL;
         }
-        ButtonColorBox buttonColorBox = currentPropPegButtons[index].getColorBox();
-        buttonColorBox.setColor(COLOR_TYPES.UNPRESSED_FRONT_COLOR, frontColor);
-        buttonColorBox.setColor(COLOR_TYPES.UNPRESSED_BACK_COLOR, colorMode.equals(COLOR_MODES.NORMAL) ? backColor : BACK_COLOR_INVERSE);
-        buttonColorBox.setColor(COLOR_TYPES.PRESSED_FRONT_COLOR, frontColor);
-        buttonColorBox.setColor(COLOR_TYPES.PRESSED_BACK_COLOR, colorMode.equals(COLOR_MODES.NORMAL) ? BACK_COLOR_INVERSE : backColor);
+        ColorBox colorBox = currentPropPegButtons[index].getColorBox();
+        colorBox.setColor(BUTTON_COLOR_TYPES.UNPRESSED_FRONT_COLOR.INDEX(), frontColor);
+        colorBox.setColor(BUTTON_COLOR_TYPES.UNPRESSED_BACK_COLOR.INDEX(), colorMode.equals(COLOR_MODES.NORMAL) ? backColor : BACK_COLOR_INVERSE);
+        colorBox.setColor(BUTTON_COLOR_TYPES.PRESSED_FRONT_COLOR.INDEX(), frontColor);
+        colorBox.setColor(BUTTON_COLOR_TYPES.PRESSED_BACK_COLOR.INDEX(), colorMode.equals(COLOR_MODES.NORMAL) ? BACK_COLOR_INVERSE : backColor);
         currentPropPegButtons[index].updateDisplayColors();
     }
 
@@ -516,30 +516,30 @@ public class MainActivity extends Activity {
         final String ACTIVE_COLOR = "000000";
         final String INACTIVE_COLOR = "808080";
 
-        ButtonColorBox buttonColorBox = commandButtons[COMMANDS.SCORE.INDEX()].getColorBox();
-        buttonColorBox.setColor(COLOR_TYPES.UNPRESSED_FRONT_COLOR, ACTIVE_COLOR);
-        buttonColorBox.setColor(COLOR_TYPES.PRESSED_FRONT_COLOR, ACTIVE_COLOR);
+        ColorBox colorBox = commandButtons[COMMANDS.SCORE.INDEX()].getColorBox();
+        colorBox.setColor(BUTTON_COLOR_TYPES.UNPRESSED_FRONT_COLOR.INDEX(), ACTIVE_COLOR);
+        colorBox.setColor(BUTTON_COLOR_TYPES.PRESSED_FRONT_COLOR.INDEX(), ACTIVE_COLOR);
         commandButtons[COMMANDS.SCORE.INDEX()].updateDisplayColors();
 
-        buttonColorBox = commandButtons[COMMANDS.NEW_GAME.INDEX()].getColorBox();
-        buttonColorBox.setColor(COLOR_TYPES.UNPRESSED_FRONT_COLOR, ACTIVE_COLOR);
-        buttonColorBox.setColor(COLOR_TYPES.PRESSED_FRONT_COLOR, ACTIVE_COLOR);
+        colorBox = commandButtons[COMMANDS.NEW_GAME.INDEX()].getColorBox();
+        colorBox.setColor(BUTTON_COLOR_TYPES.UNPRESSED_FRONT_COLOR.INDEX(), ACTIVE_COLOR);
+        colorBox.setColor(BUTTON_COLOR_TYPES.PRESSED_FRONT_COLOR.INDEX(), ACTIVE_COLOR);
         commandButtons[COMMANDS.NEW_GAME.INDEX()].updateDisplayColors();
 
-        buttonColorBox = commandButtons[COMMANDS.DELETE_LAST.INDEX()].getColorBox();
-        buttonColorBox.setColor(COLOR_TYPES.UNPRESSED_FRONT_COLOR, propRecordsHandler.getPropRecordsCount() > 0 ? ACTIVE_COLOR : INACTIVE_COLOR);
-        buttonColorBox.setColor(COLOR_TYPES.PRESSED_FRONT_COLOR, propRecordsHandler.getPropRecordsCount() > 0 ? ACTIVE_COLOR : INACTIVE_COLOR);
+        colorBox = commandButtons[COMMANDS.DELETE_LAST.INDEX()].getColorBox();
+        colorBox.setColor(BUTTON_COLOR_TYPES.UNPRESSED_FRONT_COLOR.INDEX(), propRecordsHandler.getPropRecordsCount() > 0 ? ACTIVE_COLOR : INACTIVE_COLOR);
+        colorBox.setColor(BUTTON_COLOR_TYPES.PRESSED_FRONT_COLOR.INDEX(), propRecordsHandler.getPropRecordsCount() > 0 ? ACTIVE_COLOR : INACTIVE_COLOR);
         commandButtons[COMMANDS.DELETE_LAST.INDEX()].updateDisplayColors();
 
-        buttonColorBox = commandButtons[COMMANDS.CLEAR.INDEX()].getColorBox();
-        buttonColorBox.setColor(COLOR_TYPES.UNPRESSED_FRONT_COLOR, guessMode.equals(GUESS_MODES.USER) ? ACTIVE_COLOR : INACTIVE_COLOR);
-        buttonColorBox.setColor(COLOR_TYPES.PRESSED_FRONT_COLOR, guessMode.equals(GUESS_MODES.USER) ? ACTIVE_COLOR : INACTIVE_COLOR);
+        colorBox = commandButtons[COMMANDS.CLEAR.INDEX()].getColorBox();
+        colorBox.setColor(BUTTON_COLOR_TYPES.UNPRESSED_FRONT_COLOR.INDEX(), guessMode.equals(GUESS_MODES.USER) ? ACTIVE_COLOR : INACTIVE_COLOR);
+        colorBox.setColor(BUTTON_COLOR_TYPES.PRESSED_FRONT_COLOR.INDEX(), guessMode.equals(GUESS_MODES.USER) ? ACTIVE_COLOR : INACTIVE_COLOR);
         commandButtons[COMMANDS.CLEAR.INDEX()].setHasFrontColorFilter(!guessMode.equals(GUESS_MODES.USER));   //  Griser l'image si ANDROID mode
         commandButtons[COMMANDS.CLEAR.INDEX()].updateDisplayColors();
 
-        buttonColorBox = commandButtons[COMMANDS.CHEAT.INDEX()].getColorBox();
-        buttonColorBox.setColor(COLOR_TYPES.UNPRESSED_FRONT_COLOR, guessMode.equals(GUESS_MODES.USER) ? ACTIVE_COLOR : INACTIVE_COLOR);
-        buttonColorBox.setColor(COLOR_TYPES.PRESSED_FRONT_COLOR, guessMode.equals(GUESS_MODES.USER) ? ACTIVE_COLOR : INACTIVE_COLOR);
+        colorBox = commandButtons[COMMANDS.CHEAT.INDEX()].getColorBox();
+        colorBox.setColor(BUTTON_COLOR_TYPES.UNPRESSED_FRONT_COLOR.INDEX(), guessMode.equals(GUESS_MODES.USER) ? ACTIVE_COLOR : INACTIVE_COLOR);
+        colorBox.setColor(BUTTON_COLOR_TYPES.PRESSED_FRONT_COLOR.INDEX(), guessMode.equals(GUESS_MODES.USER) ? ACTIVE_COLOR : INACTIVE_COLOR);
         commandButtons[COMMANDS.CHEAT.INDEX()].updateDisplayColors();
     }
 
@@ -550,11 +550,11 @@ public class MainActivity extends Activity {
         PropRecord itemPropRecord = propRecordsHandler.getPropRecordAtIndex(position);
         int colorIndex = itemPropRecord.getCombAtIndex(pegIndex);
         String color = paletteColors[getPaletteColorsAtIndex(colorIndex)];
-        ButtonColorBox buttonColorBox = mainPropListUpdater.getButtonColorBoxAtPosAtPegIndex(position, pegIndex);
-        buttonColorBox.setColor(COLOR_TYPES.UNPRESSED_FRONT_COLOR, color);
-        buttonColorBox.setColor(COLOR_TYPES.UNPRESSED_BACK_COLOR, colorMode.equals(COLOR_MODES.NORMAL) ? BACK_COLOR_NORMAL : BACK_COLOR_INVERSE);
-        buttonColorBox.setColor(COLOR_TYPES.PRESSED_FRONT_COLOR, color);
-        buttonColorBox.setColor(COLOR_TYPES.PRESSED_BACK_COLOR, colorMode.equals(COLOR_MODES.NORMAL) ? BACK_COLOR_INVERSE : BACK_COLOR_NORMAL);
+        ColorBox colorBox = mainPropListUpdater.getColorBoxAtPosAtPegIndex(position, pegIndex);
+        colorBox.setColor(BUTTON_COLOR_TYPES.UNPRESSED_FRONT_COLOR.INDEX(), color);
+        colorBox.setColor(BUTTON_COLOR_TYPES.UNPRESSED_BACK_COLOR.INDEX(), colorMode.equals(COLOR_MODES.NORMAL) ? BACK_COLOR_NORMAL : BACK_COLOR_INVERSE);
+        colorBox.setColor(BUTTON_COLOR_TYPES.PRESSED_FRONT_COLOR.INDEX(), color);
+        colorBox.setColor(BUTTON_COLOR_TYPES.PRESSED_BACK_COLOR.INDEX(), colorMode.equals(COLOR_MODES.NORMAL) ? BACK_COLOR_INVERSE : BACK_COLOR_NORMAL);
         mainPropListUpdater.repaintAtPosAtPegIndex(position, pegIndex);
     }
 

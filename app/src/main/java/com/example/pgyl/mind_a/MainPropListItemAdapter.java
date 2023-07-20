@@ -6,7 +6,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 
-import com.example.pgyl.pekislib_a.ButtonColorBox;
+import com.example.pgyl.pekislib_a.ColorBox;
 import com.example.pgyl.pekislib_a.ImageButtonView;
 
 import java.util.ArrayList;
@@ -16,7 +16,7 @@ import java.util.logging.Logger;
 import static com.example.pgyl.mind_a.Constants.MAX_PEGS;
 import static com.example.pgyl.mind_a.MainActivity.pegs;
 import static com.example.pgyl.mind_a.StringDBTables.getPaletteColorsAtIndex;
-import static com.example.pgyl.pekislib_a.ButtonColorBox.COLOR_TYPES;
+import static com.example.pgyl.pekislib_a.ColorUtils.BUTTON_COLOR_TYPES;
 import static com.example.pgyl.pekislib_a.Constants.UNDEFINED;
 
 public class MainPropListItemAdapter extends BaseAdapter {
@@ -105,11 +105,11 @@ public class MainPropListItemAdapter extends BaseAdapter {
         for (int i = 0; i <= (MAX_PEGS - 1); i = i + 1) {
             if (i <= (pegs - 1)) {
                 String color = ((comb[i] != UNDEFINED) ? paletteColors[getPaletteColorsAtIndex(comb[i])] : EMPTY_COLOR);
-                ButtonColorBox buttonColorBox = viewHolder.buttonColors[i].getColorBox();
-                buttonColorBox.setColor(COLOR_TYPES.UNPRESSED_FRONT_COLOR, color);
-                buttonColorBox.setColor(COLOR_TYPES.UNPRESSED_BACK_COLOR, BACK_COLOR_NORMAL);
-                buttonColorBox.setColor(COLOR_TYPES.PRESSED_FRONT_COLOR, color);
-                buttonColorBox.setColor(COLOR_TYPES.PRESSED_BACK_COLOR, BACK_COLOR_INVERSE);
+                ColorBox colorBox = viewHolder.buttonColors[i].getColorBox();
+                colorBox.setColor(BUTTON_COLOR_TYPES.UNPRESSED_FRONT_COLOR.INDEX(), color);
+                colorBox.setColor(BUTTON_COLOR_TYPES.UNPRESSED_BACK_COLOR.INDEX(), BACK_COLOR_NORMAL);
+                colorBox.setColor(BUTTON_COLOR_TYPES.PRESSED_FRONT_COLOR.INDEX(), color);
+                colorBox.setColor(BUTTON_COLOR_TYPES.PRESSED_BACK_COLOR.INDEX(), BACK_COLOR_INVERSE);
                 viewHolder.buttonColors[i].updateDisplayColors();
             } else {  //  Ne rendre visibles que <pegs> boutons de couleur
                 viewHolder.buttonColors[i].setVisibility(View.GONE);
@@ -123,7 +123,7 @@ public class MainPropListItemAdapter extends BaseAdapter {
         viewHolder.buttonColors[pegIndex].updateDisplayColors();
     }
 
-    public ButtonColorBox getButtonColorBoxAtPegIndex(View rowView, int pegIndex) {
+    public ColorBox getButtonColorBoxAtPegIndex(View rowView, int pegIndex) {
         MainPropListItemViewHolder viewHolder = (MainPropListItemViewHolder) rowView.getTag();
         return viewHolder.buttonColors[pegIndex].getColorBox();
     }
