@@ -106,11 +106,11 @@ public class MainPropListItemAdapter extends BaseAdapter {
             if (i <= (pegs - 1)) {
                 String color = ((comb[i] != UNDEFINED) ? paletteColors[getPaletteColorsAtIndex(comb[i])] : EMPTY_COLOR);
                 ColorBox colorBox = viewHolder.buttonColors[i].getColorBox();
-                colorBox.setColor(BUTTON_COLOR_TYPES.UNPRESSED_FRONT_COLOR.INDEX(), color);
-                colorBox.setColor(BUTTON_COLOR_TYPES.UNPRESSED_BACK_COLOR.INDEX(), BACK_COLOR_NORMAL);
-                colorBox.setColor(BUTTON_COLOR_TYPES.PRESSED_FRONT_COLOR.INDEX(), color);
-                colorBox.setColor(BUTTON_COLOR_TYPES.PRESSED_BACK_COLOR.INDEX(), BACK_COLOR_INVERSE);
-                viewHolder.buttonColors[i].updateDisplayColors();
+                colorBox.setColor(BUTTON_COLOR_TYPES.UNPRESSED_FRONT.INDEX(), color);
+                colorBox.setColor(BUTTON_COLOR_TYPES.UNPRESSED_BACK.INDEX(), BACK_COLOR_NORMAL);
+                colorBox.setColor(BUTTON_COLOR_TYPES.PRESSED_FRONT.INDEX(), color);
+                colorBox.setColor(BUTTON_COLOR_TYPES.PRESSED_BACK.INDEX(), BACK_COLOR_INVERSE);
+                viewHolder.buttonColors[i].updateDisplay();
             } else {  //  Ne rendre visibles que <pegs> boutons de couleur
                 viewHolder.buttonColors[i].setVisibility(View.GONE);
             }
@@ -120,7 +120,7 @@ public class MainPropListItemAdapter extends BaseAdapter {
 
     public void paintViewAtPegIndex(View rowView, int pegIndex) {
         MainPropListItemViewHolder viewHolder = (MainPropListItemViewHolder) rowView.getTag();
-        viewHolder.buttonColors[pegIndex].updateDisplayColors();
+        viewHolder.buttonColors[pegIndex].updateDisplay();
     }
 
     public ColorBox getButtonColorBoxAtPegIndex(View rowView, int pegIndex) {

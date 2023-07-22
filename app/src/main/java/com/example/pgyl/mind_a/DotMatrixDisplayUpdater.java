@@ -34,7 +34,7 @@ public class DotMatrixDisplayUpdater {
 
         setupDefaultFont();
         colorBox = dotMatrixDisplayView.getColorBox();
-        colorBox.setColor(BUTTON_COLOR_TYPES.UNPRESSED_BACK_COLOR.INDEX(), BACK_COLOR);
+        colorBox.setColor(BUTTON_COLOR_TYPES.UNPRESSED_BACK.INDEX(), BACK_COLOR);
         setupMargins();
         setupDimensions();
     }
@@ -52,17 +52,17 @@ public class DotMatrixDisplayUpdater {
         final String UNPRESSED_BACK_COLOR = "808080";
         final String PRESSED_BACK_COLOR = "FF9A22";
 
-        colorBox.setColor(BUTTON_COLOR_TYPES.UNPRESSED_BACK_COLOR.INDEX(), UNPRESSED_BACK_COLOR);
-        colorBox.setColor(BUTTON_COLOR_TYPES.PRESSED_BACK_COLOR.INDEX(), PRESSED_BACK_COLOR);
+        colorBox.setColor(BUTTON_COLOR_TYPES.UNPRESSED_BACK.INDEX(), UNPRESSED_BACK_COLOR);
+        colorBox.setColor(BUTTON_COLOR_TYPES.PRESSED_BACK.INDEX(), PRESSED_BACK_COLOR);
         dotMatrixDisplayView.drawBackRect(displayRect);
         dotMatrixDisplayView.setSymbolPos(displayRect.left + margins.left, displayRect.top + margins.top);
 
-        colorBox.setColor(BUTTON_COLOR_TYPES.UNPRESSED_FRONT_COLOR.INDEX(), UNPRESSED_FRONT_COLOR_FOR_BLACKS);
-        colorBox.setColor(BUTTON_COLOR_TYPES.PRESSED_FRONT_COLOR.INDEX(), UNPRESSED_FRONT_COLOR_FOR_BLACKS);
+        colorBox.setColor(BUTTON_COLOR_TYPES.UNPRESSED_FRONT.INDEX(), UNPRESSED_FRONT_COLOR_FOR_BLACKS);
+        colorBox.setColor(BUTTON_COLOR_TYPES.PRESSED_FRONT.INDEX(), UNPRESSED_FRONT_COLOR_FOR_BLACKS);
         String text = String.valueOf(propRecord.getScoreBlacks()) + " ";
         dotMatrixDisplayView.drawFrontText(text, null, defaultFont);
 
-        colorBox.setColor(BUTTON_COLOR_TYPES.UNPRESSED_FRONT_COLOR.INDEX(), UNPRESSED_FRONT_COLOR_FOR_WHITES);
+        colorBox.setColor(BUTTON_COLOR_TYPES.UNPRESSED_FRONT.INDEX(), UNPRESSED_FRONT_COLOR_FOR_WHITES);
         text = String.valueOf(propRecord.getScoreWhites());
         dotMatrixDisplayView.drawFrontText(text, null, defaultFont);
 
