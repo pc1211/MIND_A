@@ -17,7 +17,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginLeft="8dp"
-            android:text="Who guesses ? " />
+            android:text="Who guesses ? "
+            android:textColor="#C0C0C0" />
 
         <RadioButton
             android:id="@+id/RADIO_GUESS_USER"
@@ -123,24 +124,44 @@
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="24dp"
-        android:layout_marginLeft="8dp"
-        android:layout_marginTop="8dp"
+        android:layout_height="38dp"
+        android:layout_marginTop="16dp"
         android:orientation="horizontal">
 
-        <TextView
-            android:id="@+id/TXT_CURRENT_PROP"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
-            android:text="Current proposal:" />
+        <com.example.pgyl.pekislib_a.ImageButtonView
+            android:id="@+id/BTN_CLEAR"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_marginLeft="4dp"
+            android:layout_weight="1" />
+
+        <com.example.pgyl.pekislib_a.ImageButtonView
+            android:id="@+id/BTN_CHEAT"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_marginLeft="4dp"
+            android:layout_weight="1" />
+
+        <com.example.pgyl.pekislib_a.ImageButtonView
+            android:id="@+id/BTN_DELETE_LAST"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_marginLeft="4dp"
+            android:layout_weight="1" />
+
+        <com.example.pgyl.pekislib_a.ImageButtonView
+            android:id="@+id/BTN_NEW_GAME"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_marginLeft="4dp"
+            android:layout_weight="1" />
 
     </LinearLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="38dp"
-        android:layout_marginTop="4dp"
+        android:layout_marginTop="16dp"
         android:background="@drawable/border"
         android:orientation="horizontal">
 
@@ -233,45 +254,8 @@
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="38dp"
-        android:layout_marginTop="16dp"
-        android:layout_marginBottom="6dp"
-        android:orientation="horizontal">
-
-        <com.example.pgyl.pekislib_a.ImageButtonView
-            android:id="@+id/BTN_CLEAR"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_marginLeft="4dp"
-            android:layout_weight="1" />
-
-        <com.example.pgyl.pekislib_a.ImageButtonView
-            android:id="@+id/BTN_CHEAT"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_marginLeft="4dp"
-            android:layout_weight="1" />
-
-        <com.example.pgyl.pekislib_a.ImageButtonView
-            android:id="@+id/BTN_DELETE_LAST"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_marginLeft="4dp"
-            android:layout_weight="1" />
-
-        <com.example.pgyl.pekislib_a.ImageButtonView
-            android:id="@+id/BTN_NEW_GAME"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_marginLeft="4dp"
-            android:layout_weight="1" />
-
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
+        android:layout_marginTop="16dp"
         android:orientation="horizontal">
 
         <ListView

@@ -17,7 +17,6 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.ListView;
 import android.widget.RadioButton;
-import android.widget.TextView;
 
 import com.example.pgyl.pekislib_a.ColorBox;
 import com.example.pgyl.pekislib_a.ColorPickerActivity;
@@ -197,8 +196,7 @@ public class MainActivity extends Activity {
 
         setContentView(R.layout.main);   //  Normalement dans onCreate() mais problèmes de stabilité des drawables des customImageButtons quand leur nombre varie (selon pegs, colors)
         setupCommandButtons();
-        setupGuessModeRadioButtons();
-        setupTextViews();    //  Ces setup... ont été déplacés du onCreate au onResume pour éviter crash intermittent
+        setupGuessModeRadioButtons();   //  Ces setup... ont été déplacés du onCreate au onResume pour éviter crash intermittent
 
         shpFileName = getPackageName() + "." + getClass().getSimpleName() + SHP_FILE_NAME_SUFFIX;
         keepScreen = getSHPKeepScreen();
@@ -768,15 +766,6 @@ public class MainActivity extends Activity {
 
         SharedPreferences shp = getSharedPreferences(shpFileName, MODE_PRIVATE);
         return shp.getInt(MIND_SHP_KEY_NAMES.INPUT_PARAMS_INDEX.toString(), INPUT_PARAMS_INDEX_DEFAULT_VALUE);
-    }
-
-    private void setupTextViews() {
-        final String TXT_COLOR = "C0C0C0";
-
-        TextView tg = findViewById(R.id.TXT_GUESS);
-        TextView tcp = findViewById(R.id.TXT_CURRENT_PROP);
-        tg.setTextColor(Color.parseColor(COLOR_PREFIX + TXT_COLOR));
-        tcp.setTextColor(Color.parseColor(COLOR_PREFIX + TXT_COLOR));
     }
 
     private void setupGuessModeRadioButtons() {
