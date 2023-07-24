@@ -141,7 +141,7 @@ public class MainPropListItemAdapter extends BaseAdapter {
                 viewHolder.buttonColors[i].setPNGImageResource(R.drawable.disk);
                 viewHolder.buttonColors[i].setMinClickTimeInterval(BUTTON_MIN_CLICK_TIME_INTERVAL_MS);
                 final int pegIndex = i;
-                viewHolder.buttonColors[i].setCustomOnClickListener(new ImageButtonView.onCustomClickListener() {
+                viewHolder.buttonColors[i].setOnCustomClickListener(new ImageButtonView.onCustomClickListener() {
                     @Override
                     public void onCustomClick() {
                         onButtonClick(position, pegIndex);

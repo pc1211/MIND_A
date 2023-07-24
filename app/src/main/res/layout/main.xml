@@ -241,7 +241,7 @@
             android:layout_weight="1"
             android:orientation="horizontal">
 
-            <com.example.pgyl.pekislib_a.ImageButtonView
+            <com.example.pgyl.pekislib_a.DotMatrixDisplayView
                 android:id="@+id/BTN_SCORE"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"

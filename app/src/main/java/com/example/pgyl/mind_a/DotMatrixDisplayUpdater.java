@@ -46,7 +46,7 @@ public class DotMatrixDisplayUpdater {
         defaultFont = null;
     }
 
-    public void displayScore(PropRecord propRecord) {
+    public void displayScore(PropRecord propRecord) {   //  Si propRecord null => Afficher "? ?"
         final String UNPRESSED_FRONT_COLOR_FOR_BLACKS = "000000";
         final String UNPRESSED_FRONT_COLOR_FOR_WHITES = "FFFFFF";
         final String UNPRESSED_BACK_COLOR = "808080";
@@ -59,11 +59,11 @@ public class DotMatrixDisplayUpdater {
 
         colorBox.setColor(BUTTON_COLOR_TYPES.UNPRESSED_FRONT.INDEX(), UNPRESSED_FRONT_COLOR_FOR_BLACKS);
         colorBox.setColor(BUTTON_COLOR_TYPES.PRESSED_FRONT.INDEX(), UNPRESSED_FRONT_COLOR_FOR_BLACKS);
-        String text = String.valueOf(propRecord.getScoreBlacks()) + " ";
+        String text = (propRecord != null ? String.valueOf(propRecord.getScoreBlacks()) : "?") + " ";
         dotMatrixDisplayView.drawFrontText(text, null, defaultFont);
 
         colorBox.setColor(BUTTON_COLOR_TYPES.UNPRESSED_FRONT.INDEX(), UNPRESSED_FRONT_COLOR_FOR_WHITES);
-        text = String.valueOf(propRecord.getScoreWhites());
+        text = propRecord != null ? String.valueOf(propRecord.getScoreWhites()) : "?";
         dotMatrixDisplayView.drawFrontText(text, null, defaultFont);
 
         dotMatrixDisplayView.updateDisplay();
