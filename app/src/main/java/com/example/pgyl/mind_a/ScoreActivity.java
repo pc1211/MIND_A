@@ -2,6 +2,7 @@ package com.example.pgyl.mind_a;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.Bundle;
@@ -23,19 +24,17 @@ import java.util.logging.Logger;
 
 import static com.example.pgyl.mind_a.Constants.MAX_PEGS;
 import static com.example.pgyl.mind_a.Constants.MIND_ACTIVITIES;
+import static com.example.pgyl.mind_a.MainActivity.MIND_SHP_KEY_NAMES;
 import static com.example.pgyl.mind_a.MainActivity.pegs;
-import static com.example.pgyl.mind_a.StringDBTables.getInputParamsScoreIndex;
-import static com.example.pgyl.mind_a.StringDBTables.getInputParamsTableName;
-import static com.example.pgyl.pekislib_a.Constants.ACTIVITY_EXTRA_KEYS;
 import static com.example.pgyl.pekislib_a.Constants.COLOR_PREFIX;
+import static com.example.pgyl.pekislib_a.Constants.PEKISLIB_ACTIVITY_EXTRA_KEYS;
+import static com.example.pgyl.pekislib_a.Constants.SHP_FILE_NAME_SUFFIX;
 import static com.example.pgyl.pekislib_a.Constants.UNDEFINED;
 import static com.example.pgyl.pekislib_a.HelpActivity.HELP_ACTIVITY_EXTRA_KEYS;
 import static com.example.pgyl.pekislib_a.HelpActivity.HELP_ACTIVITY_TITLE;
 import static com.example.pgyl.pekislib_a.R.menu.menu_help_only;
 import static com.example.pgyl.pekislib_a.StringDBTables.ACTIVITY_START_STATUS;
-import static com.example.pgyl.pekislib_a.StringDBUtils.getCurrentFromActivity;
 import static com.example.pgyl.pekislib_a.StringDBUtils.isColdStartStatusOfActivity;
-import static com.example.pgyl.pekislib_a.StringDBUtils.setCurrentForActivity;
 import static com.example.pgyl.pekislib_a.StringDBUtils.setStartStatusOfActivity;
 
 public class ScoreActivity extends Activity {
@@ -69,6 +68,7 @@ public class ScoreActivity extends Activity {
     private TextView lblDisplay;
     private boolean onStartUp;
     private StringDB stringDB;
+    private String shpFileName;
     //endregion
 
     @Override
@@ -89,7 +89,6 @@ public class ScoreActivity extends Activity {
         super.onPause();
 
         savePreferences();
-        setCurrentForActivity(stringDB, MIND_ACTIVITIES.SCORE.toString(), getInputParamsTableName(), getInputParamsScoreIndex(), String.valueOf(10 * blacks + whites));
         stringDB.close();
         stringDB = null;
     }
@@ -100,7 +99,9 @@ public class ScoreActivity extends Activity {
 
         onStartUp = true;
         setupStringDB();
-        int score = Integer.parseInt(getCurrentFromActivity(stringDB, MIND_ACTIVITIES.SCORE.toString(), getInputParamsTableName(), getInputParamsScoreIndex()));
+
+        shpFileName = getPackageName() + "." + SHP_FILE_NAME_SUFFIX;   //  getClass().getSimpleName() non inclus car fichier partagé avec MainActivity
+        int score = Integer.parseInt(getSHPScore());
         if (score == UNDEFINED) {
             score = 0;
         }
@@ -168,7 +169,7 @@ public class ScoreActivity extends Activity {
     }
 
     private void updateDisplayText() {
-        lblDisplay.setText(blacks + " black" + (blacks > 1 ? "s" : "") + " and " + whites + " white" + (whites > 1 ? "s" : ""));
+        lblDisplay.setText(blacks + " black" + (blacks == 1 ? "" : "s") + " and " + whites + " white" + (whites == 1 ? "" : "s"));
     }
 
     private void updateDisplayRadioButtons() {
@@ -177,6 +178,17 @@ public class ScoreActivity extends Activity {
     }
 
     private void savePreferences() {
+        SharedPreferences shp = getSharedPreferences(shpFileName, MODE_PRIVATE);
+        SharedPreferences.Editor shpEditor = shp.edit();
+        shpEditor.putString(MIND_SHP_KEY_NAMES.SCORE.toString(), String.valueOf(10 * blacks + whites));   // Le score est sauvé et sera repris par MainActivity
+        shpEditor.commit();
+    }
+
+    private String getSHPScore() {
+        final String SCORE_DEFAULT_VALUE = "0";
+
+        SharedPreferences shp = getSharedPreferences(shpFileName, MODE_PRIVATE);
+        return shp.getString(MIND_SHP_KEY_NAMES.SCORE.toString(), SCORE_DEFAULT_VALUE);
     }
 
     private void setupCommandButtons() {
@@ -186,7 +198,7 @@ public class ScoreActivity extends Activity {
         Class rid = R.id.class;
         for (COMMANDS command : COMMANDS.values()) {
             try {
-                buttons[command.INDEX()] = findViewById(rid.getField(BUTTON_XML_PREFIX + command.toString()).getInt(rid));   //  1, 2, 3 ... dans le XML
+                buttons[command.INDEX()] = findViewById(rid.getField(BUTTON_XML_PREFIX + command.toString()).getInt(rid));
                 buttons[command.INDEX()].setText(command.TEXT());
                 final COMMANDS fcommand = command;
                 buttons[command.INDEX()].setOnClickListener(new Button.OnClickListener() {
@@ -275,7 +287,7 @@ public class ScoreActivity extends Activity {
 
     private void launchHelpActivity() {
         Intent callingIntent = new Intent(this, HelpActivity.class);
-        callingIntent.putExtra(ACTIVITY_EXTRA_KEYS.TITLE.toString(), HELP_ACTIVITY_TITLE);
+        callingIntent.putExtra(PEKISLIB_ACTIVITY_EXTRA_KEYS.TITLE.toString(), HELP_ACTIVITY_TITLE);
         callingIntent.putExtra(HELP_ACTIVITY_EXTRA_KEYS.HTML_ID.toString(), R.raw.helpscoreactivity);
         startActivity(callingIntent);
     }

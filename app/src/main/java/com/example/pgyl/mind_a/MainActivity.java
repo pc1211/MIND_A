@@ -34,20 +34,19 @@ import static com.example.pgyl.mind_a.Constants.MAX_PEGS;
 import static com.example.pgyl.mind_a.Constants.MIND_ACTIVITIES;
 import static com.example.pgyl.mind_a.Constants.MIND_ACTIVITIES_REQUEST_CODE_MULTIPLIER;
 import static com.example.pgyl.mind_a.StringDBTables.DATA_VERSION;
-import static com.example.pgyl.mind_a.StringDBTables.getInputParamsColorsIndex;
-import static com.example.pgyl.mind_a.StringDBTables.getInputParamsPegsIndex;
-import static com.example.pgyl.mind_a.StringDBTables.getInputParamsScoreIndex;
-import static com.example.pgyl.mind_a.StringDBTables.getInputParamsTableName;
 import static com.example.pgyl.mind_a.StringDBTables.getPaletteColorsAtIndex;
 import static com.example.pgyl.mind_a.StringDBTables.getPaletteColorsTableName;
+import static com.example.pgyl.mind_a.StringDBTables.getPegsColorNumbersTableName;
+import static com.example.pgyl.mind_a.StringDBTables.getPegsColorsNumbersColorsIndex;
+import static com.example.pgyl.mind_a.StringDBTables.getPegsColorsNumbersPegsIndex;
 import static com.example.pgyl.mind_a.StringDBTables.getPropsTableName;
 import static com.example.pgyl.mind_a.StringDBUtils.createMindTableIfNotExists;
 import static com.example.pgyl.mind_a.StringDBUtils.initializeTableInputParams;
 import static com.example.pgyl.mind_a.StringDBUtils.initializeTablePaletteColors;
 import static com.example.pgyl.pekislib_a.ColorUtils.BUTTON_COLOR_TYPES;
-import static com.example.pgyl.pekislib_a.Constants.ACTIVITY_EXTRA_KEYS;
 import static com.example.pgyl.pekislib_a.Constants.COLOR_PREFIX;
 import static com.example.pgyl.pekislib_a.Constants.PEKISLIB_ACTIVITIES;
+import static com.example.pgyl.pekislib_a.Constants.PEKISLIB_ACTIVITY_EXTRA_KEYS;
 import static com.example.pgyl.pekislib_a.Constants.SHP_FILE_NAME_SUFFIX;
 import static com.example.pgyl.pekislib_a.Constants.UNDEFINED;
 import static com.example.pgyl.pekislib_a.HelpActivity.HELP_ACTIVITY_EXTRA_KEYS;
@@ -69,6 +68,8 @@ import static com.example.pgyl.pekislib_a.StringDBUtils.setCurrent;
 import static com.example.pgyl.pekislib_a.StringDBUtils.setCurrentForActivity;
 import static com.example.pgyl.pekislib_a.StringDBUtils.setCurrentsForActivity;
 import static com.example.pgyl.pekislib_a.StringDBUtils.setStartStatusOfActivity;
+
+;
 
 //  MainActivity fait appel à PropRecordShandler pour la gestion des PropRecord (création, suppression, tri, ...)
 //  MainPropListUpdater maintient la liste de MainActivity (rafraîchissement, scrollbar, ...), fait appel à MainPropListAdapter (pour gérer chaque item) et également à PropRecordShandler (pour leur mise à jour)
@@ -125,14 +126,22 @@ public class MainActivity extends Activity {
 
     private enum COLOR_MODES {NORMAL, INVERSE}
 
-    public enum MIND_SHP_KEY_NAMES {KEEP_SCREEN, GUESS_MODE, INPUT_PARAMS_INDEX}
+    private enum EDIT_MODES {
+        PEGS, COLORS, SCORE, PALETTE;
+
+        public int INDEX() {
+            return ordinal();
+        }
+    }
+
+    public enum MIND_SHP_KEY_NAMES {KEEP_SCREEN, GUESS_MODE, EDIT_MODE, SCORE}
 
     public final int DISK_PNG_ID = R.drawable.disk;
     //endregion
 
     //region Variables
-    private String[] inputParams;
-    private int inputParamsIndex;
+    private String[] pegsColorsNumbers;
+    private EDIT_MODES editMode;
     private String[] paletteColors;
     private ImageButtonView[] commandButtons;
     private ImageButtonView[] paletteButtons;
@@ -174,7 +183,7 @@ public class MainActivity extends Activity {
     protected void onPause() {
         super.onPause();
 
-        setCurrentsForActivity(stringDB, MIND_ACTIVITIES.MAIN.toString(), getInputParamsTableName(), inputParams);
+        setCurrentsForActivity(stringDB, MIND_ACTIVITIES.MAIN.toString(), getPegsColorNumbersTableName(), pegsColorsNumbers);
         setCurrentsForActivity(stringDB, MIND_ACTIVITIES.MAIN.toString(), getPaletteColorsTableName(), paletteColors);
         candRecordsHandler.close();
         candRecordsHandler = null;
@@ -186,7 +195,7 @@ public class MainActivity extends Activity {
         propRecordsHandler = null;
         stringDB.close();
         stringDB = null;
-        inputParams = null;
+        pegsColorsNumbers = null;
         paletteColors = null;
         menu = null;
         savePreferences();
@@ -197,31 +206,32 @@ public class MainActivity extends Activity {
     protected void onResume() {
         super.onResume();
 
-        setContentView(R.layout.main);   //  Normalement dans onCreate() mais problèmes de stabilité des drawables des customImageButtons quand leur nombre varie (selon pegs, colors)
+        setContentView(R.layout.main);
         setupCommandButtons();
         setupGuessModeRadioButtons();   //  Ces setup... ont été déplacés du onCreate au onResume pour éviter crash intermittent
+        setupStringDB();
 
-        shpFileName = getPackageName() + "." + getClass().getSimpleName() + SHP_FILE_NAME_SUFFIX;
+        shpFileName = getPackageName() + "." + SHP_FILE_NAME_SUFFIX;   //  getClass().getSimpleName() non inclus car fichier partagé avec ScoreActivity
         keepScreen = getSHPKeepScreen();
         guessMode = getSHPGuessMode();
-        inputParamsIndex = getSHPInputParamsIndex();
+        editMode = getSHPEditMode();
         colorObject = COLOR_OBJECTS.NONE;
-        setupStringDB();
-        inputParams = getCurrentsFromActivity(stringDB, MIND_ACTIVITIES.MAIN.toString(), getInputParamsTableName());
+        pegsColorsNumbers = getCurrentsFromActivity(stringDB, MIND_ACTIVITIES.MAIN.toString(), getPegsColorNumbersTableName());
         paletteColors = getCurrentsFromActivity(stringDB, MIND_ACTIVITIES.MAIN.toString(), getPaletteColorsTableName());
-        pegs = Integer.parseInt(inputParams[getInputParamsPegsIndex()]);
-        colors = Integer.parseInt(inputParams[getInputParamsColorsIndex()]);
+        pegs = Integer.parseInt(pegsColorsNumbers[getPegsColorsNumbersPegsIndex()]);
+        colors = Integer.parseInt(pegsColorsNumbers[getPegsColorsNumbersColorsIndex()]);
         setupPropRecords();   //  Charger à partir de la DB
         setupCandRecords();
 
         String newParamValue = null;
         if (validReturnFromCalledActivity) {
             validReturnFromCalledActivity = false;
-            if (calledActivityName.equals(PEKISLIB_ACTIVITIES.INPUT_BUTTONS.toString())) {   //  Pour Entrée de pegs ou colors
-                newParamValue = getCurrentFromActivity(stringDB, PEKISLIB_ACTIVITIES.INPUT_BUTTONS.toString(), getInputParamsTableName(), inputParamsIndex);
+            if (calledActivityName.equals(PEKISLIB_ACTIVITIES.INPUT_BUTTONS.toString())) {   //  Pour Entrée du nombre de pegs ou de couleurs
+                int fieldIndex = editMode.equals(EDIT_MODES.PEGS) ? getPegsColorsNumbersPegsIndex() : getPegsColorsNumbersColorsIndex();
+                newParamValue = getCurrentFromActivity(stringDB, PEKISLIB_ACTIVITIES.INPUT_BUTTONS.toString(), getPegsColorNumbersTableName(), fieldIndex);
             }
             if (calledActivityName.equals(MIND_ACTIVITIES.SCORE.toString())) {   //  Pour Entrée du score si Android Guess
-                newParamValue = getCurrentFromActivity(stringDB, MIND_ACTIVITIES.SCORE.toString(), getInputParamsTableName(), inputParamsIndex);
+                newParamValue = getSHPScore();   //  ScoreActivity a mis le score dans le fichier SHP
             }
             if (calledActivityName.equals(PEKISLIB_ACTIVITIES.COLOR_PICKER.toString())) {   //  Pour Edition de la palette de couleurs
                 paletteColors = getCurrentsFromActivity(stringDB, PEKISLIB_ACTIVITIES.COLOR_PICKER.toString(), getPaletteColorsTableName());
@@ -265,18 +275,18 @@ public class MainActivity extends Activity {
 
     private void handleActivityReturn(String sValue) {
         if (sValue != null) {
-            int value = Integer.parseInt(sValue);
-            if (inputParamsIndex == getInputParamsPegsIndex()) {
-                inputParams[inputParamsIndex] = sValue;
+            int value = Integer.parseInt(sValue);   //  Nombre de pegs, nombre de couleurs ou score
+            if (editMode.equals(EDIT_MODES.PEGS)) {
+                pegsColorsNumbers[getPegsColorsNumbersPegsIndex()] = sValue;
                 pegs = value;
                 resetPropsAndCands();
             }
-            if (inputParamsIndex == getInputParamsColorsIndex()) {
-                inputParams[inputParamsIndex] = sValue;
+            if (editMode.equals(EDIT_MODES.COLORS)) {
+                pegsColorsNumbers[getPegsColorsNumbersColorsIndex()] = sValue;
                 colors = value;
                 resetPropsAndCands();
             }
-            if (inputParamsIndex == getInputParamsScoreIndex()) {
+            if (editMode.equals(EDIT_MODES.SCORE)) {
                 int score = value;
                 int blacks = score / 10;   //  Noirs
                 int whites = score % 10;   //  Blancs
@@ -298,7 +308,7 @@ public class MainActivity extends Activity {
                     }
                     ;
                 } else {   //  Bad guy
-                    msgBox("Invalid score: " + blacks + " black" + (blacks > 1 ? "s" : "") + " and " + whites + " white" + (whites > 1 ? "s" : ""), this);
+                    msgBox("Invalid score: " + blacks + " black" + (blacks == 1 ? "" : "s") + " and " + whites + " white" + (whites == 1 ? "" : "s"), this);
                 }
             }
         }
@@ -323,16 +333,17 @@ public class MainActivity extends Activity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == R.id.MENU_ITEM_PEGS) {
-            inputParamsIndex = getInputParamsPegsIndex();
-            launchInputButtonsActivity(inputParamsIndex);
+            editMode = EDIT_MODES.PEGS;
+            launchInputButtonsActivity();
             return true;
         }
         if (item.getItemId() == R.id.MENU_ITEM_COLORS) {
-            inputParamsIndex = getInputParamsColorsIndex();
-            launchInputButtonsActivity(inputParamsIndex);
+            editMode = EDIT_MODES.COLORS;
+            launchInputButtonsActivity();
             return true;
         }
         if (item.getItemId() == R.id.MENU_ITEM_EDIT_PALETTE) {
+            editMode = EDIT_MODES.PALETTE;
             launchColorPickerActivity();
             return true;
         }
@@ -376,13 +387,13 @@ public class MainActivity extends Activity {
 
     private void onPaletteButtonClick(int pegIndex) {
         if (guessMode.equals(GUESS_MODES.USER)) {
-            selectColor(COLOR_OBJECTS.PALETTE, pegIndex, UNDEFINED);
+            selectColorObject(COLOR_OBJECTS.PALETTE, pegIndex, UNDEFINED);
         }
     }
 
     private void onCurrentPropPegButtonClick(int pegIndex) {
         if (guessMode.equals(GUESS_MODES.USER)) {
-            selectColor(COLOR_OBJECTS.CURRENT_PROP, pegIndex, UNDEFINED);
+            selectColorObject(COLOR_OBJECTS.CURRENT_PROP, pegIndex, UNDEFINED);
         }
     }
 
@@ -415,8 +426,8 @@ public class MainActivity extends Activity {
     private void onScoreButtonClick() {
         if (currentPropRecord.hasValidComb()) {   //  Valide si aucune couleur UNDEFINED
             if (guessMode.equals(GUESS_MODES.ANDROID)) {
-                inputParamsIndex = getInputParamsScoreIndex();
-                launchScoreActivity(inputParamsIndex);
+                editMode = EDIT_MODES.SCORE;
+                launchScoreActivity();
             } else {   //  User
                 PropRecord newPropRecord = propRecordsHandler.createPropRecordWithNewId();
                 propRecordsHandler.addPropRecord(newPropRecord);
@@ -458,7 +469,7 @@ public class MainActivity extends Activity {
 
     private void onItemPropClick(int position, int pegIndex) {
         if (guessMode.equals(GUESS_MODES.USER)) {
-            selectColor(COLOR_OBJECTS.ITEM_PROP, pegIndex, position);
+            selectColorObject(COLOR_OBJECTS.ITEM_PROP, pegIndex, position);
         }
     }
 
@@ -595,9 +606,9 @@ public class MainActivity extends Activity {
             propRecordsHandler.clearPropRecords();
             propRecordsHandler = null;
             msgBox("Out of Memory Error. Now Trying to go back to saved state", this);
-            inputParams = getCurrentsFromActivity(stringDB, MIND_ACTIVITIES.MAIN.toString(), getInputParamsTableName());   //  Restaurer les anciennes valeurs de pegs et colors
-            pegs = Integer.parseInt(inputParams[getInputParamsPegsIndex()]);
-            colors = Integer.parseInt(inputParams[getInputParamsColorsIndex()]);
+            pegsColorsNumbers = getCurrentsFromActivity(stringDB, MIND_ACTIVITIES.MAIN.toString(), getPegsColorNumbersTableName());   //  Restaurer les anciennes valeurs de pegs et colors
+            pegs = Integer.parseInt(pegsColorsNumbers[getPegsColorsNumbersPegsIndex()]);
+            colors = Integer.parseInt(pegsColorsNumbers[getPegsColorsNumbersColorsIndex()]);
             setupPropRecords();   //  Restaurer à partir de la DB
             setupCandRecords();   //  Reconstruire les candidats
         }
@@ -637,7 +648,7 @@ public class MainActivity extends Activity {
         dialog.show();
     }
 
-    private void selectColor(COLOR_OBJECTS newColorObject, int newColorObjectPegIndex, int newColorObjectListPosition) {
+    private void selectColorObject(COLOR_OBJECTS newColorObject, int newColorObjectPegIndex, int newColorObjectListPosition) {
         COLOR_OBJECTS oldColorObject = colorObject;
         int oldColorObjectPegIndex = colorObjectPegIndex;
         int oldColorObjectListPosition = colorObjectListPosition;
@@ -745,7 +756,8 @@ public class MainActivity extends Activity {
         SharedPreferences.Editor shpEditor = shp.edit();
         shpEditor.putBoolean(MIND_SHP_KEY_NAMES.KEEP_SCREEN.toString(), keepScreen);
         shpEditor.putString(MIND_SHP_KEY_NAMES.GUESS_MODE.toString(), guessMode.toString());
-        shpEditor.putInt(MIND_SHP_KEY_NAMES.INPUT_PARAMS_INDEX.toString(), inputParamsIndex);
+        shpEditor.putString(MIND_SHP_KEY_NAMES.EDIT_MODE.toString(), editMode.toString());
+        shpEditor.putString(MIND_SHP_KEY_NAMES.SCORE.toString(), "0");    //  Par défaut toujours 0, cad 0 Blacks - 0 Whites, pour ScoreActivity
         shpEditor.commit();
     }
 
@@ -763,11 +775,18 @@ public class MainActivity extends Activity {
         return GUESS_MODES.valueOf(shp.getString(MIND_SHP_KEY_NAMES.GUESS_MODE.toString(), GUESS_MODE_DEFAULT_VALUE));
     }
 
-    private int getSHPInputParamsIndex() {
-        final int INPUT_PARAMS_INDEX_DEFAULT_VALUE = 0;
+    private EDIT_MODES getSHPEditMode() {
+        final String EDIT_MODE_DEFAULT_VALUE = EDIT_MODES.PEGS.toString();
 
         SharedPreferences shp = getSharedPreferences(shpFileName, MODE_PRIVATE);
-        return shp.getInt(MIND_SHP_KEY_NAMES.INPUT_PARAMS_INDEX.toString(), INPUT_PARAMS_INDEX_DEFAULT_VALUE);
+        return EDIT_MODES.valueOf(shp.getString(MIND_SHP_KEY_NAMES.EDIT_MODE.toString(), EDIT_MODE_DEFAULT_VALUE));
+    }
+
+    private String getSHPScore() {
+        final String SCORE_DEFAULT_VALUE = "0";
+
+        SharedPreferences shp = getSharedPreferences(shpFileName, MODE_PRIVATE);
+        return shp.getString(MIND_SHP_KEY_NAMES.SCORE.toString(), SCORE_DEFAULT_VALUE);
     }
 
     private void setupGuessModeRadioButtons() {
@@ -918,7 +937,7 @@ public class MainActivity extends Activity {
             stringDB.deleteTableIfExists(getAppInfosTableName());
             stringDB.deleteTableIfExists(getActivityInfosTableName());
             stringDB.deleteTableIfExists(getPropsTableName());
-            stringDB.deleteTableIfExists(getInputParamsTableName());
+            stringDB.deleteTableIfExists(getPegsColorNumbersTableName());
             stringDB.deleteTableIfExists(getPaletteColorsTableName());
             msgBox("All Data Deleted (Invalid)", this);
         }
@@ -933,11 +952,11 @@ public class MainActivity extends Activity {
         if (!stringDB.tableExists(getPropsTableName())) {
             createMindTableIfNotExists(stringDB, getPropsTableName());
         }
-        if (!stringDB.tableExists(getInputParamsTableName())) {
-            createMindTableIfNotExists(stringDB, getInputParamsTableName());
+        if (!stringDB.tableExists(getPegsColorNumbersTableName())) {
+            createMindTableIfNotExists(stringDB, getPegsColorNumbersTableName());
             initializeTableInputParams(stringDB);
-            String[] defaults = getDefaults(stringDB, getInputParamsTableName());
-            setCurrentsForActivity(stringDB, MIND_ACTIVITIES.MAIN.toString(), getInputParamsTableName(), defaults);
+            String[] defaults = getDefaults(stringDB, getPegsColorNumbersTableName());
+            setCurrentsForActivity(stringDB, MIND_ACTIVITIES.MAIN.toString(), getPegsColorNumbersTableName(), defaults);
         }
         if (!stringDB.tableExists(getPaletteColorsTableName())) {
             createMindTableIfNotExists(stringDB, getPaletteColorsTableName());
@@ -975,19 +994,18 @@ public class MainActivity extends Activity {
         }
     }
 
-    private void launchInputButtonsActivity(int inputParamsColumnIndex) {   //  Pour pegs, colors ou score
-        setCurrentForActivity(stringDB, PEKISLIB_ACTIVITIES.INPUT_BUTTONS.toString(), getInputParamsTableName(), inputParamsColumnIndex, inputParams[inputParamsColumnIndex]);
+    private void launchInputButtonsActivity() {   //  Pour pegs, colors ou score
+        int fieldIndex = editMode.equals(EDIT_MODES.PEGS) ? getPegsColorsNumbersPegsIndex() : getPegsColorsNumbersColorsIndex();
+        setCurrentForActivity(stringDB, PEKISLIB_ACTIVITIES.INPUT_BUTTONS.toString(), getPegsColorNumbersTableName(), fieldIndex, pegsColorsNumbers[fieldIndex]);
         setStartStatusOfActivity(stringDB, PEKISLIB_ACTIVITIES.INPUT_BUTTONS.toString(), ACTIVITY_START_STATUS.COLD);
         Intent callingIntent = new Intent(this, InputButtonsActivity.class);
-        callingIntent.putExtra(TABLE_EXTRA_KEYS.TABLE.toString(), getInputParamsTableName());
-        callingIntent.putExtra(TABLE_EXTRA_KEYS.INDEX.toString(), inputParamsColumnIndex);
-        callingIntent.putExtra(ACTIVITY_EXTRA_KEYS.TITLE.toString(), getLabels(stringDB, getInputParamsTableName())[inputParamsColumnIndex]);
+        callingIntent.putExtra(TABLE_EXTRA_KEYS.TABLE.toString(), getPegsColorNumbersTableName());
+        callingIntent.putExtra(TABLE_EXTRA_KEYS.INDEX.toString(), fieldIndex);
+        callingIntent.putExtra(PEKISLIB_ACTIVITY_EXTRA_KEYS.TITLE.toString(), getLabels(stringDB, getPegsColorNumbersTableName())[fieldIndex]);
         startActivityForResult(callingIntent, PEKISLIB_ACTIVITIES.INPUT_BUTTONS.INDEX());
     }
 
-    private void launchScoreActivity(int inputParamsColumnIndex) {
-        inputParams[inputParamsIndex] = "0";    //  Par défaut toujours 0, cad 0 Blacks - 0 Whites
-        setCurrentForActivity(stringDB, MIND_ACTIVITIES.SCORE.toString(), getInputParamsTableName(), inputParamsColumnIndex, inputParams[inputParamsColumnIndex]);
+    private void launchScoreActivity() {
         setStartStatusOfActivity(stringDB, MIND_ACTIVITIES.SCORE.toString(), ACTIVITY_START_STATUS.COLD);
         Intent callingIntent = new Intent(this, ScoreActivity.class);
         startActivityForResult(callingIntent, MIND_ACTIVITIES_REQUEST_CODE_MULTIPLIER * MIND_ACTIVITIES.SCORE.INDEX());
@@ -1003,7 +1021,7 @@ public class MainActivity extends Activity {
 
     private void launchHelpActivity() {
         Intent callingIntent = new Intent(this, HelpActivity.class);
-        callingIntent.putExtra(ACTIVITY_EXTRA_KEYS.TITLE.toString(), HELP_ACTIVITY_TITLE);
+        callingIntent.putExtra(PEKISLIB_ACTIVITY_EXTRA_KEYS.TITLE.toString(), HELP_ACTIVITY_TITLE);
         callingIntent.putExtra(HELP_ACTIVITY_EXTRA_KEYS.HTML_ID.toString(), R.raw.helpmainactivity);
         startActivity(callingIntent);
     }

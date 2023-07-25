@@ -168,7 +168,7 @@
         <LinearLayout
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_weight="5"
+            android:layout_weight="475"
             android:orientation="horizontal">
 
             <com.example.pgyl.pekislib_a.ImageButtonView
@@ -238,7 +238,7 @@
         <LinearLayout
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_weight="1"
+            android:layout_weight="100"
             android:orientation="horizontal">
 
             <com.example.pgyl.pekislib_a.DotMatrixDisplayView

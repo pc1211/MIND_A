@@ -20,7 +20,7 @@ public class StringDBTables {
     public static final int DATA_VERSION = 3;   //   A augmenter dès que les données éventuelles dans la DB existante ne seront plus comptatibles après changements
 
     enum MIND_TABLES {   // Les tables, rattachées à leurs champs de data
-        PROPS(MindTableDataFields.props.class, ""), PALETTE_COLORS(MindTableDataFields.paletteColors.class, ""), INPUT_PARAMS(MindTableDataFields.inputParams.class, "");   //  Table des propositions (chacune avec ses couleurs et son score)
+        PROPS(MindTableDataFields.props.class, ""), PALETTE_COLORS(MindTableDataFields.paletteColors.class, ""), PEGS_COLORS_NUMBERS(MindTableDataFields.pegsColorsNumbers.class, "");
 
         private int dataFieldsCount;
         private String description;
@@ -71,12 +71,12 @@ public class StringDBTables {
             }
         }
 
-        enum inputParams implements MindTableDataFields {   //  Les champs de data de la table INPUT_PARAMS
-            PEGS("Number of Pegs"), COLORS("Number of Colors"), SCORE("Score");
+        enum pegsColorsNumbers implements MindTableDataFields {   //  Les champs de data de la table INPUT_PARAMS
+            PEGS("Number of Pegs"), COLORS("Number of Colors");
 
             private String valueLabel;
 
-            inputParams(String valueLabel) {
+            pegsColorsNumbers(String valueLabel) {
                 this.valueLabel = valueLabel;
             }
 
@@ -123,34 +123,30 @@ public class StringDBTables {
         return PALETTE_COLORS_INITS;
     }
 
-    //region INPUT_PARAMS
-    public static String getInputParamsTableName() {
-        return MIND_TABLES.INPUT_PARAMS.toString();
+    //region PEGS_COLORS_NUMBERS
+    public static String getPegsColorNumbersTableName() {
+        return MIND_TABLES.PEGS_COLORS_NUMBERS.toString();
     }
 
-    public static String[][] getInputParamsInits() {
-        final String[][] INPUT_PARAMS_INITS = {   //  Pour entrer le nombre de pegs, de couleurs, ou le score d'une proposition d'Android; Le score est entré via ScoreActivity et non InputButtonsActivity
-                {TABLE_IDS.LABEL.toString(), MindTableDataFields.inputParams.PEGS.LABEL(), MindTableDataFields.inputParams.COLORS.LABEL(), null},
-                {TABLE_IDS.KEYBOARD.toString(), InputButtonsActivity.KEYBOARDS.INTEGER.toString(), InputButtonsActivity.KEYBOARDS.INTEGER.toString(), null},
-                {TABLE_IDS.REGEXP.toString(), REGEXP_INTEGER_FROM_0, REGEXP_INTEGER_FROM_0, null},
-                {TABLE_IDS.REGEXP_ERROR_MESSAGE.toString(), REGEXP_INTEGER_FROM_0_ERROR_MESSAGE, REGEXP_INTEGER_FROM_0_ERROR_MESSAGE, null},
-                {TABLE_IDS.MIN.toString(), "1", "1", null},
-                {TABLE_IDS.MAX.toString(), String.valueOf(MAX_PEGS), String.valueOf(MAX_COLORS), null},
-                {TABLE_IDS.DEFAULT.toString(), "4", "6", null}   //  4 pegs, 6 colors, Pas pertinent pour le score
+    public static String[][] getPegsColorsNumbersInits() {
+        final String[][] PEGS_COLORS_NUMBERS_INITS = {   //  Pour entrer le nombre de pegs ou de couleurs d'une proposition d'Android;
+                {TABLE_IDS.LABEL.toString(), MindTableDataFields.pegsColorsNumbers.PEGS.LABEL(), MindTableDataFields.pegsColorsNumbers.COLORS.LABEL()},
+                {TABLE_IDS.KEYBOARD.toString(), InputButtonsActivity.KEYBOARDS.INTEGER.toString(), InputButtonsActivity.KEYBOARDS.INTEGER.toString()},
+                {TABLE_IDS.REGEXP.toString(), REGEXP_INTEGER_FROM_0, REGEXP_INTEGER_FROM_0},
+                {TABLE_IDS.REGEXP_ERROR_MESSAGE.toString(), REGEXP_INTEGER_FROM_0_ERROR_MESSAGE, REGEXP_INTEGER_FROM_0_ERROR_MESSAGE},
+                {TABLE_IDS.MIN.toString(), "1", "1"},
+                {TABLE_IDS.MAX.toString(), String.valueOf(MAX_PEGS), String.valueOf(MAX_COLORS)},
+                {TABLE_IDS.DEFAULT.toString(), "4", "6"}   //  4 pegs, 6 colors
         };
-        return INPUT_PARAMS_INITS;
+        return PEGS_COLORS_NUMBERS_INITS;
     }
 
-    public static int getInputParamsPegsIndex() {
-        return MindTableDataFields.inputParams.PEGS.INDEX();
+    public static int getPegsColorsNumbersPegsIndex() {
+        return MindTableDataFields.pegsColorsNumbers.PEGS.INDEX();
     }
 
-    public static int getInputParamsColorsIndex() {
-        return MindTableDataFields.inputParams.COLORS.INDEX();
-    }
-
-    public static int getInputParamsScoreIndex() {
-        return MindTableDataFields.inputParams.SCORE.INDEX();
+    public static int getPegsColorsNumbersColorsIndex() {
+        return MindTableDataFields.pegsColorsNumbers.COLORS.INDEX();
     }
 
     //region PROPS

@@ -2,11 +2,11 @@ package com.example.pgyl.mind_a;
 
 import com.example.pgyl.pekislib_a.StringDB;
 
-import static com.example.pgyl.mind_a.StringDBTables.getInputParamsInits;
-import static com.example.pgyl.mind_a.StringDBTables.getInputParamsTableName;
 import static com.example.pgyl.mind_a.StringDBTables.getMindTableDataFieldsCount;
 import static com.example.pgyl.mind_a.StringDBTables.getPaletteColorsInits;
 import static com.example.pgyl.mind_a.StringDBTables.getPaletteColorsTableName;
+import static com.example.pgyl.mind_a.StringDBTables.getPegsColorNumbersTableName;
+import static com.example.pgyl.mind_a.StringDBTables.getPegsColorsNumbersInits;
 import static com.example.pgyl.mind_a.StringDBTables.getPropsTableName;
 
 public class StringDBUtils {
@@ -25,7 +25,7 @@ public class StringDBUtils {
 
     //region INPUT_PARAMS
     public static void initializeTableInputParams(StringDB stringDB) {
-        stringDB.insertOrReplaceRows(getInputParamsTableName(), getInputParamsInits());
+        stringDB.insertOrReplaceRows(getPegsColorNumbersTableName(), getPegsColorsNumbersInits());
     }
     //endregion
 
